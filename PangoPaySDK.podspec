@@ -14,6 +14,7 @@ Pod::Spec.new do |s|
         :git => 'https://github.com/PaynoPain/pangopay-objectivec-sdk.git',
 	:tag => '0.1',
     }
+    s.dependency 	= 'NXOAuth2Client'
     s.source_files      = 'Sources/'
     s.requires_arc      = true
 
