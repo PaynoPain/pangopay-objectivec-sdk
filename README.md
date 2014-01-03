@@ -26,31 +26,31 @@ There you can call
 
 <pre>
 
-    [[PangoPayDataCacher sharedInstance] setupWithClientId:@""
-                                                    secret:@""
-                                               environment:[[PNPSandboxEnvironment alloc] init]
-                                                     scope:@[@"basic"]];
+[[PangoPayDataCacher sharedInstance] setupWithClientId:@""
+                                                secret:@""
+                                           environment:[[PNPSandboxEnvironment alloc] init]
+                                                 scope:@[@"basic"]];
     
-    [[PangoPayDataCacher sharedInstance] setupLoginObserversWithSuccessCallback:^{
-        NSLog(@"User logged in.");
-    } andErrorCallback:^(NSError *error) {
-        NSLog(@"Error logging user in %@",error);
-    }];
+[[PangoPayDataCacher sharedInstance] setupLoginObserversWithSuccessCallback:^{
+    NSLog(@"User logged in.");
+} andErrorCallback:^(NSError *error) {
+    NSLog(@"Error logging user in %@",error);
+}];
     
     
-    [[PangoPayDataCacher sharedInstance] addAccesRefreshTokenExpiryObserver:^{
-        NSLog(@"Refresh token expired");
-        //Present login screen.
-    }];
+[[PangoPayDataCacher sharedInstance] addAccesRefreshTokenExpiryObserver:^{
+    NSLog(@"Refresh token expired");
+    //Present login screen.
+}];
     
     
 
     
-    if([[PangoPayDataCacher sharedInstance] isUserLoggedIn]){
-        NSLog(@"User refresh token is saved in keychain");
-    }else{
-        [[PangoPayDataCacher sharedInstance] loginWithUsername:@"demo" andPassword:@"1234"];
-    }
+if([[PangoPayDataCacher sharedInstance] isUserLoggedIn]){
+    NSLog(@"User refresh token is saved in keychain");
+}else{
+    [[PangoPayDataCacher sharedInstance] loginWithUsername:@"demo" andPassword:@"1234"];
+}
 </pre>
 
 
