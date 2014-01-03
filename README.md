@@ -49,7 +49,7 @@ There you can call
     if([[PangoPayDataCacher sharedInstance] isUserLoggedIn]){
         NSLog(@"User refresh token is saved in keychain");
     }else{
-        [[PangoPayDataCacher sharedInstance] loginWithUsername:@"jordi2" andPassword:@"1234"];
+        [[PangoPayDataCacher sharedInstance] loginWithUsername:@"demo" andPassword:@"1234"];
     }
 </pre>
 
