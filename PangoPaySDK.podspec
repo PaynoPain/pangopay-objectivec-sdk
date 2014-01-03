@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
         :git => 'https://github.com/PaynoPain/pangopay-objectivec-sdk.git',
 	:tag => '0.2',
     }
-    s.source_files      = 'Sources/'
+    s.source_files      = 'PangoPaySDK/Sources/'
     s.requires_arc      = true
     s.frameworks 	= 'Security'
 end
