@@ -7,7 +7,7 @@
 //
 
 #import "PPAppDelegate.h"
-#import "PaynoPainDataCacher.h"
+#import "PangoPayDataCacher.h"
 
 @implementation PPAppDelegate
 
@@ -21,32 +21,30 @@
     
     [self.window makeKeyAndVisible];
     
-    [[PaynoPainDataCacher sharedInstance] setupWithClientId:@""
-                                                     secret:@""
-                                                environment:[[PNPSandboxEnvironment alloc] init]
-                                                      scope:@[@"basic"]];
+    [[PangoPayDataCacher sharedInstance] setupWithClientId:@""
+                                                    secret:@""
+                                               environment:[[PNPSandboxEnvironment alloc] init]
+                                                     scope:@[@"basic"]];
     
-    [[PaynoPainDataCacher sharedInstance] setupLoginObserversWithSuccessCallback:^{
+    [[PangoPayDataCacher sharedInstance] setupLoginObserversWithSuccessCallback:^{
         NSLog(@"User logged in.");
-        [self startTests];
-        
     } andErrorCallback:^(NSError *error) {
         NSLog(@"Error logging user in %@",error);
     }];
     
     
-    [[PaynoPainDataCacher sharedInstance] addAccesRefreshTokenExpiryObserver:^{
+    [[PangoPayDataCacher sharedInstance] addAccesRefreshTokenExpiryObserver:^{
         NSLog(@"Refresh token expired");
+        //Present login screen.
     }];
     
     
 
     
-    if([[PaynoPainDataCacher sharedInstance] isUserLoggedIn]){
-        [self startTests];
+    if([[PangoPayDataCacher sharedInstance] isUserLoggedIn]){
         NSLog(@"User refresh token is saved in keychain");
     }else{
-        [[PaynoPainDataCacher sharedInstance] loginWithUsername:@"jordi2" andPassword:@"1234"];
+        [[PangoPayDataCacher sharedInstance] loginWithUsername:@"demo" andPassword:@"1234"];
     }
     
     return YES;
@@ -75,7 +73,7 @@
 }
 
 -(void) testUser{
-    [[PaynoPainDataCacher sharedInstance] getUserDataWithSuccessCallback:^(PNPUser *user) {
+    [[PangoPayDataCacher sharedInstance] getUserDataWithSuccessCallback:^(PNPUser *user) {
         NSLog(@"User %@",user);
     } andErrorCallback:^(NSError *error) {
         NSLog(@"Error in user test %@",error);
@@ -86,7 +84,7 @@
 }
 
 -(void) testUserAvatar{
-    [[PaynoPainDataCacher sharedInstance] getUserAvatarWithSuccessCallback:^(UIImage *avatar) {
+    [[PangoPayDataCacher sharedInstance] getUserAvatarWithSuccessCallback:^(UIImage *avatar) {
         NSLog(@"User avatar obtained: %@",avatar);
         
     } andErrorCallback:^(NSError *error) {
@@ -101,13 +99,13 @@
 
 -(void) testNotifications{
     
-    [[PaynoPainDataCacher sharedInstance] getNotificationsWithSuccessCallback:^(NSArray *data) {
+    [[PangoPayDataCacher sharedInstance] getNotificationsWithSuccessCallback:^(NSArray *data) {
         NSLog(@"Notifications count: %lu %@",(unsigned long)[data count],data);
         if([data count] > 0){
-            [[PaynoPainDataCacher sharedInstance] deleteNotification:[data objectAtIndex:0] withSuccessCallback:^{
+            [[PangoPayDataCacher sharedInstance] deleteNotification:[data objectAtIndex:0] withSuccessCallback:^{
                 NSLog(@"Notification deleted");
                 
-                [[PaynoPainDataCacher sharedInstance] getNotificationsWithSuccessCallback:^(NSArray *data) {
+                [[PangoPayDataCacher sharedInstance] getNotificationsWithSuccessCallback:^(NSArray *data) {
                     NSLog(@"Notifications count: %lu after deleting notification: %@ ",(unsigned long)[data count],data);
                     
                 } andErrorCallback:^(NSError *error) {
@@ -132,11 +130,11 @@
 }
 
 -(void) testExtractFromPango{
-    [[PaynoPainDataCacher sharedInstance] getPangoWithIdentifier:@59 withSuccessCallback:^(PNPPango *pango) {
+    [[PangoPayDataCacher sharedInstance] getPangoWithIdentifier:@59 withSuccessCallback:^(PNPPango *pango) {
         NSLog(@"Pango %@",pango);
         
-        [[PaynoPainDataCacher sharedInstance] extractFromPango:pango amount:@10 withSuccessCallback:^{
-            [[PaynoPainDataCacher sharedInstance] getPangoWithIdentifier:@59 withSuccessCallback:^(PNPPango *pango) {
+        [[PangoPayDataCacher sharedInstance] extractFromPango:pango amount:@10 withSuccessCallback:^{
+            [[PangoPayDataCacher sharedInstance] getPangoWithIdentifier:@59 withSuccessCallback:^(PNPPango *pango) {
                 NSLog(@"Pango :%@",pango);
             } andErrorCallback:^(NSError *error) {
                 NSLog(@"Error getting pango");
@@ -151,11 +149,11 @@
 }
 
 -(void) testChangeAliasForPango{
-    [[PaynoPainDataCacher sharedInstance] getPangoWithIdentifier:@59 withSuccessCallback:^(PNPPango *pango) {
+    [[PangoPayDataCacher sharedInstance] getPangoWithIdentifier:@59 withSuccessCallback:^(PNPPango *pango) {
         NSLog(@"Pango %@",pango);
         pango.alias = @"caca";
-        [[PaynoPainDataCacher sharedInstance] updatePangoAlias:pango withSuccessCallback:^{
-            [[PaynoPainDataCacher sharedInstance] getPangoWithIdentifier:@59 withSuccessCallback:^(PNPPango *pango) {
+        [[PangoPayDataCacher sharedInstance] updatePangoAlias:pango withSuccessCallback:^{
+            [[PangoPayDataCacher sharedInstance] getPangoWithIdentifier:@59 withSuccessCallback:^(PNPPango *pango) {
                 NSLog(@"Pango :%@",pango);
             } andErrorCallback:^(NSError *error) {
                 NSLog(@"Error getting pango");
@@ -171,11 +169,11 @@
 }
 
 -(void) testChangeStatusForPango{
-    [[PaynoPainDataCacher sharedInstance] getPangoWithIdentifier:@59 withSuccessCallback:^(PNPPango *pango) {
+    [[PangoPayDataCacher sharedInstance] getPangoWithIdentifier:@59 withSuccessCallback:^(PNPPango *pango) {
         NSLog(@"Pango %@",pango);
         
-        [[PaynoPainDataCacher sharedInstance] changeStatusForPango:pango withSuccessCallback:^{
-            [[PaynoPainDataCacher sharedInstance] getPangoWithIdentifier:@59 withSuccessCallback:^(PNPPango *pango) {
+        [[PangoPayDataCacher sharedInstance] changeStatusForPango:pango withSuccessCallback:^{
+            [[PangoPayDataCacher sharedInstance] getPangoWithIdentifier:@59 withSuccessCallback:^(PNPPango *pango) {
                 NSLog(@"Pango :%@",pango);
             } andErrorCallback:^(NSError *error) {
                 NSLog(@"Error getting pango");
@@ -190,10 +188,10 @@
 }
 
 -(void) testPangos{
-    [[PaynoPainDataCacher sharedInstance] getPangosWithSuccessCallback:^(NSArray *data) {
+    [[PangoPayDataCacher sharedInstance] getPangosWithSuccessCallback:^(NSArray *data) {
         NSLog(@"data %@",data);
         if([data count] > 0){
-            [[PaynoPainDataCacher sharedInstance] getPangoMovements:[data objectAtIndex:0] withSuccessCallback:^(NSArray *data) {
+            [[PangoPayDataCacher sharedInstance] getPangoMovements:[data objectAtIndex:0] withSuccessCallback:^(NSArray *data) {
                 NSLog(@"Pango movements %@",data);
             } andErrorCallback:^(NSError *error) {
                 NSLog(@"Error in pango movements");
@@ -211,20 +209,20 @@
 }
 
 -(void) testTransactionSend{
-    [[PaynoPainDataCacher sharedInstance] getUserDataWithSuccessCallback:^(PNPUser *user) {
+    [[PangoPayDataCacher sharedInstance] getUserDataWithSuccessCallback:^(PNPUser *user) {
         NSLog(@"User before sending %@",user);
     } andErrorCallback:nil andRefreshCallback:nil];
 
     
-    [[PaynoPainDataCacher sharedInstance] getSendTransactionCommissionForAmount:@100 withPrefix:@"34" andPhone:@"3" withSuccessCallback:^(NSNumber *number) {
+    [[PangoPayDataCacher sharedInstance] getSendTransactionCommissionForAmount:@100 withPrefix:@"34" andPhone:@"3" withSuccessCallback:^(NSNumber *number) {
         NSLog(@"Commision %@",number);
         
-        [[PaynoPainDataCacher sharedInstance] getTransactionReceiverWithPrefix:@"34" andPhone:@"3" andSuccessCallBack:^(PNPTransactionReceiver *receiver) {
+        [[PangoPayDataCacher sharedInstance] getTransactionReceiverWithPrefix:@"34" andPhone:@"3" andSuccessCallBack:^(PNPTransactionReceiver *receiver) {
             NSLog(@"Transaction receiver :%@",receiver);
             
-            [[PaynoPainDataCacher sharedInstance] sendTransactionWithAmount:@100 toPrefix:@"34" phone:@"3" pin:@"1234" withSuccessCallback:^{
+            [[PangoPayDataCacher sharedInstance] sendTransactionWithAmount:@100 toPrefix:@"34" phone:@"3" pin:@"1234" withSuccessCallback:^{
                 NSLog(@"Transaction sent succesfully");
-                [[PaynoPainDataCacher sharedInstance] getUserDataWithSuccessCallback:^(PNPUser *user) {
+                [[PangoPayDataCacher sharedInstance] getUserDataWithSuccessCallback:^(PNPUser *user) {
                     NSLog(@"User after sending %@",user);
                 } andErrorCallback:nil andRefreshCallback:nil];
             } andErrorCallback:^(NSError *error) {
@@ -242,7 +240,7 @@
 }
 
 -(void) testTransactionList{
-    [[PaynoPainDataCacher sharedInstance] getTransactionsWithSuccessCallback:^(NSArray *data) {
+    [[PangoPayDataCacher sharedInstance] getTransactionsWithSuccessCallback:^(NSArray *data) {
         NSLog(@"All transactions count %lu %@",(unsigned long)[data count],data);
     }andErrorCallback:^(NSError *error) {
         NSLog(@"Error obtaining all transactions");
@@ -252,14 +250,14 @@
 }
 
 -(void) testCancelPendingTransaction{
-    [[PaynoPainDataCacher sharedInstance] getPendingTransactionsWithSuccessCallback:^(NSArray *data) {
+    [[PangoPayDataCacher sharedInstance] getPendingTransactionsWithSuccessCallback:^(NSArray *data) {
         NSLog(@"Count of pending transaction before cancel %lu, %@",(unsigned long)[data count],data);
         if([data count] > 0){
 
-            [[PaynoPainDataCacher sharedInstance] cancelPendingTransaction:[data objectAtIndex:0] withSuccessCallback:^{
+            [[PangoPayDataCacher sharedInstance] cancelPendingTransaction:[data objectAtIndex:0] withSuccessCallback:^{
                 NSLog(@"caca");
                 
-                [[PaynoPainDataCacher sharedInstance] getPendingTransactionsWithSuccessCallback:^(NSArray *data) {
+                [[PangoPayDataCacher sharedInstance] getPendingTransactionsWithSuccessCallback:^(NSArray *data) {
                     NSLog(@"Count of pending transaction after cancel %lu : %@",(unsigned long)[data count],data);
                 } andErrorCallback:nil andRefreshCallback:nil];
             } andErrorCallback:^(NSError *error) {
@@ -272,27 +270,27 @@
 }
 
 -(void) testPaymentRequests{
-    [[PaynoPainDataCacher sharedInstance] getPaymentRequestsWithSuccessCallback:^(NSArray *data) {
+    [[PangoPayDataCacher sharedInstance] getPaymentRequestsWithSuccessCallback:^(NSArray *data) {
         NSLog(@"Payment requests count %lu: %@",(unsigned long)[data count],data);
         if([data count] > 0){
-            [[PaynoPainDataCacher sharedInstance] cancelPaymentRequest:[data objectAtIndex:0] withSuccessCallback:^{
-                [[PaynoPainDataCacher sharedInstance] getPaymentRequestsWithSuccessCallback:^(NSArray *data) {
+            [[PangoPayDataCacher sharedInstance] cancelPaymentRequest:[data objectAtIndex:0] withSuccessCallback:^{
+                [[PangoPayDataCacher sharedInstance] getPaymentRequestsWithSuccessCallback:^(NSArray *data) {
                     NSLog(@"Count of payment request after cancelling %lu",(unsigned long) [data count]);
                 } andErrorCallback:nil];
             } andErrorCallback:^(NSError *error) {
                 NSLog(@"Error cancelling payment request");
             }];
             
-            [[PaynoPainDataCacher sharedInstance] getUserDataWithSuccessCallback:^(PNPUser *user) {
+            [[PangoPayDataCacher sharedInstance] getUserDataWithSuccessCallback:^(PNPUser *user) {
                 NSLog(@"User before confirming payment request %@",user);
             } andErrorCallback:nil];
             
             
-            [[PaynoPainDataCacher sharedInstance] confirmPaymentRequest:[data objectAtIndex:2] pin:@"1234" withSuccessCallback:^{
-                [[PaynoPainDataCacher sharedInstance] getPaymentRequestsWithSuccessCallback:^(NSArray *data) {
+            [[PangoPayDataCacher sharedInstance] confirmPaymentRequest:[data objectAtIndex:2] pin:@"1234" withSuccessCallback:^{
+                [[PangoPayDataCacher sharedInstance] getPaymentRequestsWithSuccessCallback:^(NSArray *data) {
                     NSLog(@"Count of payment request after confirming %lu",(unsigned long) [data count]);
                 } andErrorCallback:nil];
-                [[PaynoPainDataCacher sharedInstance] getUserDataWithSuccessCallback:^(PNPUser *user) {
+                [[PangoPayDataCacher sharedInstance] getUserDataWithSuccessCallback:^(PNPUser *user) {
                     NSLog(@"User after confirming payment request %@",user);
                 } andErrorCallback:nil];
                 
@@ -308,7 +306,7 @@
 }
 
 -(void) testUploadAvatar{
-    [[PaynoPainDataCacher sharedInstance] uploadAvatar:[UIImage imageNamed:@"image.jpg"] withSuccessCallback:^{
+    [[PangoPayDataCacher sharedInstance] uploadAvatar:[UIImage imageNamed:@"image.jpg"] withSuccessCallback:^{
         NSLog(@"Avatar uploaded");
     } andErrorCallback:^(NSError *error) {
         NSLog(@"error uploading avatar");
@@ -316,7 +314,7 @@
 }
 
 -(void) testRegister{
-    [[PaynoPainDataCacher sharedInstance] registerUserWithUsername:@"pepopepo" password:@"lalalalala12A" name:@"trololo" surname:@"lolo" email:@"lolo@mail.com" prefix:@"34" phone:@"12823758" pin:@1234 male:YES withSuccessCallback:^{
+    [[PangoPayDataCacher sharedInstance] registerUserWithUsername:@"pepopepo" password:@"lalalalala12A" name:@"trololo" surname:@"lolo" email:@"lolo@mail.com" prefix:@"34" phone:@"12823758" pin:@1234 male:YES withSuccessCallback:^{
         NSLog(@"Register user OK");
        
     } andErrorCallback:^(NSError *error){
@@ -326,7 +324,7 @@
 }
 
 -(void) testCountries{
-    [[PaynoPainDataCacher sharedInstance] getCountriesWithSuccessCallback:^(NSArray *data) {
+    [[PangoPayDataCacher sharedInstance] getCountriesWithSuccessCallback:^(NSArray *data) {
         NSLog(@"Countries: %@",data);
     } andErrorCallback:^(NSError *error) {
         NSLog(@"Error getting countries %@",error);
@@ -335,16 +333,16 @@
 
 -(void)testUploadDnis{
     
-    [[PaynoPainDataCacher sharedInstance] getUserValidationStatusWithSuccessCallback:^(PNPUserValidation *val) {
+    [[PangoPayDataCacher sharedInstance] getUserValidationStatusWithSuccessCallback:^(PNPUserValidation *val) {
         NSLog(@"User Validation %@",val);
     } andErrorCallback:^(NSError *error) {
         NSLog(@"Error getting user validation");
     } andRefreshCallback:nil];
     
     
-    [[PaynoPainDataCacher sharedInstance] uploadIdCard:[UIImage imageNamed:@"image.jpg"] andBack:[UIImage imageNamed:@"image.jpg"] withSuccessCallback:^{
+    [[PangoPayDataCacher sharedInstance] uploadIdCard:[UIImage imageNamed:@"image.jpg"] andBack:[UIImage imageNamed:@"image.jpg"] withSuccessCallback:^{
         NSLog(@"DNIS uploaded");
-        [[PaynoPainDataCacher sharedInstance] getUserValidationStatusWithSuccessCallback:^(PNPUserValidation *val) {
+        [[PangoPayDataCacher sharedInstance] getUserValidationStatusWithSuccessCallback:^(PNPUserValidation *val) {
             NSLog(@"User Validation %@",val);
         } andErrorCallback:^(NSError *error) {
             NSLog(@"Error getting user validation");
@@ -355,13 +353,13 @@
 }
 
 -(void) testGetCards{
-    [[PaynoPainDataCacher sharedInstance] getCreditCardsWithSuccessCallback:^(NSArray *data) {
+    [[PangoPayDataCacher sharedInstance] getCreditCardsWithSuccessCallback:^(NSArray *data) {
         NSLog(@"Credit cards obtained %@",data);
         PNPCreditCard *c = [data objectAtIndex:0];
         c.isDefault = YES;
         c.alias = @"caca";
-        [[PaynoPainDataCacher sharedInstance] updateCard:c withSuccessCallback:^{
-            [[PaynoPainDataCacher sharedInstance] getCreditCardsWithSuccessCallback:^(NSArray *data) {
+        [[PangoPayDataCacher sharedInstance] updateCard:c withSuccessCallback:^{
+            [[PangoPayDataCacher sharedInstance] getCreditCardsWithSuccessCallback:^(NSArray *data) {
                 NSLog(@"Card updated %@",data);
             } andErrorCallback:nil];
         } andErrorCallback:^(NSError *error) {

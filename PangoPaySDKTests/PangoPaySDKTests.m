@@ -8,7 +8,7 @@
 
 #import <XCTest/XCTest.h>
 
-#import "PaynoPainDataCacher.h"
+#import "PangoPayDataCacher.h"
 
 @interface PangoPaySDKTests : XCTestCase
 
@@ -21,21 +21,21 @@
     [super setUp];
     // Put setup code here. This method is called before the invocation of each test method in the class.
     
-    [[PaynoPainDataCacher sharedInstance] setupWithClientId:@"NTE0MmY3NDE1ODcwYTQ2"
+    [[PangoPayDataCacher sharedInstance] setupWithClientId:@"NTE0MmY3NDE1ODcwYTQ2"
                                                      secret:@"427f2acb4fafc6d4104917ca44573884f290eed0"
                                                 environment:[[PNPSandboxEnvironment alloc] init]
                                                       scope:@[@"basic"]];
-    [[PaynoPainDataCacher sharedInstance] setupLoginObserversWithSuccessCallback:^{
+    [[PangoPayDataCacher sharedInstance] setupLoginObserversWithSuccessCallback:^{
         NSLog(@"User logged in.");
     } andErrorCallback:^(NSError *error) {
         XCTFail(@"Couldn't log in: %@",error);
     }];
     
-    [[PaynoPainDataCacher sharedInstance] addAccesRefreshTokenExpiryObserver:^{
+    [[PangoPayDataCacher sharedInstance] addAccesRefreshTokenExpiryObserver:^{
         XCTFail(@"Refresh token expired");
     }];
     
-    [[PaynoPainDataCacher sharedInstance] loginWithUsername:@"jordi2" andPassword:@"1234"];
+    [[PangoPayDataCacher sharedInstance] loginWithUsername:@"jordi2" andPassword:@"1234"];
 }
 
 - (void)tearDown
@@ -46,7 +46,7 @@
 
 - (void) testUserdata
 {
-    if(![[PaynoPainDataCacher sharedInstance] isUserLoggedIn]){
+    if(![[PangoPayDataCacher sharedInstance] isUserLoggedIn]){
         NSLog(@"User still not logged in. Waiting for login or error.");
         [self testUserdata];
     }
@@ -55,7 +55,7 @@
     __block BOOL hasRefreshed  = NO;
     
     
-    [[PaynoPainDataCacher sharedInstance]getUserDataWithSuccessCallback:^(PNPUser *user) {
+    [[PangoPayDataCacher sharedInstance]getUserDataWithSuccessCallback:^(PNPUser *user) {
         hasCalledBack = YES;
         NSLog(@"user: %@",user);
        

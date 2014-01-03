@@ -40,10 +40,10 @@
 		AA0851961869A43200205DD7 /* PNPWebserviceErrors.m in Sources */ = {isa = PBXBuildFile; fileRef = AA0851901869A43200205DD7 /* PNPWebserviceErrors.m */; };
 		AA0851971869A43200205DD7 /* PNPDataContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = AA0851921869A43200205DD7 /* PNPDataContainer.m */; };
 		AA0851981869A43200205DD7 /* PNPDataContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = AA0851921869A43200205DD7 /* PNPDataContainer.m */; };
-		AA08519B1869A44100205DD7 /* PaynoPainSDK.m in Sources */ = {isa = PBXBuildFile; fileRef = AA08519A1869A44100205DD7 /* PaynoPainSDK.m */; };
-		AA08519C1869A44100205DD7 /* PaynoPainSDK.m in Sources */ = {isa = PBXBuildFile; fileRef = AA08519A1869A44100205DD7 /* PaynoPainSDK.m */; };
-		AA08519E1869AF9000205DD7 /* PaynoPainDataCacher.m in Sources */ = {isa = PBXBuildFile; fileRef = AA08519D1869AF9000205DD7 /* PaynoPainDataCacher.m */; };
-		AA08519F1869AF9000205DD7 /* PaynoPainDataCacher.m in Sources */ = {isa = PBXBuildFile; fileRef = AA08519D1869AF9000205DD7 /* PaynoPainDataCacher.m */; };
+		AA08519B1869A44100205DD7 /* PangoPaySDK.m in Sources */ = {isa = PBXBuildFile; fileRef = AA08519A1869A44100205DD7 /* PangoPaySDK.m */; };
+		AA08519C1869A44100205DD7 /* PangoPaySDK.m in Sources */ = {isa = PBXBuildFile; fileRef = AA08519A1869A44100205DD7 /* PangoPaySDK.m */; };
+		AA08519E1869AF9000205DD7 /* PangoPayDataCacher.m in Sources */ = {isa = PBXBuildFile; fileRef = AA08519D1869AF9000205DD7 /* PangoPayDataCacher.m */; };
+		AA08519F1869AF9000205DD7 /* PangoPayDataCacher.m in Sources */ = {isa = PBXBuildFile; fileRef = AA08519D1869AF9000205DD7 /* PangoPayDataCacher.m */; };
 		AA2647BB18688A770052101D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA2647BA18688A770052101D /* Foundation.framework */; };
 		AA2647BD18688A770052101D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA2647BC18688A770052101D /* CoreGraphics.framework */; };
 		AA2647BF18688A770052101D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA2647BE18688A770052101D /* UIKit.framework */; };
@@ -99,16 +99,16 @@
 		AA08517D18699ED200205DD7 /* NXOAuth2PostBodyPart.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NXOAuth2PostBodyPart.m; path = Sources/NXOAuth2PostBodyPart.m; sourceTree = "<group>"; };
 		AA08517E18699ED200205DD7 /* NXOAuth2FileStreamWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NXOAuth2FileStreamWrapper.h; path = Sources/NXOAuth2FileStreamWrapper.h; sourceTree = "<group>"; };
 		AA08517F18699ED200205DD7 /* NXOAuth2FileStreamWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NXOAuth2FileStreamWrapper.m; path = Sources/NXOAuth2FileStreamWrapper.m; sourceTree = "<group>"; };
-		AA08518C1869A43200205DD7 /* PaynoPainDataCacher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PaynoPainDataCacher.h; path = Sources/PaynoPainDataCacher.h; sourceTree = "<group>"; };
+		AA08518C1869A43200205DD7 /* PangoPayDataCacher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PangoPayDataCacher.h; path = Sources/PangoPayDataCacher.h; sourceTree = "<group>"; };
 		AA08518D1869A43200205DD7 /* PNPConnectionError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PNPConnectionError.h; path = Sources/PNPConnectionError.h; sourceTree = "<group>"; };
 		AA08518E1869A43200205DD7 /* PNPConnectionError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PNPConnectionError.m; path = Sources/PNPConnectionError.m; sourceTree = "<group>"; };
 		AA08518F1869A43200205DD7 /* PNPWebserviceErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PNPWebserviceErrors.h; path = Sources/PNPWebserviceErrors.h; sourceTree = "<group>"; };
 		AA0851901869A43200205DD7 /* PNPWebserviceErrors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PNPWebserviceErrors.m; path = Sources/PNPWebserviceErrors.m; sourceTree = "<group>"; };
 		AA0851911869A43200205DD7 /* PNPDataContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PNPDataContainer.h; path = Sources/PNPDataContainer.h; sourceTree = "<group>"; };
 		AA0851921869A43200205DD7 /* PNPDataContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PNPDataContainer.m; path = Sources/PNPDataContainer.m; sourceTree = "<group>"; };
-		AA0851991869A44100205DD7 /* PaynoPainSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PaynoPainSDK.h; path = Sources/PaynoPainSDK.h; sourceTree = "<group>"; };
-		AA08519A1869A44100205DD7 /* PaynoPainSDK.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PaynoPainSDK.m; path = Sources/PaynoPainSDK.m; sourceTree = "<group>"; };
-		AA08519D1869AF9000205DD7 /* PaynoPainDataCacher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PaynoPainDataCacher.m; path = Sources/PaynoPainDataCacher.m; sourceTree = "<group>"; };
+		AA0851991869A44100205DD7 /* PangoPaySDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PangoPaySDK.h; path = Sources/PangoPaySDK.h; sourceTree = "<group>"; };
+		AA08519A1869A44100205DD7 /* PangoPaySDK.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PangoPaySDK.m; path = Sources/PangoPaySDK.m; sourceTree = "<group>"; };
+		AA08519D1869AF9000205DD7 /* PangoPayDataCacher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PangoPayDataCacher.m; path = Sources/PangoPayDataCacher.m; sourceTree = "<group>"; };
 		AA2647B718688A770052101D /* PangoPaySDK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PangoPaySDK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA2647BA18688A770052101D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		AA2647BC18688A770052101D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -156,10 +156,10 @@
 			children = (
 				AACF27C91875613F00781133 /* Base64.h */,
 				AACF27CA1875613F00781133 /* Base64.m */,
-				AA0851991869A44100205DD7 /* PaynoPainSDK.h */,
-				AA08519A1869A44100205DD7 /* PaynoPainSDK.m */,
-				AA08518C1869A43200205DD7 /* PaynoPainDataCacher.h */,
-				AA08519D1869AF9000205DD7 /* PaynoPainDataCacher.m */,
+				AA0851991869A44100205DD7 /* PangoPaySDK.h */,
+				AA08519A1869A44100205DD7 /* PangoPaySDK.m */,
+				AA08518C1869A43200205DD7 /* PangoPayDataCacher.h */,
+				AA08519D1869AF9000205DD7 /* PangoPayDataCacher.m */,
 				AA08518D1869A43200205DD7 /* PNPConnectionError.h */,
 				AA08518E1869A43200205DD7 /* PNPConnectionError.m */,
 				AA08518F1869A43200205DD7 /* PNPWebserviceErrors.h */,
@@ -391,7 +391,7 @@
 				AA0851931869A43200205DD7 /* PNPConnectionError.m in Sources */,
 				AA08518418699ED200205DD7 /* NXOAuth2PostBodyPart.m in Sources */,
 				AA08515818699E9900205DD7 /* NSURL+NXOAuth2.m in Sources */,
-				AA08519E1869AF9000205DD7 /* PaynoPainDataCacher.m in Sources */,
+				AA08519E1869AF9000205DD7 /* PangoPayDataCacher.m in Sources */,
 				AA2647C718688A770052101D /* main.m in Sources */,
 				AA08515618699E9900205DD7 /* NSString+NXOAuth2.m in Sources */,
 				AA08516418699EB400205DD7 /* NXOAuth2Constants.m in Sources */,
@@ -399,7 +399,7 @@
 				AA08518218699ED200205DD7 /* NXOAuth2PostBodyStream.m in Sources */,
 				AA08518618699ED200205DD7 /* NXOAuth2FileStreamWrapper.m in Sources */,
 				AA0851951869A43200205DD7 /* PNPWebserviceErrors.m in Sources */,
-				AA08519B1869A44100205DD7 /* PaynoPainSDK.m in Sources */,
+				AA08519B1869A44100205DD7 /* PangoPaySDK.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -411,9 +411,9 @@
 				AA08516518699EB400205DD7 /* NXOAuth2Constants.m in Sources */,
 				AA08515718699E9900205DD7 /* NSString+NXOAuth2.m in Sources */,
 				AA08515518699E9900205DD7 /* NSData+NXOAuth2.m in Sources */,
-				AA08519C1869A44100205DD7 /* PaynoPainSDK.m in Sources */,
+				AA08519C1869A44100205DD7 /* PangoPaySDK.m in Sources */,
 				AA08518518699ED200205DD7 /* NXOAuth2PostBodyPart.m in Sources */,
-				AA08519F1869AF9000205DD7 /* PaynoPainDataCacher.m in Sources */,
+				AA08519F1869AF9000205DD7 /* PangoPayDataCacher.m in Sources */,
 				AA08518318699ED200205DD7 /* NXOAuth2PostBodyStream.m in Sources */,
 				AA08518118699ED200205DD7 /* NXOAuth2Connection.m in Sources */,
 				AA08516718699EB400205DD7 /* NXOAuth2AccountStore.m in Sources */,
