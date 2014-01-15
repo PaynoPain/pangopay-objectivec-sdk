@@ -39,9 +39,10 @@ typedef void(^PnPPaymentRequestSuccessHandler)(PNPPaymentRequest * request);
 
 
 #pragma mark - Authentication Methods
--(void) setupLoginObserversWithSuccessCallback:(PnPLoginSuccessHandler)successHandler
-                              andErrorCallback:(PnPLoginErrorHandler)errorHandler;
+-(NSArray *) setupLoginObserversWithSuccessCallback:(PnPLoginSuccessHandler)successHandler
+                                   andErrorCallback:(PnPLoginErrorHandler)errorHandler;
 -(void) addAccesRefreshTokenExpiryObserver:(PnPLogoutHandler) callback;
+
 -(void) loginWithUsername:(NSString *) username
               andPassword:(NSString *) password;
 -(BOOL) isUserLoggedIn;
@@ -97,8 +98,8 @@ typedef void(^PnPPaymentRequestSuccessHandler)(PNPPaymentRequest * request);
 
 
 -(void) requestRecoverPassword:(NSString *)email
-    withSuccessCallback:(PnPSuccessHandler) successHandler
-       andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+           withSuccessCallback:(PnPSuccessHandler) successHandler
+              andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) recoverPassword:(NSString *) password
                   token:(NSString *) token
@@ -151,10 +152,10 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 -(void) createCard:(PNPCreditCard *) card
 withSuccessCallback:(PnPSuccessHandler) successHandler
-andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+  andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) updateCard:(PNPCreditCard *) card
-    withSuccessCallback:(PnPSuccessHandler) successHandler
+withSuccessCallback:(PnPSuccessHandler) successHandler
   andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) deleteCard:(PNPCreditCard *) card
@@ -217,10 +218,10 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 #pragma mark - Send Payment methods
 
 -(void) getSendTransactionCommissionForAmount:(NSNumber *) amount
-                    withPrefix:(NSString *) prefix
-                      andPhone:(NSString *)phone
-           withSuccessCallback:(PnPNSNumberSucceddHandler) successHandler
-              andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+                                   withPrefix:(NSString *) prefix
+                                     andPhone:(NSString *)phone
+                          withSuccessCallback:(PnPNSNumberSucceddHandler) successHandler
+                             andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 
 
@@ -247,10 +248,10 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                   andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) getSentTransactionsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
-                                  andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+                              andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) getPendingTransactionsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
-                              andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+                                 andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) cancelPendingTransaction:(PNPTransactionPending *) transaction
              withSuccessCallback:(PnPSuccessHandler) successHandler
@@ -293,7 +294,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 #pragma mark - Static data
 
 -(void) getCountriesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
-                      andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+                       andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 @end
 

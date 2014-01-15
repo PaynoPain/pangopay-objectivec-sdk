@@ -178,6 +178,10 @@
 
 @end
 
+@interface  PNPTransactionReceiverHalcash : PNPTransactionReceiver
+
+@end
+
 @interface PNPTransactionEmitter : PNPTransactionEntity <NSCoding>
 
 @end

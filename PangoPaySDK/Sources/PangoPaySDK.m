@@ -22,6 +22,7 @@
 @property (strong,nonatomic) NSArray *scope;
 @property (nonatomic)  BOOL userIsLoggedIn;
 @property (strong,nonatomic) NXOAuth2Account *userAccount;
+
 @end
 
 @implementation PangoPaySDK
@@ -80,39 +81,43 @@
 }
 
 #pragma mark - Authentication Methods
--(void) setupLoginObserversWithSuccessCallback:(PnPLoginSuccessHandler)successHandler
-                              andErrorCallback:(PnPLoginErrorHandler)errorHandler{
+-(NSArray *) setupLoginObserversWithSuccessCallback:(PnPLoginSuccessHandler)successHandler
+                                   andErrorCallback:(PnPLoginErrorHandler)errorHandler{
     
-    [[NSNotificationCenter defaultCenter]
-     addObserverForName:NXOAuth2AccountStoreAccountsDidChangeNotification
-     object:[NXOAuth2AccountStore sharedStore]
-     queue:nil
-     usingBlock:^(NSNotification *aNotification){
-         if(aNotification.userInfo != nil){
-             NXOAuth2Account *a = [aNotification.userInfo objectForKey:NXOAuth2AccountStoreNewAccountUserInfoKey];
-             self.userAccount = a;
-             [self.userDefaults setObject:a.identifier
-                                   forKey:PNP_MOBILE_ACCOUNT_IDENTIFIER_KEY];
-             [self.userDefaults synchronize];
-             self.userIsLoggedIn = YES;
-             if(successHandler) successHandler();
-         }else{
-             NSError *error = [aNotification.userInfo
-                               objectForKey:NXOAuth2AccountStoreErrorKey];
-             if(errorHandler)errorHandler( [self handleErrors:error]);
-         }
-     }];
     
-    [[NSNotificationCenter defaultCenter]
-     addObserverForName:NXOAuth2AccountStoreDidFailToRequestAccessNotification
-     object:[NXOAuth2AccountStore sharedStore]
-     queue:nil
-     usingBlock:^(NSNotification *aNotification){
-         NSError *error = [aNotification.userInfo objectForKey:NXOAuth2AccountStoreErrorKey];
-         if(errorHandler) errorHandler([self handleErrors:error]);
-     }];
+    id observer =[[NSNotificationCenter defaultCenter]
+                  addObserverForName:NXOAuth2AccountStoreAccountsDidChangeNotification
+                  object:[NXOAuth2AccountStore sharedStore]
+                  queue:nil
+                  usingBlock:^(NSNotification *aNotification){
+                      if(aNotification.userInfo != nil){
+                          NXOAuth2Account *a = [aNotification.userInfo objectForKey:NXOAuth2AccountStoreNewAccountUserInfoKey];
+                          self.userAccount = a;
+                          [self.userDefaults setObject:a.identifier
+                                                forKey:PNP_MOBILE_ACCOUNT_IDENTIFIER_KEY];
+                          [self.userDefaults synchronize];
+                          self.userIsLoggedIn = YES;
+                          if(successHandler) successHandler();
+                      }else{
+                          NSError *error = [aNotification.userInfo
+                                            objectForKey:NXOAuth2AccountStoreErrorKey];
+                          if(errorHandler)errorHandler( [self handleErrors:error]);
+                      }
+                  }];
     
+    id observer2 = [[NSNotificationCenter defaultCenter]
+                    addObserverForName:NXOAuth2AccountStoreDidFailToRequestAccessNotification
+                    object:[NXOAuth2AccountStore sharedStore]
+                    queue:nil
+                    usingBlock:^(NSNotification *aNotification){
+                        NSError *error = [aNotification.userInfo objectForKey:NXOAuth2AccountStoreErrorKey];
+                        if(errorHandler) errorHandler([self handleErrors:error]);
+                    }];
+    
+    return @[observer,observer2];
 }
+
+
 
 -(void) addAccesRefreshTokenExpiryObserver:(PnPLogoutHandler) callback{
     [[NSNotificationCenter defaultCenter] addObserverForName:NXOAuth2AccountDidFailToGetAccessTokenNotification
@@ -130,7 +135,6 @@
 
 -(void) loginWithUsername:(NSString *)username
               andPassword:(NSString *)password{
-    NSLog(@"login was called");
     [[NXOAuth2AccountStore sharedStore] requestAccessToAccountWithType:PNP_MOBILE_ACCOUNT_TYPE
                                                               username:username
                                                               password:password];
@@ -954,7 +958,6 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     
     void (^callback)(NSURLResponse * ,NSData *,NSError *);
     callback  = ^(NSURLResponse *response, NSData *responseData, NSError *error){
-        NSLog(@"ResponseData %@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
         if(!error){
             @try {
                 NSError *parseError;
@@ -1243,7 +1246,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 -(void) createCard:(PNPCreditCard *) card
 withSuccessCallback:(PnPSuccessHandler) successHandler
-andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+  andErrorCallback:(PnPGenericErrorHandler) errorHandler{
     if(![self isUserLoggedIn ]){
         NSLog(@"No user logged in.");
         return;
@@ -1269,7 +1272,7 @@ andErrorCallback:(PnPGenericErrorHandler) errorHandler{
                                    return;
                                }
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
-                                    if(successHandler)  successHandler();
+                                   if(successHandler)  successHandler();
                                }else{
                                    if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
                                                                    initWithDomain:@"PNPGenericWebserviceError"
@@ -1294,7 +1297,7 @@ andErrorCallback:(PnPGenericErrorHandler) errorHandler{
 -(void) updateCard:(PNPCreditCard *) card
 withSuccessCallback:(PnPSuccessHandler) successHandler
   andErrorCallback:(PnPGenericErrorHandler) errorHandler{
-   
+    
     if(![self isUserLoggedIn ]){
         NSLog(@"No user logged in.");
         return;
@@ -2453,7 +2456,6 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
         return;
     }
     
-    
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"transactions/payments"]
                    usingParameters:nil
@@ -2495,8 +2497,15 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                      phone:[receiverData objectForKey:@"phone"]
                                                      email:nil];
                                            
+                                           
+                                       }else if([receiverType isEqualToString:@"UnregisteredUser"]){
+                                           entity = [[PNPTransactionReceiverUnregistered alloc] initWithPrefix:[receiverData objectForKey:@"prefix"]
+                                                                                                      andPhone:[receiverData objectForKey:@"phone"]];
+                                           
                                        }else if([receiverType isEqualToString:@"Pango"]){
                                            entity = [[PNPTransactionEmitterPango alloc] init];
+                                       }else if([receiverType isEqualToString:@"HalCash"]){
+                                           entity = [[PNPTransactionReceiverHalcash alloc] init];
                                        }else{
                                            NSLog(@"No implementation for receiver type %@",receiverType);
                                            if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]

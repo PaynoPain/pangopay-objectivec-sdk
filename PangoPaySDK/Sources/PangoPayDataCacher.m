@@ -43,18 +43,18 @@
     self = [super init];
     if (!self) return nil;
     self.dataFileNames = @{
-                           @"user"                      : @"pnpuser.plist",
-                           @"avatar"                    : @"pnpuseravatar.plist",
-                           @"notifications"             : @"pnpnotifications.plist",
-                           @"pangos"                    : @"pnppangos.plist",
-                           @"pangoMovements"            : @"pnppangomovements.plist",
-                           @"sentTransactions"          : @"pnpsenttransactions.plist",
-                           @"receivedTransactions"      : @"pnpreceivedtransactions.plist",
-                           @"pendingTransactions"       : @"pnppendingtransactions.plist",
-                           @"paymentRequests"           : @"pnppaymentrequests.plist",
-                           @"countries"                 : @"pnpcountries.plist",
-                           @"validation"                : @"pnpuservalidation.plist",
-                           @"creditCards"               : @"pnpcreditcards.plist",
+                           @"user"                      : @"pnpuser",
+                           @"avatar"                    : @"pnpuseravatar",
+                           @"notifications"             : @"pnpnotifications",
+                           @"pangos"                    : @"pnppangos",
+                           @"pangoMovements"            : @"pnppangomovements",
+                           @"sentTransactions"          : @"pnpsenttransactions",
+                           @"receivedTransactions"      : @"pnpreceivedtransactions",
+                           @"pendingTransactions"       : @"pnppendingtransactions",
+                           @"paymentRequests"           : @"pnppaymentrequests",
+                           @"countries"                 : @"pnpcountries",
+                           @"validation"                : @"pnpuservalidation",
+                           @"creditCards"               : @"pnpcreditcards",
                            };
     return self;
 }
@@ -122,12 +122,11 @@
                 
             }
         }else{
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                [super getUserAvatarWithSuccessCallback:^(UIImage *avatar) {
-                    [self storeUserAvatar:avatar];
-                    if(successHandler) successHandler(avatar);
-                } andErrorCallback:errorHandler];
-            });
+            [super getUserAvatarWithSuccessCallback:^(UIImage *avatar) {
+                [self storeUserAvatar:avatar];
+                if(successHandler) successHandler(avatar);
+            } andErrorCallback:errorHandler];
+            
         }
     }];
 }
@@ -186,8 +185,8 @@
         [self getUserValidationStatusWithSuccessCallback:nil
                                         andErrorCallback:errorHandler
                                       andRefreshCallback:^(PNPUserValidation *val){
-            successHandler();
-        }];
+                                          successHandler();
+                                      }];
     }
        andErrorCallback:errorHandler];
 }
@@ -196,7 +195,7 @@
 -(void) getUser:(PnpUserDataSuccessHandler) successHandler{
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         if(self.user == nil){
-            NSString *pnpUserPath = [[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"user"]];
+            NSString *pnpUserPath = [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"user"]];
             self.user =[NSKeyedUnarchiver unarchiveObjectWithFile:pnpUserPath];
         }
         if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(self.user);} );
@@ -205,7 +204,7 @@
 
 -(void) storeUser:(PNPUser *) user{
     self.user = user;
-    NSString *pnpUserPath = [[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"user"]];
+    NSString *pnpUserPath = [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"user"]];
     [NSKeyedArchiver archiveRootObject:self.user toFile:pnpUserPath];
 }
 
@@ -213,7 +212,7 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         if(self.avatar == nil){
             self.avatar = [UIImage imageWithData:[NSKeyedUnarchiver unarchiveObjectWithFile:
-                                                  [[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"avatar"]]]];
+                                                  [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"avatar"]]]];
         }
         if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(self.avatar);} );
     });
@@ -224,7 +223,7 @@
     self.avatar = avatar;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [NSKeyedArchiver archiveRootObject:UIImageJPEGRepresentation(avatar, 0)
-                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"avatar"]]];
+                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"avatar"]]];
     });
 }
 
@@ -232,7 +231,7 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         if(self.validation == nil){
             self.validation = [NSKeyedUnarchiver unarchiveObjectWithFile:
-                                                  [[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"validation"]]];
+                               [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"validation"]]];
         }
         if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(self.validation);} );
     });
@@ -243,7 +242,7 @@
     self.validation = validation;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [NSKeyedArchiver archiveRootObject:self.validation
-                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"validation"]]];
+                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"validation"]]];
     });
 }
 
@@ -253,21 +252,21 @@
 -(void) getCreditCardsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                          andErrorCallback:(PnPGenericErrorHandler) errorHandler
                           refreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler{
-
+    
     [self getCreditCardsOnSuccess:^(NSArray *data) {
         if(data != nil){
             if(successHandler) successHandler(data);
             if(refreshHandler){
                 [super getCreditCardsWithSuccessCallback:^(NSArray *data) {
-                     [self storeCreditCards:data];
-                     refreshHandler(data);
-                 } andErrorCallback:errorHandler];
+                    [self storeCreditCards:data];
+                    refreshHandler(data);
+                } andErrorCallback:errorHandler];
             }
         }else{
             [super getCreditCardsWithSuccessCallback:^(NSArray *data) {
-                 [self storeCreditCards:data];
-                 if(successHandler)successHandler(data);
-             } andErrorCallback:errorHandler];
+                [self storeCreditCards:data];
+                if(successHandler)successHandler(data);
+            } andErrorCallback:errorHandler];
         }
     }];
     
@@ -313,7 +312,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
           [cards removeObjectsInArray:filteredArray];
           [cards addObject:card];
           [self storeCreditCards:cards];
-
+          
           if(successHandler) successHandler();
       }];
   }
@@ -323,7 +322,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 -(void) createCard:(PNPCreditCard *)card
 withSuccessCallback:(PnPSuccessHandler)successHandler
   andErrorCallback:(PnPGenericErrorHandler)errorHandler{
-
+    
     [super createCard:card withSuccessCallback:^{
         [self getCreditCardsWithSuccessCallback:nil
                                andErrorCallback:errorHandler
@@ -339,7 +338,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         if(self.creditCards == nil){
             self.creditCards = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self pnpDataDirectoryPath]
-                                                                             stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"creditCards"]]];
+                                                                           stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"creditCards"]]];
         }
         if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(self.creditCards);} );
     });
@@ -350,7 +349,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     self.creditCards = [NSMutableArray arrayWithArray:cards];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [NSKeyedArchiver archiveRootObject:self.creditCards
-                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"creditCards"]]];
+                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"creditCards"]]];
     });
 }
 
@@ -419,7 +418,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         if(self.notifications == nil){
             self.notifications = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self pnpDataDirectoryPath]
-                                                                             stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"notifications"]]];
+                                                                             stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"notifications"]]];
         }
         if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(self.notifications);} );
     });
@@ -429,7 +428,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     self.notifications = [NSMutableArray arrayWithArray:notifications];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [NSKeyedArchiver archiveRootObject:self.notifications
-                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"notifications"]]];
+                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"notifications"]]];
     });
 }
 
@@ -470,7 +469,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         if(self.pangos == nil){
             self.pangos = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self pnpDataDirectoryPath]
-                                                                      stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"pangos"]]];
+                                                                      stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"pangos"]]];
         }
         if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(self.pangos);} );
     });
@@ -478,12 +477,12 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 }
 
 -(void) storePangos:(NSArray *) pangos{
-
+    
     self.pangos = [NSMutableArray arrayWithArray:pangos];
-
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [NSKeyedArchiver archiveRootObject:self.pangos
-                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"pangos"]]];
+                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"pangos"]]];
     });
 }
 
@@ -527,7 +526,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         if(self.pangoMovements == nil){
             self.pangoMovements = [NSKeyedUnarchiver unarchiveObjectWithFile:
-                                   [[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"pangoMovements"]]];
+                                   [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"pangoMovements"]]];
         }
         if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler([self.pangoMovements objectForKey:pango.identifier]);} );
     });
@@ -539,7 +538,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     [self.pangoMovements setObject:[NSMutableArray arrayWithArray:movements] forKey:pango.identifier];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [NSKeyedArchiver archiveRootObject:self.pangoMovements
-                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"pangoMovements"]]];
+                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"pangoMovements"]]];
     });
 }
 
@@ -783,7 +782,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                     [self storeReceivedTransactions:data];
                     refreshHandler(data);
                 } andErrorCallback:errorHandler];
-              
+                
             }
         }else{
             [super getReceivedTransactionsWithSuccessCallback:^(NSArray *data) {
@@ -805,14 +804,14 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                 [super getSentTransactionsWithSuccessCallback:^(NSArray *data) {
                     [self storeSentTransactions:data];
                     refreshHandler(data);
-                } andErrorCallback:nil];
+                } andErrorCallback:errorHandler];
                 
             }
         }else{
             [super getSentTransactionsWithSuccessCallback:^(NSArray *data) {
-                    [self storeSentTransactions:data];
+                [self storeSentTransactions:data];
                 if(successHandler) successHandler(data);
-            } andErrorCallback:nil];
+            } andErrorCallback:errorHandler];
         }
     }];
     
@@ -828,17 +827,17 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
             if(successHandler) successHandler(data);
             if(refreshHandler){
                 [super getPendingTransactionsWithSuccessCallback:^(NSArray *data) {
-                [self storePendingTransactions:data];
+                    [self storePendingTransactions:data];
                     refreshHandler(data);
-                } andErrorCallback:nil];
+                } andErrorCallback:errorHandler];
             }
         }else{
             [super getPendingTransactionsWithSuccessCallback:^(NSArray *data) {
                 [self storePendingTransactions:data];
                 if(successHandler) successHandler(data);
-            } andErrorCallback:nil];
+            } andErrorCallback:errorHandler];
         }
-       
+        
     }];
     
 }
@@ -860,8 +859,8 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                               if(successHandler) successHandler();
                                           }];
                     }
-                                            andErrorCallback:errorHandler
-                                          andRefreshCallback:nil];
+                                                   andErrorCallback:errorHandler
+                                                 andRefreshCallback:nil];
                 }
                    andErrorCallback:errorHandler];
     
@@ -905,7 +904,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         if(self.pendingTransactions == nil){
             self.pendingTransactions = [NSKeyedUnarchiver unarchiveObjectWithFile:
-                                   [[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"pendingTransactions"]]];
+                                        [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"pendingTransactions"]]];
         }
         if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(self.pendingTransactions);} );
     });
@@ -915,7 +914,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     self.pendingTransactions = [NSMutableArray arrayWithArray:transactions];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [NSKeyedArchiver archiveRootObject:self.pendingTransactions
-                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"pendingTransactions"]]];
+                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"pendingTransactions"]]];
     });
 }
 
@@ -924,7 +923,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         if(self.sentTransactions == nil){
             self.sentTransactions = [NSKeyedUnarchiver unarchiveObjectWithFile:
-                                        [[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"sentTransactions"]]];
+                                     [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"sentTransactions"]]];
         }
         if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(self.sentTransactions);} );
     });
@@ -934,7 +933,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     self.sentTransactions = [NSMutableArray arrayWithArray:transactions];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [NSKeyedArchiver archiveRootObject:self.sentTransactions
-                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"sentTransactions"]]];
+                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"sentTransactions"]]];
     });
 }
 
@@ -943,7 +942,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         if(self.receivedTransactions == nil){
             self.receivedTransactions = [NSKeyedUnarchiver unarchiveObjectWithFile:
-                                     [[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"receivedTransactions"]]];
+                                         [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"receivedTransactions"]]];
         }
         if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(self.receivedTransactions);} );
     });
@@ -953,7 +952,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     self.receivedTransactions = [NSMutableArray arrayWithArray:transactions];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [NSKeyedArchiver archiveRootObject:self.receivedTransactions
-                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"receivedTransactions"]]];
+                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"receivedTransactions"]]];
     });
 }
 
@@ -1054,7 +1053,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         if(self.paymentRequests == nil){
             self.paymentRequests = [NSKeyedUnarchiver unarchiveObjectWithFile:
-                                         [[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"paymentRequests"]]];
+                                    [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"paymentRequests"]]];
         }
         if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(self.paymentRequests);} );
     });
@@ -1064,7 +1063,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     self.paymentRequests = [NSMutableArray arrayWithArray:requests];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [NSKeyedArchiver archiveRootObject:self.paymentRequests
-                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"paymentRequests"]]];
+                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"paymentRequests"]]];
     });
 }
 
@@ -1092,7 +1091,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
             } andErrorCallback:nil];
         }
     }];
-
+    
     
     
     
@@ -1111,7 +1110,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     self.countries = [NSMutableArray arrayWithArray:countries];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [NSKeyedArchiver archiveRootObject:self.countries
-                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"countries"]]];
+                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"countries"]]];
     });
     
 }
@@ -1120,7 +1119,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         if(self.countries == nil){
             self.countries = [NSKeyedUnarchiver unarchiveObjectWithFile:
-                                    [[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:@"countries"]]];
+                              [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"countries"]]];
         }
         if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(self.countries);} );
     });
@@ -1138,21 +1137,14 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 
 - (NSString *) pnpDataDirectoryPath
 {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *docsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    return docsPath;
     
-    NSString *pnpdataPath =[documentsDirectory stringByAppendingPathExtension:@"pnpdata"];
-    
-    [[NSFileManager defaultManager] createDirectoryAtPath:pnpdataPath
-                              withIntermediateDirectories:YES
-                                               attributes:nil
-                                                    error:nil];
-    return pnpdataPath;
 }
 
 -(void) deletePnpData{
     for (id key in self.dataFileNames){
-        [[NSFileManager defaultManager] removeItemAtPath:[[self pnpDataDirectoryPath] stringByAppendingPathExtension:[self.dataFileNames objectForKey:key]] error:nil];
+        [[NSFileManager defaultManager] removeItemAtPath:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:key]] error:nil];
     }
 }
 

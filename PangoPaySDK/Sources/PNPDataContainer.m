@@ -484,6 +484,23 @@
 }
 
 @end
+
+
+@implementation PNPTransactionReceiverHalcash
+
+-(NSString *) description{
+    return @"Hal-Cash";
+}
+
+-(NSString *) tableString{
+    return [self description];
+}
+@end
+
+
+
+
+
 @implementation PNPTransactionEmitterUser
 
 -(id) initWithName:(NSString *) name
