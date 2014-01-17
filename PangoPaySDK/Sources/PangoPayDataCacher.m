@@ -98,6 +98,16 @@
     }];
 }
 
+-(void) deleteUserAvatarWithSuccessCallback:(PnPSuccessHandler)successHandler
+                           andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+    
+    [super deleteUserAvatarWithSuccessCallback:^{
+        [self storeUserAvatar:nil];
+        if(successHandler) successHandler();
+    } andErrorCallback:errorHandler];
+    
+}
+
 -(void) getUserAvatarWithSuccessCallback:(PnpUserAvatarSuccessHandler)successHandler
                         andErrorCallback:(PnPGenericErrorHandler)errorHandler{
     [self getUserAvatarWithSuccessCallback:successHandler
@@ -169,6 +179,7 @@
     
     [super uploadAvatar:avatar
     withSuccessCallback:^{
+        if(successHandler) successHandler();
         [self storeUserAvatar:avatar];
     }
        andErrorCallback:errorHandler];
