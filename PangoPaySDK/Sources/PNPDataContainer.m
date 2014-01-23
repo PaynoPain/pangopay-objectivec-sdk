@@ -346,7 +346,7 @@
     self.amount = [decoder decodeObjectForKey:@"amount"];
     self.currencySymbol = [decoder decodeObjectForKey:@"currencySymbol"];
     self.date = [decoder decodeObjectForKey:@"date"];
- 
+    
     return self;
 }
 
@@ -430,7 +430,7 @@
 -(id) initWithCoder:(NSCoder *) decoder{
     self = [super init];
     if(!self) return nil;
-
+    
     self.name      = [decoder decodeObjectForKey:@"name"];
     self.prefix    = [decoder decodeObjectForKey:@"prefix"];
     self.phone     = [decoder decodeObjectForKey:@"phone"];
@@ -457,7 +457,7 @@
     if(!self) return nil;
     self.prefix = prefix;
     self.phone = phone;
-    return self; 
+    return self;
     
 }
 
@@ -563,6 +563,18 @@
 
 @end
 
+@implementation PNPTransactionEmitterHalcash
+
+-(NSString *) tableString{
+    return @"Hal-Cash cancellation";
+}
+
+-(NSString *) description{
+    return @"Hal-Cash cancellation";
+}
+
+@end
+
 
 @implementation PNPTransaction
 
@@ -615,7 +627,7 @@
     [encoder encodeObject:self.concept forKey:@"concept"];
     [encoder encodeObject:self.status forKey:@"status"];
     [encoder encodeObject:self.created forKey:@"created"];
-    [encoder encodeObject:self.entity forKey:@"entity"];    
+    [encoder encodeObject:self.entity forKey:@"entity"];
 }
 
 
@@ -875,5 +887,69 @@
     [encoder encodeBool:self.isDefault forKey:@"isDefault"];
     
 }
+
+@end
+
+@implementation PNPHalcashExtraction
+
+-(id) initWithIdentifier:(NSNumber *) identifier
+                  amount:(NSNumber *)amount
+          currencySymbol:(NSString *)currencySymbol
+                  status:(NSString *)status
+                 created:(NSDate *)created
+                  expiry:(NSDate *)expiry
+                  ticket:(NSString *)ticket
+           transactionId:(NSNumber *)transactionId{
+    self = [super init];
+    if(!self) return nil;
+    self.identifier = identifier;
+    self.amount= amount;
+    self.currency = currencySymbol;
+    self.status = status;
+    self.date = created;
+    self.expirationDate = expiry;
+    self.ticket = ticket;
+    self.transactioId = transactionId;
+    return self;
+    
+}
+-(BOOL) isCancellable{
+    if([self.status isEqualToString:PNPHalcashExtractionStatusPending]){
+        return YES;
+    }
+    return NO;
+}
+
+-(id) initWithCoder:(NSCoder *)decoder{
+    self = [super init];
+    if(!self) return nil;
+    self.identifier = [decoder decodeObjectForKey:@"identifier"];
+    self.amount = [decoder decodeObjectForKey:@"amount"];
+    self.currency = [decoder decodeObjectForKey:@"currency"];
+    self.status = [decoder decodeObjectForKey:@"status"];
+    self.date = [decoder decodeObjectForKey:@"date"];
+    self.expirationDate = [decoder decodeObjectForKey:@"expirationDate"];
+    self.ticket = [decoder decodeObjectForKey:@"ticket"];
+    self.transactioId = [decoder decodeObjectForKey:@"transactionId"];
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)encoder{
+    
+    [encoder encodeObject:self.identifier forKey:@"identifier"];
+    [encoder encodeObject:self.amount forKey:@"amount"];
+    [encoder encodeObject:self.currency forKey:@"currency"];
+    [encoder encodeObject:self.status forKey:@"status"];
+    [encoder encodeObject:self.date forKey:@"date"];
+    [encoder encodeObject:self.expirationDate forKey:@"expirationDate"];
+    [encoder encodeObject:self.ticket forKey:@"ticket"];
+    [encoder encodeObject:self.transactioId forKey:@"transactionId"];
+    
+}
+
+-(NSString *)description{
+    return [NSString stringWithFormat:@"\n ID: %@ \n Amount: %@ %@ \n Status: %@ \n Date: %@ \n Expiry: %@ \n Ticket: %@ \n TransactionId: %@ \n",_identifier,_amount,_currency,_status,_date,_expirationDate,_ticket,_transactioId];
+}
+
 
 @end

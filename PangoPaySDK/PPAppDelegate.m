@@ -28,6 +28,7 @@
     
     [[PangoPayDataCacher sharedInstance] setupLoginObserversWithSuccessCallback:^{
         NSLog(@"User logged in.");
+        [self startTests];
     } andErrorCallback:^(NSError *error) {
         NSLog(@"Error logging user in %@",error);
     }];
@@ -43,8 +44,9 @@
     
     if([[PangoPayDataCacher sharedInstance] isUserLoggedIn]){
         NSLog(@"User refresh token is saved in keychain");
+        [self startTests];
     }else{
-        [[PangoPayDataCacher sharedInstance] loginWithUsername:@"demo" andPassword:@"1234"];
+        [[PangoPayDataCacher sharedInstance] loginWithUsername:@"" andPassword:@""];
     }
     
     return YES;
@@ -69,7 +71,9 @@
 //    [self testCountries];
     
 //    [self testUploadDnis];
-    [self testGetCards];
+//    [self testGetCards];
+    
+    [self testHalcash];
 }
 
 -(void) testUser{
@@ -368,6 +372,28 @@
     } andErrorCallback:^(NSError *error) {
         NSLog(@"Credit cards error");
     } refreshCallback:nil];
+}
+
+-(void) testHalcash{
+
+    [[PangoPayDataCacher sharedInstance] getHalcashExtractionsWithSuccessCallback:^(NSArray *data){
+
+        for (PNPHalcashExtraction *e in data) {
+            if([e isCancellable]){
+                NSLog(@"cancelando hal %@",e);
+                [[PangoPayDataCacher sharedInstance] cancelHalcashTransaction:e withSuccessCallback:^{
+                    NSLog(@"halcash cancelada e %@",e.ticket);
+                } andErrorCallback:^(NSError *error) {
+                    NSLog(@"error cancelando hal e %@",e.ticket);
+                }];
+            }
+        }
+    } andErrorCallback:^(NSError *error) {
+        NSLog(@" %s --> %@",__PRETTY_FUNCTION__,error);
+    }];
+    
+
+    
 }
 
 @end

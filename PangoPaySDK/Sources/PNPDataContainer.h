@@ -230,6 +230,11 @@
 @end
 
 
+@interface PNPTransactionEmitterHalcash : PNPTransactionEmitter
+
+@end
+
+
 #define PNPTransactionStatusOK @"OK";
 #define PNPTransactionStatusCancelled @"CA";
 
@@ -360,5 +365,33 @@
 
 @end
 
+
+#define PNPHalcashExtractionStatusPending @"PE"
+#define PNPHalcashExtractionStatusDenied @"DE"
+#define PNPHalcashExtractionStatusCancelled @"CA"
+#define PNPHalcashExtractionStatusFinished @"AC"
+
+@interface PNPHalcashExtraction : NSObject <NSCoding>
+
+@property (strong,nonatomic) NSNumber *amount;
+@property (strong,nonatomic) NSDate *date;
+@property (strong,nonatomic) NSString *currency;
+@property (strong,nonatomic) NSDate *expirationDate;
+@property (strong,nonatomic) NSNumber *identifier;
+@property (strong,nonatomic) NSString *status;
+@property (strong,nonatomic) NSString *ticket;
+@property (strong,nonatomic) NSNumber *transactioId;
+
+-(id) initWithIdentifier:(NSNumber *) identifier
+                  amount:(NSNumber *)amount
+          currencySymbol:(NSString *)currencySymbol
+                  status:(NSString *)status
+                 created:(NSDate *)created
+                  expiry:(NSDate *)expiry
+                  ticket:(NSString *)ticket
+           transactionId:(NSNumber *)transactionId;
+
+-(BOOL) isCancellable;
+@end
 
 

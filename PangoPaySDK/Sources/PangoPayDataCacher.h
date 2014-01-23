@@ -80,6 +80,13 @@
              andSuccessCallback:(PnPPaymentRequestSuccessHandler) successHandler
                andErrorCallback:(PnPGenericErrorHandler)errorHandler;
 
+#pragma mark - Halcash 
+
+-(void) getHalcashExtractionsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+                                andErrorCallback:(PnPGenericErrorHandler)errorHandler
+                              andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler;
+    
+
 
 
 #pragma mark - Static data

@@ -22,6 +22,7 @@
 @property (strong,nonatomic) NSMutableArray *paymentRequests;
 @property (strong,nonatomic) NSMutableArray  *countries;
 @property (strong,nonatomic) NSMutableArray  *creditCards;
+@property (strong,nonatomic) NSMutableArray  *halcashExtractions;
 @property (strong,nonatomic) PNPUserValidation *validation;
 
 
@@ -55,6 +56,7 @@
                            @"countries"                 : @"pnpcountries",
                            @"validation"                : @"pnpuservalidation",
                            @"creditCards"               : @"pnpcreditcards",
+                           @"halcashExtractions"       : @"pnphalcashextractions",
                            };
     return self;
 }
@@ -410,7 +412,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                    [a removeObjectsInArray:[notifications allObjects]];
                    [self storeNotifications:a];
                    if(successHandler)successHandler();
-               } andErrorCallback:nil];
+               } andErrorCallback:errorHandler];
            }andErrorCallback:errorHandler];
     
 }
@@ -981,13 +983,13 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                 [super getPaymentRequestsWithSuccessCallback:^(NSArray *data) {
                     [self storePaymentRequests:data];
                     refreshHandler(data);
-                } andErrorCallback:nil];
+                } andErrorCallback:errorHandler];
             }
         }else{
             [super getPaymentRequestsWithSuccessCallback:^(NSArray *data) {
                 [self storePaymentRequests:data];
                 if(successHandler) successHandler(data);
-            } andErrorCallback:nil];
+            } andErrorCallback:errorHandler];
         }
     }];
     
@@ -1080,6 +1082,102 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 
 
 
+
+
+
+#pragma mark - Halcash methods
+
+
+-(void) getHalcashExtractionsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+                                andErrorCallback:(PnPGenericErrorHandler)errorHandler
+                              andRefreshCallback:(PnPGenericNSAarraySucceddHandler)refreshHandler{
+    [self getHalcashExtractionsOnSuccess:^(NSArray *data) {
+
+        if(data != nil){
+            if(successHandler) successHandler(data);
+            if(refreshHandler){
+                [super getHalcashExtractionsWithSuccessCallback:^(NSArray *data) {
+                    [self storeHalcashExtractions:data];
+                    refreshHandler(data);
+                } andErrorCallback:errorHandler];
+            }
+        }else{
+            [super getHalcashExtractionsWithSuccessCallback:^(NSArray *data) {
+                [self storeHalcashExtractions:data];
+                if(successHandler) successHandler(data);
+            } andErrorCallback:errorHandler];
+        }
+    }];
+    
+}
+
+-(void) sendHalcashWithAmount:(NSNumber *)amount
+                          pin:(NSString *)pin
+                      concept:(NSString *)concept
+          withSuccessCallback:(PnPSuccessHandler)successHandler
+             andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+    
+    [super sendHalcashWithAmount:amount
+                             pin:pin
+                         concept:concept
+             withSuccessCallback:^{
+                 [self getHalcashExtractionsWithSuccessCallback:nil
+                                               andErrorCallback:errorHandler
+                                             andRefreshCallback:^(NSArray *data) {
+                                                 if(successHandler) successHandler();
+                                             }
+                  ];
+             }
+                andErrorCallback:errorHandler];
+    
+}
+
+-(void) cancelHalcashTransaction:(PNPHalcashExtraction *)extraction
+             withSuccessCallback:(PnPSuccessHandler)successHandler
+                andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+    [super cancelHalcashTransaction:extraction
+                withSuccessCallback:^{
+                    [self getHalcashExtractionsWithSuccessCallback:nil
+                                                  andErrorCallback:errorHandler
+                                                andRefreshCallback:^(NSArray *data) {
+                                                    if(successHandler) successHandler();
+                                                }
+                     ];
+                }
+                   andErrorCallback:errorHandler];
+    
+}
+
+-(void) getHalcashExtractionsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+                                andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+    [self getHalcashExtractionsWithSuccessCallback:successHandler
+                                  andErrorCallback:errorHandler
+                                andRefreshCallback:nil];
+    
+}
+
+-(void) getHalcashExtractionsOnSuccess:(PnPGenericNSAarraySucceddHandler) successHandler{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        if(self.halcashExtractions == nil){
+            self.halcashExtractions = [NSKeyedUnarchiver unarchiveObjectWithFile:
+                              [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"halcashExtractions"]]];
+        }
+        if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(self.halcashExtractions);} );
+    });
+    
+}
+
+-(void) storeHalcashExtractions:(NSArray *) extractions{
+    self.halcashExtractions = [NSMutableArray arrayWithArray:extractions];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        [NSKeyedArchiver archiveRootObject:self.halcashExtractions
+                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"halcashExtractions"]]];
+    });
+}
+
+
+
+
 #pragma mark - Static data
 
 -(void) getCountriesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
@@ -1093,13 +1191,13 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                 [super getCountriesWithSuccessCallback:^(NSArray *data) {
                     [self storeCountries:data];
                     refreshHandler(data);
-                } andErrorCallback:nil];
+                } andErrorCallback:errorHandler];
             }
         }else{
             [super getCountriesWithSuccessCallback:^(NSArray *data) {
                 [self storeCountries:data];
                 if(successHandler) successHandler(data);
-            } andErrorCallback:nil];
+            } andErrorCallback:errorHandler];
         }
     }];
     
