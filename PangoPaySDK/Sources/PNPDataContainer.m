@@ -952,4 +952,30 @@
 }
 
 
+
+@end
+
+@implementation PNPLocation
+
+-(id) initWithLocation:(CLLocation *)location
+                  city:(NSString *)city
+               address:(NSString *)address
+                  name:(NSString *)name{
+
+    self = [super init];
+    
+    if (!self) return false;
+    
+    self.location = location;
+    self.city = city;
+    self.address = address;
+    self.name = name;
+    
+    return self;
+}
+
+-(NSString *) description{
+    return [NSString stringWithFormat:@"\n Name: %@ \n City: %@ \n Address: %@ \n",_name,_city,_address];
+}
+
 @end

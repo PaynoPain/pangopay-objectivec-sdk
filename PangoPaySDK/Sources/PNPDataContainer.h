@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CoreLocation/CLLocation.h>
 
 @interface PNPWallet : NSObject <NSCoding>
 -(id) initWithAmount:(NSNumber *) amount
@@ -392,6 +393,18 @@
            transactionId:(NSNumber *)transactionId;
 
 -(BOOL) isCancellable;
+@end
+
+@interface PNPLocation : NSObject
+@property (strong,nonatomic) CLLocation *location;
+@property (strong,nonatomic) NSString *city;
+@property (strong,nonatomic) NSString *address;
+@property (strong,nonatomic) NSString *name;
+-(id) initWithLocation:(CLLocation *) location
+                  city:(NSString *)city
+               address:(NSString *) address
+                  name:(NSString *) name;
+
 @end
 
 

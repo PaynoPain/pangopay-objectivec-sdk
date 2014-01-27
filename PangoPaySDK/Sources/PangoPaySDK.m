@@ -3071,7 +3071,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                   initWithIdentifier:[dataDic objectForKey:@"id"]
                                                                   amount:[self clearAmount:[dataDic objectForKey:@"amount"]]
                                                                   currencySymbol:[dataDic objectForKey:@"currency"]
-                                                                  status:[dataDic objectForKey:@"currency"]
+                                                                  status:[dataDic objectForKey:@"status"]
                                                                   created:[df dateFromString:[dataDic objectForKey:@"created"]]
                                                                   expiry:[df dateFromString:[dataDic objectForKey:@"expiration_date"]]
                                                                   ticket:[dataDic objectForKey:@"ticket"]
@@ -3079,7 +3079,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                        
                                        [extractions addObject:e];
                                        
-
+                                       
                                    }
                                    if(successHandler)successHandler(extractions);
                                }else{
@@ -3100,7 +3100,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                            if(errorHandler)errorHandler([self handleErrors:error]);
                        }
                    }];
-
+    
     
     
     
@@ -3166,7 +3166,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
         NSLog(@"No user logged in.");
         return;
     }
-
+    
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"hal_cash/cancel"]
                    usingParameters: @{@"ticket":extraction.ticket}
@@ -3189,6 +3189,68 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                }
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    if(successHandler)successHandler();
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                   }];
+    
+}
+
+-(void) getAtmsNearLocation:(CLLocation *)location
+              andRadiusInKm:(float)radius
+        withSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+           andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"hal_cash/near_atms"]
+                   usingParameters: @{@"latitude":[NSString stringWithFormat:@"%f",location.coordinate.latitude] ,@"longitude":[NSString stringWithFormat:@"%f",location.coordinate.latitude],@"distance":[NSString stringWithFormat:@"%f",radius]}
+                       withAccount:self.userAccount
+                           timeout:20
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"near_atms"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   NSMutableArray *a = [NSMutableArray new];
+                                   for (NSDictionary *d in [responseDictionary objectForKey:@"data"]) {
+                                       CLLocation *loc =[[CLLocation alloc] initWithLatitude:[[d objectForKey:@"latitude"] doubleValue]
+                                                                                   longitude:[[d objectForKey:@"longitude"] doubleValue]];
+                                       PNPLocation *l = [[PNPLocation alloc] initWithLocation:loc city:[d objectForKey:@"locality"] address:[d objectForKey:@"address"] name:[d objectForKey:@"name"]];
+                                       [a addObject:l];
+                                   }
+                                   if(successHandler) successHandler(a);
+
                                }else{
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"

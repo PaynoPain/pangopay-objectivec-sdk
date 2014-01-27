@@ -11,6 +11,8 @@
 #import "PNPWebserviceErrors.h"
 #import "PNPDataContainer.h"
 #import "Base64.h"
+#import <CoreLocation/CLLocation.h>
+
 #pragma mark - Client definitions
 
 
@@ -304,6 +306,13 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 -(void) cancelHalcashTransaction:(PNPHalcashExtraction *) extraction
              withSuccessCallback:(PnPSuccessHandler) successHandler
                 andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) getAtmsNearLocation:(CLLocation *) location
+              andRadiusInKm:(float) radius
+        withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+           andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+
 
 
 
