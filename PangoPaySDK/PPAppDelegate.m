@@ -73,7 +73,13 @@
 //    [self testUploadDnis];
 //    [self testGetCards];
     
-    [self testHalcash];
+//    [self testHalcash];
+    [self testRecharge];
+}
+
+-(void) testRecharge{
+
+    
 }
 
 -(void) testUser{
@@ -318,13 +324,13 @@
 }
 
 -(void) testRegister{
-    [[PangoPayDataCacher sharedInstance] registerUserWithUsername:@"pepopepo" password:@"lalalalala12A" name:@"trololo" surname:@"lolo" email:@"lolo@mail.com" prefix:@"34" phone:@"12823758" pin:@1234 male:YES withSuccessCallback:^{
-        NSLog(@"Register user OK");
-       
-    } andErrorCallback:^(NSError *error){
-        NSLog(@"Error in register user %@",[error userInfo]);
-       
-    }];
+//    [[PangoPayDataCacher sharedInstance] registerUserWithUsername:@"pepopepo" password:@"lalalalala12A" name:@"trololo" surname:@"lolo" email:@"lolo@mail.com" prefix:@"34" phone:@"12823758" pin:@1234 male:YES withSuccessCallback:^{
+//        NSLog(@"Register user OK");
+//       
+//    } andErrorCallback:^(NSError *error){
+//        NSLog(@"Error in register user %@",[error userInfo]);
+//       
+//    }];
 }
 
 -(void) testCountries{

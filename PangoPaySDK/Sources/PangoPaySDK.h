@@ -34,6 +34,7 @@ typedef void(^PnPGenericNSAarraySucceddHandler)(NSArray * data);
 typedef void(^PnPNSNumberSucceddHandler)(NSNumber * number);
 typedef void(^PnPTransactionReceiverSuccessHandler)(PNPTransactionReceiverUser * receiver);
 typedef void(^PnPPaymentRequestSuccessHandler)(PNPPaymentRequest * request);
+typedef void(^PnPSecureRechargeHandler)(NSURL * url);
 + (instancetype)sharedInstance;
 
 
@@ -76,7 +77,8 @@ typedef void(^PnPPaymentRequestSuccessHandler)(PNPPaymentRequest * request);
                           prefix:(NSString *) prefix
                            phone:(NSString *) phone
                              pin:(NSNumber *) pin
-                            male:(BOOL) isMale
+                            male:(BOOL ) isMale
+                       birthdate:(NSDate *) date
              withSuccessCallback:(PnPSuccessHandler) successHandler
                 andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
@@ -167,6 +169,13 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 -(void) deleteCard:(PNPCreditCard *) card
 withSuccessCallback:(PnPSuccessHandler) successHandler
   andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) rechargeWithCreditCard:(PNPCreditCard *)card
+                           cvv:(NSString *) cvv
+                        amount:(NSNumber *)amount
+           withSuccessCallback:(PnPSuccessHandler)successHandler
+         secureRechargeHandler:(PnPSecureRechargeHandler)secureRecharge
+                 errorCallback:(PnPGenericErrorHandler) errorHandler;
 
 
 

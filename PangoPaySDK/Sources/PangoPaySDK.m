@@ -341,12 +341,14 @@
                           prefix:(NSString *)prefix
                            phone:(NSString *)phone
                              pin:(NSNumber *)pin
-                            male:(BOOL)isMale
+                            male:(BOOL )isMale
+                       birthdate:(NSDate *) date
              withSuccessCallback:(PnPSuccessHandler) successHandler
                 andErrorCallback:(PnPGenericErrorHandler) errorHandler{
     
     NSMutableDictionary *params = [NSMutableDictionary new];
-    
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    [df setDateFormat:@"YYYY-mm-dd"];
     [params setObject:username  forKey:@"username"];
     [params setObject:password  forKey:@"password"];
     [params setObject:email     forKey:@"mail"];
@@ -355,6 +357,7 @@
     [params setObject:prefix    forKey:@"prefix"];
     [params setObject:phone     forKey:@"phone"];
     [params setObject:pin       forKey:@"pin"];
+    [params setObject:[df stringFromDate:date] forKey:@"birthdate"];
     
     if(isMale){
         [params setObject:@"M" forKey:@"sex"];
@@ -374,6 +377,7 @@
                            timeout:PNP_REQUEST_TIMEOUT
                sendProgressHandler:nil
                    responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
                        if(!error){
                            @try {
                                NSError *parseError;
@@ -392,10 +396,21 @@
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    if(successHandler)  successHandler();
                                }else{
-                                   if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
-                                                                   initWithDomain:@"PNPGenericWebserviceError"
-                                                                   code:-6060
-                                                                   userInfo:[responseDictionary objectForKey:@"data"]]);
+                                   if([[responseDictionary objectForKey:@"code"] isEqualToString:@"EC0920"]){
+                                       if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
+                                                                       initWithDomain:@"PNPGenericWebserviceError"
+                                                                       code:-6060
+                                                                       userInfo:@{@"errors":[responseDictionary objectForKey:@"data"]}]);
+                                   }else{
+                                       if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
+                                                                       initWithDomain:@"PNPGenericWebserviceError"
+                                                                       code:-6060
+                                                                       userInfo:@{@"errors":@[@[[responseDictionary objectForKey:@"code"],[responseDictionary objectForKey:@"message"]]] }]);
+                                   }
+                                   
+                                   
+                                   
+                                   
                                }
                            }
                            @catch (NSException *exception) {
@@ -691,10 +706,6 @@
 -(void) requestRecoverPassword:(NSString *)email
            withSuccessCallback:(PnPSuccessHandler)successHandler
               andErrorCallback:(PnPGenericErrorHandler)errorHandler{
-    if(![self isUserLoggedIn ]){
-        NSLog(@"No user logged in.");
-        return;
-    }
     
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"register/recover_password"]
@@ -703,6 +714,7 @@
                            timeout:PNP_REQUEST_TIMEOUT
                sendProgressHandler:nil
                    responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       NSLog(@"Responsedata %@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
                        if(!error){
                            @try {
                                NSError *parseError;
@@ -1433,6 +1445,68 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                            
                        }
                    }];
+    
+}
+
+-(void) rechargeWithCreditCard:(PNPCreditCard *)card
+                           cvv:(NSString *) cvv
+                        amount:(NSNumber *)amount
+           withSuccessCallback:(PnPSuccessHandler)successHandler
+         secureRechargeHandler:(PnPSecureRechargeHandler)secureRecharge
+                 errorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    if(![self isUserLoggedIn ]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+    amount = [NSNumber numberWithDouble:[amount doubleValue] *100];
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"wallets/recharge"]
+                   usingParameters:@{@"creditcard_id":card.identifier,@"cvv":cvv,@"amount":amount}
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"recharge"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               NSLog(@"responseDictionary %@",responseDictionary);
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   if(successHandler)  successHandler();
+                               }else{
+                                   if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
+                                                                   initWithDomain:@"PNPGenericWebserviceError"
+                                                                   code:-6060
+                                                                   userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc] initWithDomain:@"PNPMalformedJson"
+                                                                                                      code:-2020
+                                                                                                  userInfo:nil]);
+                               
+                           }
+                       }else{
+                           if(errorHandler) errorHandler([self handleErrors:error]);
+                           
+                       }
+                   }];
+
+    
+    
     
 }
 
@@ -2278,7 +2352,6 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
         NSLog(@"No user logged in.");
         return;
     }
-    
     
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"users/get_user"]
@@ -3214,7 +3287,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
               andRadiusInKm:(float)radius
         withSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
            andErrorCallback:(PnPGenericErrorHandler)errorHandler{
-
+    
     
     if(![self userIsLoggedIn]){
         NSLog(@"No user logged in.");
@@ -3223,7 +3296,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"hal_cash/near_atms"]
-                   usingParameters: @{@"latitude":[NSString stringWithFormat:@"%f",location.coordinate.latitude] ,@"longitude":[NSString stringWithFormat:@"%f",location.coordinate.latitude],@"distance":[NSString stringWithFormat:@"%f",radius]}
+                   usingParameters: @{@"latitude":[NSString stringWithFormat:@"%f",location.coordinate.latitude] ,@"longitude":[NSString stringWithFormat:@"%f",location.coordinate.longitude],@"distance":[NSString stringWithFormat:@"%f",radius]}
                        withAccount:self.userAccount
                            timeout:20
                sendProgressHandler:nil
@@ -3241,6 +3314,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                                                   userInfo:parseError.userInfo]);
                                    return;
                                }
+                               NSLog(@"responseDictionary %@",responseDictionary);
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    NSMutableArray *a = [NSMutableArray new];
                                    for (NSDictionary *d in [responseDictionary objectForKey:@"data"]) {
@@ -3250,7 +3324,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                        [a addObject:l];
                                    }
                                    if(successHandler) successHandler(a);
-
+                                   
                                }else{
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
@@ -3364,7 +3438,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 
 @implementation PNPSandboxEnvironment
 -(id) init{
-    self = [super initWithUrl:[NSURL URLWithString:@"https://pre-core.paynopain.com"]];
+    self = [super initWithUrl:[NSURL URLWithString:@"https://demo-core.paynopain.com"]];
     return self;
 }
 @end
