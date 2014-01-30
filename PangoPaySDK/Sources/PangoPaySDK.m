@@ -1424,6 +1424,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                                                                   userInfo:parseError.userInfo]);
                                    return;
                                }
+
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    if(successHandler)  successHandler();
                                }else{
@@ -1482,9 +1483,13 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                                                                   userInfo:parseError.userInfo]);
                                    return;
                                }
-                               NSLog(@"responseDictionary %@",responseDictionary);
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
-                                   if(successHandler)  successHandler();
+                                   if([[responseDictionary objectForKey:@"code"] isEqualToString:@"EC1004"]){
+                                       NSURL * url = [NSURL URLWithString:[responseDictionary objectForKey:@"data"]];
+                                       if(secureRecharge) secureRecharge(url);
+                                   }else{
+                                       if(successHandler)  successHandler();
+                                   }
                                }else{
                                    if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
                                                                    initWithDomain:@"PNPGenericWebserviceError"
