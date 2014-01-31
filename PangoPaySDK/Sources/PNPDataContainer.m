@@ -563,6 +563,18 @@
 
 @end
 
+@implementation PNPTransactionEmitterRecharge
+
+-(NSString *) tableString{
+    return @"Wallet Recharge";
+}
+
+-(NSString *) description{
+    return @"Wallet Recharge";
+}
+
+@end
+
 @implementation PNPTransactionEmitterHalcash
 
 -(NSString *) tableString{
@@ -961,7 +973,7 @@
                   city:(NSString *)city
                address:(NSString *)address
                   name:(NSString *)name{
-
+    
     self = [super init];
     
     if (!self) return false;
@@ -978,4 +990,31 @@
     return [NSString stringWithFormat:@"\n Name: %@ \n City: %@ \n Address: %@ \n",_name,_city,_address];
 }
 
+@end
+
+@implementation PNPOrder
+
+-(id) initWithIdentifier:(NSNumber *)identifier
+               reference:(NSString *)reference
+                 concept:(NSString *) concept
+                 created:(NSDate *)created
+                commerce:(NSString *)commerce
+                  amount:(NSNumber *)amount
+                currency:(NSString *)currency{
+    self = [super init];
+    if(!self) return nil;
+    self.identifier = identifier;
+    self.reference  = reference;
+    self.concept = concept;
+    self.created = created;
+    self.commerce = commerce;
+    self.amount = amount;
+    self.currency = currency;
+    return self;
+    
+}
+
+-(NSString *) description{
+    return [NSString stringWithFormat:@"\n ID: %@ \n Reference: %@ Concept: %@ \n Created: %@ \n Commerce: %@ \n Amount: %@ %@ \n ",_identifier,_reference,_concept,_created,_commerce,_amount,_currency];
+}
 @end

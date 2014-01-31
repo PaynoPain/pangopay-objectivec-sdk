@@ -1341,6 +1341,9 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                    }];
 }
 
+
+
+
 -(void) updateCard:(PNPCreditCard *) card
 withSuccessCallback:(PnPSuccessHandler) successHandler
   andErrorCallback:(PnPGenericErrorHandler) errorHandler{
@@ -1424,7 +1427,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                                                                   userInfo:parseError.userInfo]);
                                    return;
                                }
-
+                               
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    if(successHandler)  successHandler();
                                }else{
@@ -1509,9 +1512,135 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                            
                        }
                    }];
+    
+    
+    
+    
+}
+
+
+#pragma mark - Commerce Payment Methods
+
+
+-(void) getOrderWithReference:(NSString *) reference
+          withSuccessCallback:(PnPOrderSuccessHandler)successHandler
+                errorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    if(![self isUserLoggedIn ]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"orders/view_order"]
+                   usingParameters:@{@"reference":reference}
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"view_order"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   NSDictionary *order = [responseDictionary objectForKey:@"order"];
+                                   NSNumber *amount = [self clearAmount:[order objectForKey:@"amount"]];
+                                   NSDateFormatter *df = [[NSDateFormatter alloc] init];
+                                   [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+                                   [df setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
+                                   PNPOrder *o = [[PNPOrder alloc] initWithIdentifier:[order objectForKey:@"id"]
+                                                                            reference:[order objectForKey:@"reference"]
+                                                                              concept:[order objectForKey:@"concept"]
+                                                                              created:[df dateFromString:[order objectForKey:@"created"]]
+                                                                             commerce:[order objectForKey:@"commerce"]
+                                                                               amount:amount
+                                                                             currency:[[order objectForKey:@"currency"] objectForKey:@"symbol"]];
+                                   if(successHandler) successHandler(o);
+                                   
+
+                               }else{
+                                   if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
+                                                                   initWithDomain:@"PNPGenericWebserviceError"
+                                                                   code:-6060
+                                                                   userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc] initWithDomain:@"PNPMalformedJson"
+                                                                                                      code:-2020
+                                                                                                  userInfo:nil]);
+                               
+                           }
+                       }else{
+                           if(errorHandler) errorHandler([self handleErrors:error]);
+                           
+                       }
+                   }];
 
     
+}
+
+-(void) payOrder:(PNPOrder *) order
+         withPin:(NSString *) pin
+withSuccessCallback:(PnPSuccessHandler)successHandler
+   errorCallback:(PnPGenericErrorHandler) errorHandler{
     
+    if(![self isUserLoggedIn ]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"orders/payment"]
+                   usingParameters:@{@"reference":order.reference,@"pin":pin}
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"payment"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   if(successHandler) successHandler();
+                               }else{
+                                   if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
+                                                                   initWithDomain:@"PNPGenericWebserviceError"
+                                                                   code:-6060
+                                                                   userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc] initWithDomain:@"PNPMalformedJson"
+                                                                                                      code:-2020
+                                                                                                  userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler) errorHandler([self handleErrors:error]);
+                           
+                       }
+                   }];
+
     
 }
 
@@ -2518,6 +2647,8 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                            entity = [[PNPTransactionEmitterPango alloc] init];
                                        }else if([emitterType isEqualToString:@"HalCash"]){
                                            entity = [[PNPTransactionEmitterHalcash alloc] init];
+                                       }else if([emitterType isEqualToString:@"Recharge"]){
+                                           entity = [[PNPTransactionEmitterRecharge alloc] init];
                                        }
                                        else{
                                            NSLog(@"No implementation for emitter type %@",emitterType);

@@ -210,6 +210,9 @@
 
 @end
 
+@interface PNPTransactionEmitterRecharge : PNPTransactionEmitter <NSCoding>
+
+@end
 
 @interface PNPTransactionEmitterUser : PNPTransactionEmitter <NSCoding>
 
@@ -407,4 +410,23 @@
 
 @end
 
+
+@interface PNPOrder : NSObject
+@property (strong,nonatomic) NSString *concept;
+@property (strong,nonatomic) NSString *reference;
+@property (strong,nonatomic) NSNumber *identifier;
+@property (strong,nonatomic) NSNumber *amount;
+@property (strong,nonatomic) NSString *currency;
+@property (strong,nonatomic) NSDate *created;
+@property (strong,nonatomic) NSString *commerce;
+
+-(id) initWithIdentifier:(NSNumber *) identifier
+               reference:(NSString *) reference
+                 concept:(NSString *) concept
+                 created:(NSDate *)   created
+                commerce:(NSString *) commerce
+                  amount:(NSNumber *) amount
+                currency:(NSString *) currency;
+
+@end
 

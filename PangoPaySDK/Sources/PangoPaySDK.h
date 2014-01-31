@@ -35,6 +35,7 @@ typedef void(^PnPNSNumberSucceddHandler)(NSNumber * number);
 typedef void(^PnPTransactionReceiverSuccessHandler)(PNPTransactionReceiverUser * receiver);
 typedef void(^PnPPaymentRequestSuccessHandler)(PNPPaymentRequest * request);
 typedef void(^PnPSecureRechargeHandler)(NSURL * url);
+typedef void(^PnPOrderSuccessHandler)(PNPOrder * order);
 + (instancetype)sharedInstance;
 
 
@@ -179,6 +180,17 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 
 
+#pragma mark - Commerce Payment Methods
+
+
+-(void) getOrderWithReference:(NSString *) reference
+          withSuccessCallback:(PnPOrderSuccessHandler)successHandler
+                errorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) payOrder:(PNPOrder *) order
+         withPin:(NSString *) pin
+withSuccessCallback:(PnPSuccessHandler)successHandler
+   errorCallback:(PnPGenericErrorHandler) errorHandler;
 
 
 #pragma mark - Notification Methods
