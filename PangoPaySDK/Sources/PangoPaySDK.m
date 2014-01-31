@@ -1552,7 +1552,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                    return;
                                }
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
-                                   NSDictionary *order = [responseDictionary objectForKey:@"order"];
+                                   NSDictionary *order = [[responseDictionary objectForKey:@"data"] objectForKey:@"order"];
                                    NSNumber *amount = [self clearAmount:[order objectForKey:@"amount"]];
                                    NSDateFormatter *df = [[NSDateFormatter alloc] init];
                                    [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
