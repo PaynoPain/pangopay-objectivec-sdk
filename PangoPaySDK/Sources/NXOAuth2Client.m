@@ -367,6 +367,7 @@ NSString * const NXOAuth2ClientConnectionContextTokenRefresh = @"tokenRefresh";
     NSAssert1(!authConnection, @"authConnection already running with: %@", authConnection);
     
     NSMutableURLRequest *tokenRequest = [NSMutableURLRequest requestWithURL:tokenURL];
+    tokenRequest.timeoutInterval = 5.0;
     [tokenRequest setHTTPMethod:@"POST"];
     [authConnection cancel];  // just to be sure
 

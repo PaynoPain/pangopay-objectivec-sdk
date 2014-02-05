@@ -183,6 +183,14 @@
 
 @end
 
+@interface  PNPTransactionReceiverCommerce : PNPTransactionReceiver<NSCoding>
+
+@property (strong,nonatomic) NSString *name;
+
+-(id) initWithName:(NSString *)name;
+
+@end
+
 @interface PNPTransactionEmitter : PNPTransactionEntity <NSCoding>
 
 @end

@@ -448,6 +448,36 @@
 
 @end
 
+@implementation PNPTransactionReceiverCommerce
+
+-(id) initWithName:(NSString *)name{
+    self = [super init];
+    if(!self) return nil;
+    self.name = name;
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if(!self) return nil;
+    self.name = [aDecoder decodeObjectForKey:@"name"];
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:self.name forKey:@"name"];
+}
+
+-(NSString *) description{
+    return _name;
+}
+
+-(NSString *) tableString{
+    return [NSString stringWithFormat:@"Comercio %@",_name];
+}
+
+@end
+
 @implementation PNPTransactionReceiverUnregistered
 
 -(id) initWithPrefix:(NSString *)prefix

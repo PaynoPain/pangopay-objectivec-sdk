@@ -12,7 +12,7 @@
 
 #define     PNP_MOBILE_ACCOUNT_TYPE            @"paynopain"
 #define     PNP_MOBILE_ACCOUNT_IDENTIFIER_KEY  @"pnpaccount"
-#define     PNP_REQUEST_TIMEOUT                20
+#define     PNP_REQUEST_TIMEOUT                10
 
 @interface PangoPaySDK ()
 @property (strong,nonatomic) NSUserDefaults  *userDefaults;
@@ -22,7 +22,6 @@
 @property (strong,nonatomic) NSArray *scope;
 @property (nonatomic)  BOOL userIsLoggedIn;
 @property (strong,nonatomic) NXOAuth2Account *userAccount;
-
 @end
 
 @implementation PangoPaySDK
@@ -57,7 +56,7 @@
             self.userIsLoggedIn = NO;
         }
     }
-    return self;
+    return self;  
 }
 
 
@@ -182,7 +181,7 @@
                                                                                                   userInfo:parseError.userInfo]);
                                    return;
                                }
-                               if([responseDictionary objectForKey:@"success"]){
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    
                                    responseDictionary = [responseDictionary objectForKey:@"data"];
                                    
@@ -405,7 +404,7 @@
                                        if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
                                                                        initWithDomain:@"PNPGenericWebserviceError"
                                                                        code:-6060
-                                                                       userInfo:@{@"errors":@[@[[responseDictionary objectForKey:@"code"],[responseDictionary objectForKey:@"message"]]] }]);
+                                                                       userInfo:@{@"errors":@[@[[responseDictionary objectForKey:@"message"],[responseDictionary objectForKey:@"code"]]] }]);
                                    }
                                    
                                    
@@ -548,11 +547,12 @@
     
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"devices/register"]
-                   usingParameters:@{@"token":ds,@"type":@"IOS"}
+                   usingParameters:@{@"device":ds,@"type":@"IOS"}
                        withAccount:self.userAccount
                            timeout:PNP_REQUEST_TIMEOUT
                sendProgressHandler:nil
                    responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+
                        if(!error){
                            @try {
                                NSError *parseError;
@@ -714,7 +714,7 @@
                            timeout:PNP_REQUEST_TIMEOUT
                sendProgressHandler:nil
                    responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
-                       NSLog(@"Responsedata %@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+
                        if(!error){
                            @try {
                                NSError *parseError;
@@ -1678,7 +1678,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                                                   userInfo:parseError.userInfo]);
                                    return;
                                }
-                               if([responseDictionary objectForKey:@"success"]){
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    NSDateFormatter *df = [[NSDateFormatter alloc] init];
                                    [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
                                    [df setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
@@ -1751,7 +1751,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                                               userInfo:parseError.userInfo]);
                                return;
                            }
-                           if([responseDictionary objectForKey:@"success"]){
+                           if([[responseDictionary objectForKey:@"success"] boolValue]){
                                if(successHandler) successHandler();
                            }else{
                                if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc] initWithDomain:@"PNPGenericWebserviceError"
@@ -1807,7 +1807,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                                                   userInfo:parseError.userInfo]);
                                    return;
                                }
-                               if([responseDictionary objectForKey:@"success"]){
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    NSMutableArray *pangos = [NSMutableArray new];
                                    NSNumberFormatter *nf = [[NSNumberFormatter alloc] init];
                                    [nf setNumberStyle:NSNumberFormatterNoStyle];
@@ -1892,7 +1892,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                                                   userInfo:parseError.userInfo]);
                                    return;
                                }
-                               if([responseDictionary objectForKey:@"success"]){
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    NSMutableArray *pangos = [NSMutableArray new];
                                    for(NSDictionary *d in [responseDictionary objectForKey:@"data"]){
                                        NSNumber *amount = [nf numberFromString:[d objectForKey:@"amount"]];
@@ -1968,13 +1968,12 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                                              userInfo:parseError.userInfo]);
                                return;
                            }
-                           if([responseDictionary objectForKey:@"success"]){
+                           if([[responseDictionary objectForKey:@"success"] boolValue]){
                                if(successHandler) successHandler();
                            }else{
                                if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc] initWithDomain:@"PNPGenericWebserviceError"
                                                                                                          code:-6060
-                                                                                                     userInfo:[responseDictionary
-                                                                                                               objectForKey:@"message"]]);
+                                                                                                     userInfo:responseDictionary]);
                            }
                        }else{
                            if(errorHandler) errorHandler([self handleErrors:error]);
@@ -2022,13 +2021,12 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                                               userInfo:parseError.userInfo]);
                                return;
                            }
-                           if([responseDictionary objectForKey:@"success"]){
+                           if([[responseDictionary objectForKey:@"success"] boolValue]){
                                if(successHandler)successHandler();
                            }else{
                                if(errorHandler) errorHandler([[PNPGenericWebserviceError alloc] initWithDomain:@"PNPGenericWebserviceError"
                                                                                                           code:-6060
-                                                                                                      userInfo:[responseDictionary
-                                                                                                                objectForKey:@"message"]]);
+                                                                                                      userInfo:responseDictionary]);
                            }
                        }else{
                            if(errorHandler)errorHandler([self handleErrors:error]);
@@ -2068,13 +2066,12 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                                               userInfo:parseError.userInfo]);
                                return;
                            }
-                           if([responseDictionary objectForKey:@"success"]){
+                           if([[responseDictionary objectForKey:@"success"] boolValue]){
                                if(successHandler)successHandler();
                            }else{
                                if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc] initWithDomain:@"PNPGenericWebserviceError"
                                                                                                          code:-6060
-                                                                                                     userInfo:[responseDictionary
-                                                                                                               objectForKey:@"message"]]);
+                                                                                                     userInfo:responseDictionary]);
                            }
                        }else{
                            if(errorHandler)errorHandler([self handleErrors:error]);
@@ -2115,13 +2112,12 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                                               userInfo:parseError.userInfo]);
                                return;
                            }
-                           if([responseDictionary objectForKey:@"success"]){
+                           if([[responseDictionary objectForKey:@"success"] boolValue]){
                                if(successHandler)successHandler();
                            }else{
                                if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc] initWithDomain:@"PNPGenericWebserviceError"
                                                                                                          code:-6060
-                                                                                                     userInfo:[responseDictionary
-                                                                                                               objectForKey:@"message"]]);
+                                                                                                     userInfo:responseDictionary]);
                            }
                        }else{
                            if(errorHandler) errorHandler([self handleErrors:error]);
@@ -2163,13 +2159,12 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                                               userInfo:parseError.userInfo]);
                                return;
                            }
-                           if([responseDictionary objectForKey:@"success"]){
+                           if([[responseDictionary objectForKey:@"success"] boolValue]){
                                if(successHandler)successHandler();
                            }else{
                                if(errorHandler) errorHandler([[PNPGenericWebserviceError alloc] initWithDomain:@"PNPGenericWebserviceError"
                                                                                                           code:-6060
-                                                                                                      userInfo:[responseDictionary
-                                                                                                                objectForKey:@"message"]]);
+                                                                                                      userInfo:responseDictionary]);
                            }
                        }else{
                            if(errorHandler) errorHandler([self handleErrors:error]);
@@ -2211,13 +2206,12 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                                               userInfo:parseError.userInfo]);
                                return;
                            }
-                           if([responseDictionary objectForKey:@"success"]){
+                           if([[responseDictionary objectForKey:@"success"] boolValue]){
                                if(successHandler)successHandler();
                            }else{
                                if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc] initWithDomain:@"PNPGenericWebserviceError"
                                                                                                          code:-6060
-                                                                                                     userInfo:[responseDictionary
-                                                                                                               objectForKey:@"message"]]);
+                                                                                                     userInfo:responseDictionary]);
                            }
                        }else{
                            if(errorHandler)errorHandler([self handleErrors:error]);
@@ -2268,7 +2262,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    return;
                                }
                                
-                               if([responseDictionary objectForKey:@"success"]){
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    NSMutableArray *movements = [NSMutableArray new];
                                    
                                    NSArray *results;
@@ -2397,13 +2391,13 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                    userInfo:parseError.userInfo]);
                                    return;
                                }
-                               if([responseDictionary objectForKey:@"success"]){
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    if(successHandler)successHandler([self clearAmount:[responseDictionary objectForKey:@"data"]]);
                                }else{
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
                                                                  code:-6060
-                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -2455,13 +2449,14 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                    userInfo:parseError.userInfo]);
                                    return;
                                }
-                               if([responseDictionary objectForKey:@"success"]){
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    if(successHandler) successHandler();
                                }else{
+
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
                                                                  code:-6060
-                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -2522,7 +2517,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
                                                                  code:-6060
-                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -2650,16 +2645,19 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                        }else if([emitterType isEqualToString:@"Recharge"]){
                                            entity = [[PNPTransactionEmitterRecharge alloc] init];
                                        }
+                                   else if([emitterType isEqualToString:@"Commerce"]){
+                                       entity = [[PNPTransactionReceiverCommerce alloc] initWithName:[emitterData objectForKey:@"name"]];
+                                   }
                                        else{
                                            NSLog(@"No implementation for emitter type %@",emitterType);
-                                           if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
-                                                                         initWithDomain:@"PNPGenericWebserviceError"
-                                                                         code:-6060
-                                                                         userInfo:@{
-                                                                                    @"description":
-                                                                                        @"NO Implementation for this emitter type."
-                                                                                    }]);
-                                           return;
+//                                           if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+//                                                                         initWithDomain:@"PNPGenericWebserviceError"
+//                                                                         code:-6060
+//                                                                         userInfo:@{
+//                                                                                    @"description":
+//                                                                                        @"NO Implementation for this emitter type."
+//                                                                                    }]);
+//                                           return;
                                        }
                                        
                                        [PNPTransactionsArray addObject:[[PNPTransactionReceived alloc]
@@ -2678,7 +2676,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
                                                                  code:-6060
-                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -2753,16 +2751,18 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                            entity = [[PNPTransactionEmitterPango alloc] init];
                                        }else if([receiverType isEqualToString:@"HalCash"]){
                                            entity = [[PNPTransactionReceiverHalcash alloc] init];
+                                       }else if ([receiverType isEqualToString:@"Commerce"]){
+                                           entity = [[PNPTransactionReceiverCommerce alloc] initWithName:[receiverData objectForKey:@"name"]];
                                        }else{
                                            NSLog(@"No implementation for receiver type %@",receiverType);
-                                           if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
-                                                                         initWithDomain:@"PNPGenericWebserviceError"
-                                                                         code:-6060
-                                                                         userInfo:@{
-                                                                                    @"description":
-                                                                                        @"NO Implementation for this receiver type."
-                                                                                    }]);
-                                           return;
+//                                           if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+//                                                                         initWithDomain:@"PNPGenericWebserviceError"
+//                                                                         code:-6060
+//                                                                         userInfo:@{
+//                                                                                    @"description":
+//                                                                                        @"NO Implementation for this receiver type."
+//                                                                                    }]);
+//                                           return;
                                        }
                                        
                                        [PNPTransactionsArray addObject:[[PNPTransactionReceived alloc]
@@ -2781,7 +2781,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
                                                                  code:-6060
-                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -2849,14 +2849,14 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                            
                                        }else{
                                            NSLog(@"No implementation for receiver type %@",receiverType);
-                                           if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
-                                                                         initWithDomain:@"PNPGenericWebserviceError"
-                                                                         code:-6060
-                                                                         userInfo:@{
-                                                                                    @"description":
-                                                                                        @"NO Implementation for receiver type."
-                                                                                    }]);
-                                           return;
+//                                           if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+//                                                                         initWithDomain:@"PNPGenericWebserviceError"
+//                                                                         code:-6060
+//                                                                         userInfo:@{
+//                                                                                    @"description":
+//                                                                                        @"NO Implementation for receiver type."
+//                                                                                    }]);
+//                                           return;
                                        }
                                        
                                        [PNPTransactionsArray addObject:[[PNPTransactionReceived alloc]
@@ -2875,7 +2875,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
                                                                  code:-6060
-                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -2930,7 +2930,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
                                                                  code:-6060
-                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -2999,7 +2999,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
                                                                  code:-6060
-                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -3049,7 +3049,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
                                                                  code:-6060
-                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -3101,7 +3101,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
                                                                  code:-6060
-                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -3156,7 +3156,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
                                                                  code:-6060
-                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -3218,7 +3218,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
                                                                  code:-6060
-                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -3295,7 +3295,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
                                                                  code:-6060
-                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -3352,7 +3352,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
                                                                  code:-6060
-                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -3402,7 +3402,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
                                                                  code:-6060
-                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -3450,7 +3450,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                                                   userInfo:parseError.userInfo]);
                                    return;
                                }
-                               NSLog(@"responseDictionary %@",responseDictionary);
+
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    NSMutableArray *a = [NSMutableArray new];
                                    for (NSDictionary *d in [responseDictionary objectForKey:@"data"]) {
@@ -3465,7 +3465,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
                                                                  code:-6060
-                                                                 userInfo:[responseDictionary objectForKey:@"message"]]);
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -3574,7 +3574,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 
 @implementation PNPSandboxEnvironment
 -(id) init{
-    self = [super initWithUrl:[NSURL URLWithString:@"https://demo-core.paynopain.com"]];
+    self = [super initWithUrl:[NSURL URLWithString:@"https://pre-core.paynopain.com"]];
     return self;
 }
 @end

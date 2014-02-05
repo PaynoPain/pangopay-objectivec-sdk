@@ -56,7 +56,7 @@
                            @"countries"                 : @"pnpcountries",
                            @"validation"                : @"pnpuservalidation",
                            @"creditCards"               : @"pnpcreditcards",
-                           @"halcashExtractions"       : @"pnphalcashextractions",
+                           @"halcashExtractions"        : @"pnphalcashextractions",
                            };
     return self;
 }
@@ -77,6 +77,7 @@
 -(void) getUserDataWithSuccessCallback:(PnpUserDataSuccessHandler) successHandler
                       andErrorCallback:(PnPGenericErrorHandler) errorHandler
                     andRefreshCallback:(PnpUserDataSuccessHandler) refreshHandler{
+
     [self getUser:^(PNPUser *user) {
         if(user != nil){
             if(successHandler) successHandler(user);
@@ -552,6 +553,10 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [NSKeyedArchiver archiveRootObject:self.pangoMovements
                                     toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"pangoMovements"]]];
+        
+        
+
+    
     });
 }
 
@@ -708,7 +713,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                  pin:pin
                  withSuccessCallback:^{
                      [self getUserDataWithSuccessCallback:nil andErrorCallback:errorHandler andRefreshCallback:^(PNPUser *user) {
-                         successHandler();
+                         if(successHandler)successHandler();
                      }];
                  }
                     andErrorCallback:errorHandler];
@@ -998,15 +1003,17 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 -(void) getPaymentRequestsWitId:(NSNumber *)identifier
              andSuccessCallback:(PnPPaymentRequestSuccessHandler) successHandler
                andErrorCallback:(PnPGenericErrorHandler)errorHandler{
-    [self getPaymentRequestsWithSuccessCallback:^(NSArray *data) {
-        NSPredicate *p = [NSPredicate predicateWithFormat:@"self.identifier == %@",identifier];
-        NSArray *f = [data filteredArrayUsingPredicate:p];
-        if([f count] > 0){
-            if(successHandler) successHandler([f objectAtIndex:0]);
-        }else{
-            if(successHandler) successHandler(nil);
-        }
-    } andErrorCallback:errorHandler];
+    [self getPaymentRequestsWithSuccessCallback:nil
+                               andErrorCallback:errorHandler
+     andRefreshCallback:^(NSArray *data) {
+         NSPredicate *p = [NSPredicate predicateWithFormat:@"self.identifier.intValue == %d",[identifier intValue]];
+         NSArray *f = [data filteredArrayUsingPredicate:p];
+         if([f count] > 0){
+             if(successHandler) successHandler([f objectAtIndex:0]);
+         }else{
+             if(errorHandler) errorHandler(nil);
+         }
+     }];
     
 }
 
@@ -1096,6 +1103,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
         if(data != nil){
             if(successHandler) successHandler(data);
             if(refreshHandler){
+
                 [super getHalcashExtractionsWithSuccessCallback:^(NSArray *data) {
                     [self storeHalcashExtractions:data];
                     refreshHandler(data);
@@ -1124,7 +1132,10 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                  [self getHalcashExtractionsWithSuccessCallback:nil
                                                andErrorCallback:errorHandler
                                              andRefreshCallback:^(NSArray *data) {
-                                                 if(successHandler) successHandler();
+                                                 [self getUserDataWithSuccessCallback:nil andErrorCallback:errorHandler andRefreshCallback:^(PNPUser *user) {
+                                                     if(successHandler) successHandler();
+                                                 }];
+
                                              }
                   ];
              }
@@ -1140,7 +1151,9 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                     [self getHalcashExtractionsWithSuccessCallback:nil
                                                   andErrorCallback:errorHandler
                                                 andRefreshCallback:^(NSArray *data) {
-                                                    if(successHandler) successHandler();
+                                                    [self getUserDataWithSuccessCallback:nil andErrorCallback:errorHandler andRefreshCallback:^(PNPUser *user) {
+                                                        if(successHandler) successHandler();
+                                                    }];
                                                 }
                      ];
                 }
