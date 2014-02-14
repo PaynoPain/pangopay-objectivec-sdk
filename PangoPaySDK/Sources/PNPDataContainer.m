@@ -473,8 +473,38 @@
 }
 
 -(NSString *) tableString{
-    return [NSString stringWithFormat:@"Comercio %@",_name];
+    return [NSString stringWithFormat:@"%@",_name];
 }
+@end
+
+@implementation PNPTransactionEmitterCommerce
+
+-(id) initWithName:(NSString *)name{
+    self = [super init];
+    if(!self) return nil;
+    self.name = name;
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if(!self) return nil;
+    self.name = [aDecoder decodeObjectForKey:@"name"];
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:self.name forKey:@"name"];
+}
+
+-(NSString *) description{
+    return _name;
+}
+
+-(NSString *) tableString{
+    return [NSString stringWithFormat:@"%@",_name];
+}
+
 
 @end
 
@@ -582,6 +612,18 @@
 @end
 
 @implementation PNPTransactionEmitterPango
+
+-(NSString *) tableString{
+    return @"Pango";
+}
+
+-(NSString *) description{
+    return @"Pango";
+}
+
+@end
+
+@implementation PNPTransactionReceiverPango
 
 -(NSString *) tableString{
     return @"Pango";

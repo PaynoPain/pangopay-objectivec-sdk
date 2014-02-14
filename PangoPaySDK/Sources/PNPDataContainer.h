@@ -183,6 +183,8 @@
 
 @end
 
+
+
 @interface  PNPTransactionReceiverCommerce : PNPTransactionReceiver<NSCoding>
 
 @property (strong,nonatomic) NSString *name;
@@ -192,6 +194,14 @@
 @end
 
 @interface PNPTransactionEmitter : PNPTransactionEntity <NSCoding>
+
+@end
+
+@interface  PNPTransactionEmitterCommerce : PNPTransactionEmitter<NSCoding>
+
+@property (strong,nonatomic) NSString *name;
+
+-(id) initWithName:(NSString *)name;
 
 @end
 
@@ -206,6 +216,10 @@
             prefix:(NSString *) prefix
              phone:(NSString *) phone
              email:(NSString *) email;
+@end
+
+@interface PNPTransactionReceiverPango : PNPTransactionEmitter
+
 @end
 
 @interface PNPTransactionReceiverUnregistered : PNPTransactionReceiver <NSCoding>

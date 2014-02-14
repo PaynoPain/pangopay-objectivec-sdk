@@ -156,6 +156,7 @@
 
 -(void) getUserDataWithSuccessCallback:(PnpUserDataSuccessHandler) successHandler
                       andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+
     if(![self isUserLoggedIn ]){
         NSLog(@"No user logged in.");
         return;
@@ -168,6 +169,7 @@
                            timeout:PNP_REQUEST_TIMEOUT
                sendProgressHandler:nil
                    responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                          
                        if(!error){
                            @try {
                                NSError *parseError;
@@ -347,7 +349,7 @@
     
     NSMutableDictionary *params = [NSMutableDictionary new];
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    [df setDateFormat:@"YYYY-mm-dd"];
+    [df setDateFormat:@"yyyy-MM-dd"];
     [params setObject:username  forKey:@"username"];
     [params setObject:password  forKey:@"password"];
     [params setObject:email     forKey:@"mail"];
@@ -2645,19 +2647,11 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                        }else if([emitterType isEqualToString:@"Recharge"]){
                                            entity = [[PNPTransactionEmitterRecharge alloc] init];
                                        }
-                                   else if([emitterType isEqualToString:@"Commerce"]){
-                                       entity = [[PNPTransactionReceiverCommerce alloc] initWithName:[emitterData objectForKey:@"name"]];
-                                   }
+                                       else if([emitterType isEqualToString:@"Commerce"]){
+                                           entity = [[PNPTransactionEmitterCommerce alloc] initWithName:[emitterData objectForKey:@"name"]];
+                                       }
                                        else{
                                            NSLog(@"No implementation for emitter type %@",emitterType);
-//                                           if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
-//                                                                         initWithDomain:@"PNPGenericWebserviceError"
-//                                                                         code:-6060
-//                                                                         userInfo:@{
-//                                                                                    @"description":
-//                                                                                        @"NO Implementation for this emitter type."
-//                                                                                    }]);
-//                                           return;
                                        }
                                        
                                        [PNPTransactionsArray addObject:[[PNPTransactionReceived alloc]
@@ -2748,21 +2742,13 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                                                       andPhone:[receiverData objectForKey:@"phone"]];
                                            
                                        }else if([receiverType isEqualToString:@"Pango"]){
-                                           entity = [[PNPTransactionEmitterPango alloc] init];
+                                           entity = [[PNPTransactionReceiverPango alloc] init];
                                        }else if([receiverType isEqualToString:@"HalCash"]){
                                            entity = [[PNPTransactionReceiverHalcash alloc] init];
                                        }else if ([receiverType isEqualToString:@"Commerce"]){
                                            entity = [[PNPTransactionReceiverCommerce alloc] initWithName:[receiverData objectForKey:@"name"]];
                                        }else{
                                            NSLog(@"No implementation for receiver type %@",receiverType);
-//                                           if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
-//                                                                         initWithDomain:@"PNPGenericWebserviceError"
-//                                                                         code:-6060
-//                                                                         userInfo:@{
-//                                                                                    @"description":
-//                                                                                        @"NO Implementation for this receiver type."
-//                                                                                    }]);
-//                                           return;
                                        }
                                        
                                        [PNPTransactionsArray addObject:[[PNPTransactionReceived alloc]
@@ -2845,18 +2831,8 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                            entity = [[PNPTransactionReceiverUnregistered alloc]
                                                      initWithPrefix:[receiverData objectForKey:@"prefix"]
                                                      andPhone:[receiverData objectForKey:@"phone"]];
-                                           
-                                           
                                        }else{
                                            NSLog(@"No implementation for receiver type %@",receiverType);
-//                                           if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
-//                                                                         initWithDomain:@"PNPGenericWebserviceError"
-//                                                                         code:-6060
-//                                                                         userInfo:@{
-//                                                                                    @"description":
-//                                                                                        @"NO Implementation for receiver type."
-//                                                                                    }]);
-//                                           return;
                                        }
                                        
                                        [PNPTransactionsArray addObject:[[PNPTransactionReceived alloc]
