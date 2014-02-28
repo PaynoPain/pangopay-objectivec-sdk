@@ -236,7 +236,7 @@
                         onResource:[self.environment.url URLByAppendingPathComponent:@"users/avatar"]
                    usingParameters:nil
                        withAccount:self.userAccount
-                           timeout:PNP_REQUEST_TIMEOUT
+                           timeout:60
                sendProgressHandler:nil
                    responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
                        if(!error){
@@ -288,7 +288,7 @@
                         onResource:[self generateUrl:@"users/upload_avatar"]
                    usingParameters:@{@"avatar":base64encodedImage}
                        withAccount:self.userAccount
-                           timeout:PNP_REQUEST_TIMEOUT
+                           timeout:60
                sendProgressHandler:nil
                    responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
                        
@@ -3550,7 +3550,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 
 @implementation PNPSandboxEnvironment
 -(id) init{
-    self = [super initWithUrl:[NSURL URLWithString:@"https://pre-core.paynopain.com"]];
+    self = [super initWithUrl:[NSURL URLWithString:@"https://demo-core.paynopain.com"]];
     return self;
 }
 @end
