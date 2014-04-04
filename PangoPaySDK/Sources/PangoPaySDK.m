@@ -2751,7 +2751,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                            NSLog(@"No implementation for receiver type %@",receiverType);
                                        }
                                        
-                                       [PNPTransactionsArray addObject:[[PNPTransactionReceived alloc]
+                                       [PNPTransactionsArray addObject:[[PNPTransactionSent alloc]
                                                                         initWithIdentifier:[d objectForKey:@"id"]
                                                                         amount:amount
                                                                         currencyCode:[currency objectForKey:@"code"]
