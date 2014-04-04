@@ -38,6 +38,7 @@ typedef void(^PnPTransactionReceiverSuccessHandler)(PNPTransactionReceiverUser *
 typedef void(^PnPPaymentRequestSuccessHandler)(PNPPaymentRequest * request);
 typedef void(^PnPSecureRechargeHandler)(NSURL * url);
 typedef void(^PnPOrderSuccessHandler)(PNPOrder * order);
+typedef void(^PnPCommerceOrderSuccessHandler)(PNPCommerceOrder * order);
 + (instancetype)sharedInstance;
 
 
@@ -347,20 +348,19 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 
 
 -(void) createOrderWithConcept:(NSString *) concept
-                        amount:(NSNumber *)amount
-           withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                        amount:(NSNumber *) amount
+           withSuccessCallback:(PnPSuccessStringHandler) successHandler
               andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
-
 -(void) checkIfOrderIsPaid:(NSString *) orderReference
-       withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+       withSuccessCallback:(PnPCommerceOrderSuccessHandler) successHandler
           andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) sendMailForOrder:(NSString *) orderReference
                   toMail:(NSString *) mail
                     type:(NSString *) mailType
                   userId:(NSNumber *) userId
-     withSuccessCallback:(PnPSuccessStringHandler) successHandler
+     withSuccessCallback:(PnPSuccessHandler) successHandler
         andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) refundOrder:(NSNumber *) orderId

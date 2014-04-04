@@ -457,3 +457,27 @@
 
 @end
 
+
+@interface PNPCommerceOrder : NSObject <NSCoding>
+@property (strong,nonatomic) NSString *reference;
+@property (strong,nonatomic) NSNumber *identifier;
+@property (strong,nonatomic) NSString *mail;
+@property (strong,nonatomic) NSNumber *userId;
+@property (strong,nonatomic) NSString *name;
+@property (strong,nonatomic) NSString *surname;
+
+-(id) initWithIdentifier:(NSNumber *) identifier
+               reference:(NSString *) reference
+                    mail:(NSString *) mail
+                    userId:(NSNumber *) userId
+                    name:(NSString *) name
+                    surname:(NSString *) surname;
+
+
+
+@end
+
+
+
+
+

@@ -1104,3 +1104,54 @@
     return [NSString stringWithFormat:@"\n ID: %@ \n Reference: %@ Concept: %@ \n Created: %@ \n Commerce: %@ \n Amount: %@ %@ \n ",_identifier,_reference,_concept,_created,_commerce,_amount,_currency];
 }
 @end
+
+@implementation PNPCommerceOrder
+
+-(id) initWithIdentifier:(NSNumber *) identifier
+               reference:(NSString *) reference
+                    mail:(NSString *) mail
+                  userId:(NSNumber *) userId
+                    name:(NSString *) name
+                 surname:(NSString *) surname{
+    self = [super  init];
+    if(!self) return nil;
+    self.identifier = identifier;
+    self.reference = reference;
+    self.mail = mail;
+    self.userId = userId;
+    self.name = name;
+    self.surname = surname;
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super  init];
+    if(!self) return nil;
+    self.identifier = [aDecoder decodeObjectForKey:@"identifier"];
+    self.reference = [aDecoder decodeObjectForKey:@"reference"];
+    self.mail = [aDecoder decodeObjectForKey:@"mail"];
+    self.userId = [aDecoder decodeObjectForKey:@"userid"];
+    self.name = [aDecoder decodeObjectForKey:@"name"];
+    self.surname = [aDecoder decodeObjectForKey:@"surname"];
+    
+    return self;
+    
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:_identifier forKey:@"identifier"];
+    [aCoder encodeObject:_reference forKey:@"reference"];
+    [aCoder encodeObject:_mail forKey:@"mail"];
+    [aCoder encodeObject:_userId forKey:@"userId"];
+    [aCoder encodeObject:_name forKey:@"name"];
+    [aCoder encodeObject:_surname forKey:@"surname"];
+}
+
+-(NSString *) description{
+    return [NSString stringWithFormat:@"\n ID: %@ \n Reference: %@ mail: %@ \n userId: %@ \n name: %@ \n surname: %@ \n ",_identifier,_reference,_mail,_userId,_name,_surname];
+}
+
+
+
+@end
+
