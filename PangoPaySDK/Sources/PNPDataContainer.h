@@ -45,6 +45,11 @@
 @property (strong,nonatomic) NSArray *limits;
 @end
 
+@interface PNPCommerce : NSObject <NSCoding>
+@end
+
+
+
 #define PNPNotificationSendPayment          @"sendPayment"
 #define PNPNotificationRequestPayment       @"requestPayment"
 #define PNPNotificationNewGroupPayment      @"groupPayment"

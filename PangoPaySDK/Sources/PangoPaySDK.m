@@ -225,6 +225,19 @@
                    }];
 }
 
+-(void) getCommerceDataWithSuccessCallback:(PnpCommerceDataSuccessHandler)successHandler
+                          andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"ComUsers/commerce_data"]
+                   usingParameters:nil
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                   }];
+}
 
 -(void) getUserAvatarWithSuccessCallback:(PnpUserAvatarSuccessHandler) successHandler
                         andErrorCallback:(PnPGenericErrorHandler) errorHandler{
@@ -3455,6 +3468,27 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                            if(errorHandler)errorHandler([self handleErrors:error]);
                        }
                    }];
+    
+}
+
+
+#pragma mark - Commerce payment methods
+
+
+
+-(void) sendMailForOrder:(NSString *) orderReference
+                  toMail:(NSString *) mail
+                    type:(NSString *) mailType
+                  userId:(NSNumber *) userId
+     withSuccessCallback:(PnPSuccessStringHandler) successHandler
+        andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+}
+
+-(void) refundOrder:(NSNumber *) orderId
+                pin:(NSString *) pin
+withSuccessCallback:(PnPSuccessHandler) successHandler
+   andErrorCallback:(PnPGenericErrorHandler) errorHandler{
     
 }
 

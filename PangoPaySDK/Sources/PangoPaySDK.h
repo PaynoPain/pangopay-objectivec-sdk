@@ -22,11 +22,13 @@
 @interface PangoPaySDK : NSObject
 
 typedef void(^PnPSuccessHandler)();
+typedef void(^PnPSuccessStringHandler)(NSString *string);
 typedef void(^PnPLoginSuccessHandler)();
 typedef void(^PnPLoginErrorHandler)(NSError *error);
 typedef void(^PnPLogoutHandler)();
 typedef void(^PnPGenericErrorHandler)(NSError *error);
 typedef void(^PnpUserDataSuccessHandler)(PNPUser *user);
+typedef void(^PnpCommerceDataSuccessHandler)(PNPCommerce *commerce);
 typedef void(^PnpUserValidationSuccessHandler)(PNPUserValidation *val);
 typedef void(^PnpPangoDataSuccessHandler)(PNPPango *pango);
 typedef void(^PnpUserAvatarSuccessHandler)(UIImage *avatar);
@@ -56,6 +58,9 @@ typedef void(^PnPOrderSuccessHandler)(PNPOrder * order);
 -(void) getUserDataWithSuccessCallback:(PnpUserDataSuccessHandler) successHandler
                       andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
+-(void) getCommerceDataWithSuccessCallback:(PnpCommerceDataSuccessHandler) successHandler
+                      andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 -(void) getUserAvatarWithSuccessCallback:(PnpUserAvatarSuccessHandler) successHandler
                         andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
@@ -68,6 +73,7 @@ typedef void(^PnPOrderSuccessHandler)(PNPOrder * order);
 
 -(NSURL *) generateAvatarUrlFromPrefix:(NSString *) prefix
                               andPhone:(NSString *) phone;
+
 
 
 -(void) registerUserWithUsername:(NSString *) username
@@ -334,7 +340,33 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
            andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 
+#pragma mark - Commerce payment methods
 
+#define PNPOrderMailTypeComplete @"complete"
+#define PNPOrderMailTypeRefund @"cancel"
+
+
+-(void) createOrderWithConcept:(NSString *) concept
+                        amount:(NSNumber *)amount
+           withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+              andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+
+-(void) checkIfOrderIsPaid:(NSString *) orderReference
+       withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+          andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) sendMailForOrder:(NSString *) orderReference
+                  toMail:(NSString *) mail
+                    type:(NSString *) mailType
+                  userId:(NSNumber *) userId
+     withSuccessCallback:(PnPSuccessStringHandler) successHandler
+        andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) refundOrder:(NSNumber *) orderId
+                pin:(NSString *) pin
+withSuccessCallback:(PnPSuccessHandler) successHandler
+   andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 
 #pragma mark - Static data

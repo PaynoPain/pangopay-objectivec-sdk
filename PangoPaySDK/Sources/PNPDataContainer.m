@@ -118,6 +118,20 @@
 
 @end
 
+@implementation PNPCommerce
+
+-(void) encodeWithCoder:(NSCoder *)encoder{
+}
+
+-(id) initWithCoder:(NSCoder *)decoder{
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+    return self;
+}
+
+@end
 
 @implementation PNPNotification
 -(id) initWithId:(NSNumber *) identifier
