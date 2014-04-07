@@ -1136,7 +1136,7 @@
     self.identifier = [aDecoder decodeObjectForKey:@"identifier"];
     self.reference = [aDecoder decodeObjectForKey:@"reference"];
     self.mail = [aDecoder decodeObjectForKey:@"mail"];
-    self.userId = [aDecoder decodeObjectForKey:@"userid"];
+    self.userId = [aDecoder decodeObjectForKey:@"userId"];
     self.name = [aDecoder decodeObjectForKey:@"name"];
     self.surname = [aDecoder decodeObjectForKey:@"surname"];
     self.prefix =[aDecoder decodeObjectForKey:@"prefix"];
