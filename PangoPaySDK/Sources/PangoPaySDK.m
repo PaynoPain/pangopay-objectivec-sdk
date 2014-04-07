@@ -2430,6 +2430,11 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     
 }
 
+
+-(void) funciondepruebayyotengorazon{
+    
+}
+
 -(void) sendTransactionWithAmount:(NSNumber *) amount
                          toPrefix:(NSString *) prefix
                             phone:(NSString *) phone
