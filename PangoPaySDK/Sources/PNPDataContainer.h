@@ -465,13 +465,19 @@
 @property (strong,nonatomic) NSNumber *userId;
 @property (strong,nonatomic) NSString *name;
 @property (strong,nonatomic) NSString *surname;
+@property (strong,nonatomic) NSString *prefix;
+@property (strong,nonatomic) NSString *phone;
+@property (strong,nonatomic) NSDate *created;
 
 -(id) initWithIdentifier:(NSNumber *) identifier
                reference:(NSString *) reference
                     mail:(NSString *) mail
-                    userId:(NSNumber *) userId
+                  userId:(NSNumber *) userId
                     name:(NSString *) name
-                    surname:(NSString *) surname;
+                 surname:(NSString *) surname
+                  prefix:(NSString *) prefix
+                   phone:(NSString *) phone
+                 created:(NSDate *) created;
 
 
 

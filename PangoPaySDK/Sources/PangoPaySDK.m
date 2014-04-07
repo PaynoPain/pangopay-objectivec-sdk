@@ -2430,11 +2430,6 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     
 }
 
-
--(void) funciondepruebayyotengorazon{
-    
-}
-
 -(void) sendTransactionWithAmount:(NSNumber *) amount
                          toPrefix:(NSString *) prefix
                             phone:(NSString *) phone
@@ -3582,8 +3577,11 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                      userInfo:responseDictionary]);
                                        return;
                                    }
+                                   NSDateFormatter *df = [[NSDateFormatter alloc] init];
+                                   [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+                                   [df setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
                                    NSDictionary *payerDic = [[[responseDictionary objectForKey:@"data"] objectAtIndex:0] objectForKey:@"payer_data"];
-                                   PNPCommerceOrder *c = [[PNPCommerceOrder alloc] initWithIdentifier:[orderDic objectForKey:@"id"] reference:[orderDic objectForKey:@"reference"] mail:[payerDic objectForKey:@"mail"] userId:[payerDic objectForKey:@"user_id"] name:[payerDic objectForKey:@"name"] surname:[payerDic objectForKey:@"surname"]];
+                                   PNPCommerceOrder *c = [[PNPCommerceOrder alloc] initWithIdentifier:[orderDic objectForKey:@"id"] reference:[orderDic objectForKey:@"reference"] mail:[payerDic objectForKey:@"mail"] userId:[payerDic objectForKey:@"user_id"] name:[payerDic objectForKey:@"name"] surname:[payerDic objectForKey:@"surname"] prefix:[payerDic objectForKey:@"prefix"] phone:[payerDic objectForKey:@"phone"] created:[df dateFromString:[orderDic objectForKey:@"created"]]];
                                    if(successHandler) successHandler(c);
                                }else{
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]

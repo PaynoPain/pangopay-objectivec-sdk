@@ -1112,7 +1112,10 @@
                     mail:(NSString *) mail
                   userId:(NSNumber *) userId
                     name:(NSString *) name
-                 surname:(NSString *) surname{
+                 surname:(NSString *) surname
+                  prefix:(NSString *) prefix
+                   phone:(NSString *) phone
+                 created:(NSDate *)created{
     self = [super  init];
     if(!self) return nil;
     self.identifier = identifier;
@@ -1121,6 +1124,9 @@
     self.userId = userId;
     self.name = name;
     self.surname = surname;
+    self.phone = phone;
+    self.prefix = prefix;
+    self.created = created;
     return self;
 }
 
@@ -1133,7 +1139,9 @@
     self.userId = [aDecoder decodeObjectForKey:@"userid"];
     self.name = [aDecoder decodeObjectForKey:@"name"];
     self.surname = [aDecoder decodeObjectForKey:@"surname"];
-    
+    self.prefix =[aDecoder decodeObjectForKey:@"prefix"];
+    self.phone =[aDecoder decodeObjectForKey:@"phone"];
+    self.created=[aDecoder decodeObjectForKey:@"created"];
     return self;
     
 }
@@ -1145,10 +1153,13 @@
     [aCoder encodeObject:_userId forKey:@"userId"];
     [aCoder encodeObject:_name forKey:@"name"];
     [aCoder encodeObject:_surname forKey:@"surname"];
+    [aCoder encodeObject:_prefix forKey:@"prefix"];
+    [aCoder encodeObject:_phone forKey:@"phone"];
+        [aCoder encodeObject:_created forKey:@"created"];
 }
 
 -(NSString *) description{
-    return [NSString stringWithFormat:@"\n ID: %@ \n Reference: %@ mail: %@ \n userId: %@ \n name: %@ \n surname: %@ \n ",_identifier,_reference,_mail,_userId,_name,_surname];
+    return [NSString stringWithFormat:@"\nID: %@ \n Reference: %@ mail: %@ \n userId: %@ \n name: %@ \n surname: %@ \n Prefix: %@ \n Phone: %@ \n Created: %@",_identifier,_reference,_mail,_userId,_name,_surname,_prefix,_phone,_created];
 }
 
 
