@@ -23,6 +23,7 @@
 @property (strong,nonatomic) NSMutableArray  *countries;
 @property (strong,nonatomic) NSMutableArray  *creditCards;
 @property (strong,nonatomic) NSMutableArray  *halcashExtractions;
+@property (strong,nonatomic) NSMutableArray *walletRecharges;
 @property (strong,nonatomic) PNPUserValidation *validation;
 
 
@@ -1189,6 +1190,50 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 }
 
 
+
+#pragma mark - Wallet recharge
+
+-(void) getWalletRechargesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+							 andErrorCallback:(PnPGenericErrorHandler) errorHandler
+						   andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler{
+	
+    [self getWalletRechargesOnSuccess:^(NSArray *data) {
+        if(data != nil){
+            if(successHandler) successHandler(data);
+            if(refreshHandler){
+                [super getWalletRechargesWithSuccessCallback:^(NSArray *data) {
+                    [self storeWalletRecharges:data];
+                    refreshHandler(data);
+                } andErrorCallback:errorHandler];
+            }
+        }else{
+            [super getWalletRechargesWithSuccessCallback:^(NSArray *data) {
+                [self storeWalletRecharges:data];
+                if(successHandler) successHandler(data);
+            } andErrorCallback:errorHandler];
+        }
+    }];
+	
+}
+
+
+-(void) getWalletRechargesOnSuccess:(PnPGenericNSAarraySucceddHandler) successHandler{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        if(_walletRecharges == nil){
+            _walletRecharges = [NSKeyedUnarchiver unarchiveObjectWithFile:
+                                    [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"walletRecharges"]]];
+        }
+        if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(_walletRecharges);} );
+    });
+}
+
+-(void) storeWalletRecharges:(NSArray *) requests{
+    _walletRecharges = [NSMutableArray arrayWithArray:requests];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        [NSKeyedArchiver archiveRootObject:_walletRecharges
+                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"walletRecharges"]]];
+    });
+}
 
 
 #pragma mark - Static data

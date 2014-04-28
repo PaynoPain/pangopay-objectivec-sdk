@@ -3724,6 +3724,128 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
     
 }
 
+#pragma mark - Wallet
+-(void) rechargeWalletWithAmount:(NSNumber *) amount
+							 pin:(NSString*) pin
+			 withSuccessCallback:(PnPSuccessHandler) successHandler
+				andErrorCallback:(PnPGenericErrorHandler) errorHandler {
+	
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"referenced_payments/send_mx"]
+                   usingParameters:@{
+									 @"amount":[NSString stringWithFormat:@"%f",[amount doubleValue] *100],
+									 @"pin":pin,
+									 }
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+					   
+					   
+					   if(!error){
+						   
+                           NSError *parseError;
+                           NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                               options:0
+                                                                                                 error:&parseError]
+                                                               objectForKey:@"send_mx"];
+                           if(parseError){
+                               if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                  code:[parseError code]
+                                                                                              userInfo:parseError.userInfo]);
+                               return;
+                           }
+						   
+                           if([[responseDictionary objectForKey:@"success"] boolValue]){
+							   
+							   NSString* barCodeURL = [[responseDictionary objectForKey:@"data"] valueForKey:@"0"];
+							   
+                               if(successHandler)successHandler(barCodeURL);
+                           }else{
+                               if(errorHandler) errorHandler([[PNPGenericWebserviceError alloc] initWithDomain:@"PNPGenericWebserviceError"
+                                                                                                          code:-6060
+                                                                                                      userInfo:responseDictionary]);
+                           }
+                       }else{
+                           if(errorHandler) errorHandler([self handleErrors:error]);
+                       }
+                   }];
+	
+}
+
+
+-(void) getWalletRechargesWithSuccessCallback:(PnPSuccessHandler) successHandler
+							 andErrorCallback:(PnPGenericErrorHandler) errorHandler {
+	
+	NSNumberFormatter *nf = [[NSNumberFormatter alloc] init];
+	[nf setNumberStyle:NSNumberFormatterNoStyle];
+	
+	NSDateFormatter *df = [[NSDateFormatter alloc] init];
+	[df setDateFormat:@"yyyy-mm-dd HH:mm:ss"];
+	
+	
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"referenced_payments/get"]
+                   usingParameters:nil
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+					   
+					   if(!error){
+						   
+                           NSError *parseError;
+                           NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                               options:0
+                                                                                                 error:&parseError]
+                                                               objectForKey:@"get"];
+						   
+						   
+						   
+                           if(parseError){
+                               if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                  code:[parseError code]
+                                                                                              userInfo:parseError.userInfo]);
+                               return;
+                           }
+						   
+                           if([[responseDictionary objectForKey:@"success"] boolValue]){
+							   
+							   
+							   NSMutableArray *list = [NSMutableArray new];
+							   
+							   list = [responseDictionary objectForKey:@"data"];
+							   NSMutableArray *recharges = [NSMutableArray new];
+							   
+							   
+							   for (NSDictionary *p in list) {
+								   
+								   PNPTransactionEmitterRecharge *recharge = [[PNPTransactionEmitterRecharge alloc]init];
+								   recharge.amount = [nf numberFromString:[p valueForKey:@"amount"]];
+								   recharge.created = [df dateFromString:[p valueForKey:@"created"]];
+								   recharge.currencyCode = [[p valueForKey:@"currency"] valueForKey:@"code"];
+								   recharge.currencySymbol = [[p valueForKey:@"currency"] valueForKey:@"symbol"];
+								   recharge.status = [p valueForKey:@"status"];
+								   recharge.barcode = [NSURL URLWithString:[p valueForKey:@"url"]];
+								   
+								   [recharges addObject:recharge];
+							   }
+							   
+                               if(successHandler)successHandler(recharges);
+                           }else{
+                               if(errorHandler) errorHandler([[PNPGenericWebserviceError alloc] initWithDomain:@"PNPGenericWebserviceError"
+                                                                                                          code:-6060
+                                                                                                      userInfo:responseDictionary]);
+                           }
+                       }else{
+                           if(errorHandler) errorHandler([self handleErrors:error]);
+                       }
+                   }];
+	
+}
+
+
+
 #pragma mark - Private Methods
 -(NSNumber *) clearAmount:(NSNumber *)n{
     
