@@ -87,7 +87,16 @@
                               andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler;
     
 
+#pragma mark - Wallet recharge
 
+-(void) getWalletRechargesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+							 andErrorCallback:(PnPGenericErrorHandler) errorHandler
+						   andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler;
+
+-(void) rechargeWalletWithAmount:(NSNumber *) amount
+							 pin:(NSString*) pin
+			 withSuccessCallback:(PnPSuccessHandler) successHandler
+				andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 #pragma mark - Static data
 

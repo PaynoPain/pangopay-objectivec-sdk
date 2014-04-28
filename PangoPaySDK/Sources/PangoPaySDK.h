@@ -368,6 +368,15 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 withSuccessCallback:(PnPSuccessHandler) successHandler
    andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
+#pragma mark - Wallet
+-(void) rechargeWalletWithAmount:(NSNumber *) amount
+							 pin:(NSString*) pin
+			 withSuccessCallback:(PnPSuccessHandler) successHandler
+				andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) getWalletRechargesWithSuccessCallback:(PnPSuccessHandler) successHandler
+							 andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 
 #pragma mark - Static data
 
