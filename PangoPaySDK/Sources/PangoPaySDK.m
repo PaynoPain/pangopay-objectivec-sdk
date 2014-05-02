@@ -374,9 +374,9 @@
     [params setObject:[df stringFromDate:date] forKey:@"birthdate"];
     
     if(isMale){
-        [params setObject:@"M" forKey:@"sex"];
+        [params setObject:@"M" forKey:@"gender"];
     }else{
-        [params setObject:@"F" forKey:@"sex"];
+        [params setObject:@"F" forKey:@"gender"];
     }
     
     [params setObject:self.clientId forKey:@"client_id"];
