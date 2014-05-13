@@ -651,6 +651,50 @@
 
 @implementation PNPTransactionEmitterRecharge
 
+-(id) initWithAmount:(NSNumber *) amount
+	   currencyCode :(NSString *) currencyCode
+	  currencySymbol:(NSString *) currencySymbol
+			  status:(NSString *) status
+			 created:(NSDate *) created
+			 barcode:(NSURL*) barcode {
+	
+    self = [super init];
+    if(!self) return nil;
+    
+	_amount = amount;
+	_currencyCode = currencyCode;
+	_currencySymbol = currencySymbol;
+	_status = status;
+	_created = created;
+	_barcode = barcode;
+	
+    return self;
+}
+
+
+-(id) initWithCoder:(NSCoder *)decoder{
+    self = [super init];
+    if(!self) return nil;
+	_amount = [decoder decodeObjectForKey:@"amount"];
+	_created = [decoder decodeObjectForKey:@""];
+	_currencyCode = [decoder decodeObjectForKey:@"currencyCode"];
+	_currencySymbol = [decoder decodeObjectForKey:@"currencySymbol"];
+	_barcode = [decoder decodeObjectForKey:@"barcode"];
+	_status = [decoder decodeObjectForKey:@"status"];
+	return self;
+	
+}
+
+-(void) encodeWithCoder:(NSCoder *) encoder{
+    [encoder encodeObject:self.amount forKey:@"amount"];
+    [encoder encodeObject:self.currencyCode forKey:@"currencyCode"];
+    [encoder encodeObject:self.currencySymbol forKey:@"currencySymbol"];
+    [encoder encodeObject:self.status forKey:@"status"];
+    [encoder encodeObject:self.created forKey:@"created"];
+    [encoder encodeObject:self.barcode forKey:@"barcode"];
+}
+
+
 -(NSString *) tableString{
     return @"Wallet Recharge";
 }
