@@ -238,7 +238,12 @@
 @end
 
 @interface PNPTransactionEmitterRecharge : PNPTransactionEmitter <NSCoding>
-
+@property (strong, nonatomic) NSNumber *amount;
+@property (strong, nonatomic) NSDate *created;
+@property (strong, nonatomic) NSString *currencyCode;
+@property (strong, nonatomic) NSString *currencySymbol;
+@property (strong, nonatomic) NSString *status;
+@property (strong, nonatomic) NSURL *barcode;
 @end
 
 @interface PNPTransactionEmitterUser : PNPTransactionEmitter <NSCoding>
