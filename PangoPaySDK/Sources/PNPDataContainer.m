@@ -139,7 +139,8 @@
          message:(NSString *) message
      referenceId:(NSNumber *) referenceId
           userId:(NSNumber *) userId
-            type:(NSString *) type{
+            type:(NSString *) type
+            read:(BOOL)read{
     
     self = [super init];
     if(self){
@@ -149,6 +150,7 @@
         self.referenceId = referenceId;
         self.userId = userId;
         self.type = type;
+        self.read = read;
     }
     return self;
 }
@@ -168,6 +170,7 @@
     self.referenceId = [decoder decodeObjectForKey:@"referenceId"];
     self.userId = [decoder decodeObjectForKey:@"userId"];
     self.type = [decoder decodeObjectForKey:@"type"];
+    self.read = [decoder decodeBoolForKey:@"read"];
     return self;
 }
 -(void) encodeWithCoder:(NSCoder *)encoder{
@@ -177,6 +180,7 @@
     [encoder encodeObject:self.referenceId forKey:@"referenceId"];
     [encoder encodeObject:self.userId forKey:@"userId"];
     [encoder encodeObject:self.type forKey:@"type"];
+    [encoder encodeBool:self.read forKey:@"read"];
 }
 
 @end
@@ -322,7 +326,7 @@
     [encoder encodeObject:self.surname forKey:@"surname"];
 }
 -(NSString *) description{
-    return [NSString stringWithFormat:@"%@ %@",self.name,self.surname];
+    return [NSString stringWithFormat:@"%@",self.name];
 }
 @end
 
@@ -798,7 +802,8 @@
                  concept:(NSString *) concept
                   prefix:(NSString *) prefix
                    phone:(NSString *) phone
-                    name:(NSString *) name{
+                    name:(NSString *) name
+                  status:(NSString *) status{
     self= [super init];
     if(!self) return nil;
     self.identifier     = identifier;
@@ -809,12 +814,19 @@
     self.prefix         = prefix;
     self.phone          = phone;
     self.name           = name;
+    self.status         = status;
     return self;
 }
 
 -(NSString *) description{
     return [NSString stringWithFormat:@"\n ID: %@ \n Amount: %@ %@ \n Created: %@ \n Concept: %@ \n Phone: +%@ %@ \n Name: %@ \n",self.identifier,self.amount,self.currencySymbol,self.created,self.concept,self.prefix,self.phone,self.name];
 }
+
+-(BOOL) isEqual:(id)object{
+    return [self.identifier intValue] == [((PNPPaymentRequest *)object).identifier intValue];
+}
+
+
 
 -(id) initWithCoder:(NSCoder *)decoder{
     self = [super init];
@@ -827,6 +839,7 @@
     self.prefix = [decoder decodeObjectForKey:@"prefix"];
     self.phone = [decoder decodeObjectForKey:@"phone"];
     self.name = [decoder decodeObjectForKey:@"name"];
+    self.status = [decoder decodeObjectForKey:@"status"];
     return self;
 }
 
@@ -839,6 +852,7 @@
     [encoder encodeObject:self.prefix  forKey:@"prefix"];
     [encoder encodeObject:self.phone forKey:@"phone"];
     [encoder encodeObject:self.name forKey:@"name"];
+    [encoder encodeObject:self.status forKey:@"status"];
 }
 
 
@@ -1124,13 +1138,16 @@
 
 @implementation PNPOrder
 
--(id) initWithIdentifier:(NSNumber *)identifier
-               reference:(NSString *)reference
+-(id) initWithIdentifier:(NSNumber *) identifier
+               reference:(NSString *) reference
                  concept:(NSString *) concept
-                 created:(NSDate *)created
-                commerce:(NSString *)commerce
-                  amount:(NSNumber *)amount
-                currency:(NSString *)currency{
+                 created:(NSDate *)   created
+                commerce:(NSString *) commerce
+                  amount:(NSNumber *) amount
+               netAmount:(NSNumber *) netAmount
+       loyaltyPercentage:(NSNumber *) loyaltyPercentage
+   loyaltyDiscountAmount:(NSNumber *) loyaltyDiscountAmount
+                currency:(NSString *) currency{
     self = [super init];
     if(!self) return nil;
     self.identifier = identifier;
@@ -1139,7 +1156,11 @@
     self.created = created;
     self.commerce = commerce;
     self.amount = amount;
+    self.netAmount = netAmount;
+    self.loyaltyPercentage = loyaltyPercentage;
+    self.loyaltyDiscountAmount = loyaltyDiscountAmount;
     self.currency = currency;
+    
     return self;
     
 }
@@ -1199,7 +1220,7 @@
     [aCoder encodeObject:_surname forKey:@"surname"];
     [aCoder encodeObject:_prefix forKey:@"prefix"];
     [aCoder encodeObject:_phone forKey:@"phone"];
-        [aCoder encodeObject:_created forKey:@"created"];
+    [aCoder encodeObject:_created forKey:@"created"];
 }
 
 -(NSString *) description{
@@ -1210,3 +1231,450 @@
 
 @end
 
+
+@implementation PNPCoupon
+
+-(id) initWithCode:(NSString *)code
+        identifier:(NSNumber *)identifier
+ loyaltyIdentifier:(NSNumber *)loyaltyIdentifier
+        actualUses:(NSNumber *)actualUses
+         limitUses:(NSNumber *)limitUses
+       companyName:(NSString *)companyName
+             title:(NSString *)title
+       description:(NSString *)description
+  shortDescription:(NSString *)shortDescription
+           logoUrl:(NSString *)logoUrl
+      brandLogoUrl:(NSString *)brandLogoUrl
+         startDate:(NSDate *)startDate
+           endDate:(NSDate *)endDate
+       fixedAmount:(NSNumber *) fixedAmount
+  percentageAmount:(NSNumber *) percentageAmount
+              gift:(NSString *) gift
+          favorite:(BOOL) favorite
+            viewed:(BOOL) viewed
+            status:(NSString *)status{
+    
+    self = [super init];
+    if(!self) return nil;
+    
+    _ccode = code;
+    _favorite = favorite;
+    _identifier = identifier;
+    _loyaltyIdentifier = loyaltyIdentifier;
+    _actualUses = actualUses;
+    _limitUses = limitUses;
+    _companyName = companyName;
+    _title = title;
+    _viewed = viewed;
+    _longDescription = description;
+    _shortDescription = shortDescription;
+    _logoUrl = logoUrl;
+    _brandLogoUrl = brandLogoUrl;
+    _startDate = startDate;
+    _endDate = endDate;
+    _fixedAmount = fixedAmount;
+    _percentageAmount = percentageAmount;
+    _gift = gift;
+    _status = status;
+    
+    return self;
+}
+-(BOOL) isEqual:(id)object{
+    return [self.ccode isEqualToString:((PNPCoupon *)object).ccode];
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if(!self) return nil;
+    _ccode = [aDecoder decodeObjectForKey:@"code"];
+    _status = [aDecoder decodeObjectForKey:@"status"];
+    _identifier = [aDecoder decodeObjectForKey:@"identifier"];
+    _loyaltyIdentifier = [aDecoder decodeObjectForKey:@"loyaltyIdentifier"];
+    _actualUses = [aDecoder decodeObjectForKey:@"actualUses"];
+    _limitUses = [aDecoder decodeObjectForKey:@"limitUses"];
+    _companyName = [aDecoder decodeObjectForKey:@"companyName"];
+    _title = [aDecoder decodeObjectForKey:@"title"];
+    _longDescription = [aDecoder decodeObjectForKey:@"_longDescription"];
+    _shortDescription = [aDecoder decodeObjectForKey:@"shortDescription"];
+    _logoUrl = [aDecoder decodeObjectForKey:@"logoUrl"];
+    _brandLogoUrl = [aDecoder decodeObjectForKey:@"brandLogoUrl"];
+    _startDate = [aDecoder decodeObjectForKey:@"startDate"];
+    _favorite = [aDecoder decodeBoolForKey:@"favorite"];
+    _viewed = [aDecoder decodeBoolForKey:@"viewed"];
+    _endDate = [aDecoder decodeObjectForKey:@"endDate"];
+    _gift = [aDecoder decodeObjectForKey:@"gift"];
+    _percentageAmount = [aDecoder decodeObjectForKey:@"percentageAmount"];
+    _fixedAmount = [aDecoder decodeObjectForKey:@"fixedAmount"];
+    
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:_ccode forKey:@"code"];
+    [aCoder encodeObject:_identifier forKey:@"identifier"];
+    [aCoder encodeObject:_loyaltyIdentifier forKey:@"loyaltyIdentifier"];
+    [aCoder encodeObject:_actualUses forKey:@"actualUses"];
+    [aCoder encodeObject:_limitUses forKey:@"limitUses"];
+    [aCoder encodeObject:_companyName forKey:@"companyName"];
+    [aCoder encodeBool:_favorite forKey:@"favorite"];
+    [aCoder encodeBool:_viewed forKey:@"viewed"];
+    [aCoder encodeObject:_title forKey:@"title"];
+    [aCoder encodeObject:_longDescription forKey:@"_longDescription"];
+    [aCoder encodeObject:_status forKey:@"status"];
+    [aCoder encodeObject:_shortDescription forKey:@"shortDescription"];
+    [aCoder encodeObject:_logoUrl forKey:@"logoUrl"];
+    [aCoder encodeObject:_brandLogoUrl forKey:@"brandLogoUrl"];
+    [aCoder encodeObject:_startDate forKey:@"startDate"];
+    [aCoder encodeObject:_endDate forKey:@"endDate"];
+    [aCoder encodeObject:_fixedAmount forKey:@"fixedAmount"];
+    [aCoder encodeObject:_percentageAmount forKey:@"percentageAmount"];
+    [aCoder encodeObject:_gift forKey:@"gift"];
+}
+
+
+-(NSString *) description{
+    return [NSString stringWithFormat:@"CODE: %@,FAVORITE: %hhd, Viewed: %hhd , Id:%@, promoId:%@, actualUses:%@, limitUses:%@, companyName:%@, Title:%@, longDescr:%@, shortDescr:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@",_ccode,_favorite,_viewed,_identifier,_loyaltyIdentifier,_actualUses,_limitUses,_companyName,_title,_longDescription,_shortDescription,_logoUrl,_brandLogoUrl,_startDate,_endDate];
+}
+
+
+@end
+
+
+@implementation PNPCPDaily
+@end
+
+@implementation PNPCPStampCard
+@end
+
+@implementation PNPCPMultiUssage
+@end
+
+@implementation PNPCPOneTime
+@end
+
+@implementation PNPCPExchange
+@end
+
+@implementation PNPCPLoyalty
+@end
+
+
+@implementation PNPLoyalty
+
+-(id) initWithIdentifier:(NSNumber *)identifier
+                  userId:(NSNumber *)userId
+                   title:(NSString *)title
+             description:(NSString *)description
+        shortDescription:(NSString *)shortDescription
+                 logoUrl:(NSString *)logoUrl
+                  status:(NSString *)status
+               startDate:(NSDate *)startDate
+                 endDate:(NSDate *)endDate
+                  amount:(NSNumber *)amount
+                  points:(NSNumber *)points
+       suscriptionFields:(NSArray *)suscriptionFields
+      exchangableCoupons:(NSArray *)exchangableCoupons
+               commerces:(NSArray *)commerces
+            company:(PNPLoyaltyCompany *)company
+                benefits:(NSArray *)benefits
+              registered:(BOOL)registered{
+    
+    self = [super init];
+    if (!self) return nil;
+    _identifier = identifier;
+    _userId = userId;
+    _title = title;
+    _description = description;
+    _shortDescription = shortDescription;
+    _logoUrl = logoUrl;
+    _status = status;
+    _startDate = startDate;
+    _endDate = endDate;
+    _amount = amount;
+    _points = points;
+    _suscriptionFields = suscriptionFields;
+    _exchangableCoupons = exchangableCoupons;
+    _commerces = commerces;
+    _company = company;
+    _benefits = benefits;
+    _registered = registered;
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if (!self) return nil;
+    _identifier = [aDecoder decodeObjectForKey:@"identifier"];
+    _userId = [aDecoder decodeObjectForKey:@"userId"];
+    _title = [aDecoder decodeObjectForKey:@"title"];
+    _description = [aDecoder decodeObjectForKey:@"description"];
+    _shortDescription = [aDecoder decodeObjectForKey:@"shortDescription"];
+    _logoUrl = [aDecoder decodeObjectForKey:@"logoUrl"];
+    _status = [aDecoder decodeObjectForKey:@"status"];
+    _startDate = [aDecoder decodeObjectForKey:@"startDate"];
+    _endDate = [aDecoder decodeObjectForKey:@"endDate"];
+    _amount = [aDecoder decodeObjectForKey:@"amount"];
+    _points = [aDecoder decodeObjectForKey:@"points"];
+    _suscriptionFields = [aDecoder decodeObjectForKey:@"suscriptionFields"];
+    _exchangableCoupons = [aDecoder decodeObjectForKey:@"exchangableCoupons"];
+    _commerces = [aDecoder decodeObjectForKey:@"commerces"];
+    _company = [aDecoder decodeObjectForKey:@"company"];
+    _benefits = [aDecoder decodeObjectForKey:@"benefits"];
+    _registered = [aDecoder decodeBoolForKey:@"registered"];
+    return self;
+}
+
+-(BOOL) isEqual:(id)object{
+    return [self.identifier intValue] == [((PNPLoyalty *)object).identifier intValue];
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:_identifier forKey:@"identifier"];
+    [aCoder encodeObject:_userId forKey:@"userId"];
+    [aCoder encodeObject:_title forKey:@"title"];
+    [aCoder encodeObject:_description forKey:@"description"];
+    [aCoder encodeObject:_shortDescription forKey:@"shortDescription"];
+    [aCoder encodeObject:_logoUrl forKey:@"logoUrl"];
+    [aCoder encodeObject:_status forKey:@"status"];
+    [aCoder encodeObject:_startDate forKey:@"startDate"];
+    [aCoder encodeObject:_endDate forKey:@"endDate"];
+    [aCoder encodeObject:_amount forKey:@"amount"];
+    [aCoder encodeObject:_points forKey:@"points"];
+    [aCoder encodeObject:_suscriptionFields forKey:@"suscriptionFields"];
+    [aCoder encodeObject:_exchangableCoupons forKey:@"exchangableCoupons"];
+    [aCoder encodeObject:_commerces forKey:@"commerces"];
+    [aCoder encodeObject:_company forKey:@"company"];
+    [aCoder encodeObject:_benefits forKey:@"benefits"];
+    [aCoder encodeBool:_registered forKey:@"registered"];
+}
+
+@end
+
+
+@implementation PNPLoyaltySuscriptionField
+
+-(id) initWithName:(NSString *) name attribute:(NSString *) attribute order:(int) order{
+    self = [super init];
+    if(!self) return nil;
+    _name = name;
+    _attribute = attribute;
+    _order = order;
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if(!self) return nil;
+    _name = [aDecoder decodeObjectForKey:@"name"];
+    _order = [aDecoder decodeIntForKey:@"order"];
+    _attribute = [aDecoder decodeObjectForKey:@"attribute"];
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:_name forKey:@"name"];
+    [aCoder encodeInt:_order forKey:@"order"];
+    [aCoder encodeObject:_attribute forKey:@"attribute"];
+}
+
+@end
+
+@implementation PNPLoyaltySuscriptionFieldText
+@end
+
+@implementation PNPLoyaltySuscriptionFieldSelect
+
+-(id) initWithName:(NSString *)name
+         attribute:(NSString *)attribute
+        options:(NSArray *)options
+andOptionValues:(NSArray *)optionValues
+             order:(int) order{
+    self = [super init];
+    if(!self) return nil;
+    self.name = name;
+    self.attribute = attribute;
+    self.options = options;
+    self.optionValues = optionValues;
+    self.order = order;
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if(!self) return nil;
+    self.name = [aDecoder decodeObjectForKey:@"name"];
+    self.attribute = [aDecoder decodeObjectForKey:@"attribute"];
+    self.options = [aDecoder decodeObjectForKey:@"options"];
+    self.order = [aDecoder decodeIntForKey:@"order"];
+    self.optionValues = [aDecoder decodeObjectForKey:@"optionValues"];
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:self.name forKey:@"name"];
+    [aCoder encodeObject:self.attribute forKey:@"attribute"];
+    [aCoder encodeObject:self.options forKey:@"options"];
+    [aCoder encodeInt:self.order forKey:@"order"];
+    [aCoder encodeObject:self.optionValues forKey:@"optionValues"];
+}
+
+@end
+
+@implementation PNPLoyaltyExchanges
+
+-(id) initWithIdentifier:(NSNumber *)identifier
+       loyaltyIdentifier:(NSNumber *)loyaltyIdentifier
+                  points:(NSNumber *)points
+             fixedAmount:(NSNumber *)fixedAmount
+        percentageAmount:(NSNumber *)percentageAmount
+                gift:(NSString *)gift{
+    self = [super init];
+    if(!self) return nil;
+    _identifier = identifier;
+    _loyaltyIdentifier = loyaltyIdentifier;
+    _points = points;
+    _fixedAmount = fixedAmount;
+    _percentageAmount = percentageAmount;
+    _gift = gift;
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if(!self) return nil;
+    _identifier = [aDecoder decodeObjectForKey:@"identifier"];
+    _loyaltyIdentifier = [aDecoder decodeObjectForKey:@"loyaltyIdentifier"];
+    _points = [aDecoder decodeObjectForKey:@"points"];
+    _fixedAmount = [aDecoder decodeObjectForKey:@"fixedAmount"];
+    _percentageAmount = [aDecoder decodeObjectForKey:@"percentageAmount"];
+    _gift = [aDecoder decodeObjectForKey:@"gift"];
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:_identifier forKey:@"identifier"];
+    [aCoder encodeObject:_loyaltyIdentifier forKey:@"loyaltyIdentifier"];
+    [aCoder encodeObject:_points forKey:@"points"];
+    [aCoder encodeObject:_fixedAmount forKey:@"fixedAmount"];
+    [aCoder encodeObject:_percentageAmount forKey:@"percentageAmount"];
+    [aCoder encodeObject:_gift forKey:@"gift"];
+}
+
+@end
+
+@implementation PNPLoyaltyCommerce
+
+-(id) initWithIdentifier:(NSNumber *)identifier name:(NSString *)name{
+    self = [super init];
+    if(!self) return nil;
+    _identifier = identifier;
+    _name = name;
+    return self;
+}
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if(!self) return nil;
+    _identifier = [aDecoder decodeObjectForKey:@"identifier"];
+    _name = [aDecoder decodeObjectForKey:@"name"];
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:_identifier forKey:@"identifier"];
+    [aCoder encodeObject:_name forKey:@"name"];
+}
+
+@end
+
+@implementation PNPLoyaltyCompany
+
+-(id) initWithName:(NSString *)name{
+    self = [super init];
+    if(!self) return nil;
+    _name = name;
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if(!self) return nil;
+    _name = [aDecoder decodeObjectForKey:@"name"];
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:_name forKey:@"name"];
+}
+
+@end
+
+@implementation PNPLoyaltyBenefits
+
+-(id) initWithIdentifier:(NSNumber *)identifier
+        percentageAmount:(NSNumber *)percentageAmount
+               startDate:(NSDate *)startDate
+                 endDate:(NSDate *)endDate{
+    self = [super init];
+    if(!self) return nil;
+    
+    _identifier = identifier;
+    _percentageAmount = percentageAmount;
+    _startDate = startDate;
+    _endDate = endDate;
+    
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if(!self) return nil;
+    _identifier = [aDecoder decodeObjectForKey:@"identifier"];
+    _percentageAmount = [aDecoder decodeObjectForKey:@"percentageAmount"];
+    _startDate = [aDecoder decodeObjectForKey:@"startDate"];
+    _endDate = [aDecoder decodeObjectForKey:@"endDate"];
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:_identifier forKey:@"identifier"];
+    [aCoder encodeObject:_percentageAmount forKey:@"percentageAmount"];
+    [aCoder encodeObject:_startDate forKey:@"startDate"];
+    [aCoder encodeObject:_endDate forKey:@"endDate"];
+}
+
+
+
+@end
+
+@implementation PNPLoyaltyUserData
+
+-(id) initWithLoyaltyId:(NSNumber *) identifier
+           actualPoints:(NSNumber *) actualPoints
+             lastPoints:(NSNumber *) lastPoints
+                   code:(NSString *) code{
+    self = [super init];
+    if(!self) return nil;
+    _loyaltyId = identifier;
+    _actualPoints = actualPoints;
+    _lastPoints = lastPoints;
+    _code = code;
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if(!self) return nil;
+    _loyaltyId = [aDecoder decodeObjectForKey:@"loyaltyId"];
+    _actualPoints = [aDecoder decodeObjectForKey:@"actualPoints"];
+    _lastPoints = [aDecoder decodeObjectForKey:@"lastPoints"];
+    _code = [aDecoder decodeObjectForKey:@"code"];
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:_loyaltyId forKey:@"loyaltyId"];
+    [aCoder encodeObject:_actualPoints forKey:@"actualPoints"];
+    [aCoder encodeObject:_lastPoints forKey:@"lastPoints"];
+    [aCoder encodeObject:_code forKey:@"code"];
+}
+@end

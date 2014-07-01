@@ -27,6 +27,8 @@
 @property (strong,nonatomic) PNPUserValidation *validation;
 
 
+
+
 @property dispatch_queue_t task;
 @end
 
@@ -58,6 +60,9 @@
                            @"validation"                : @"pnpuservalidation",
                            @"creditCards"               : @"pnpcreditcards",
                            @"halcashExtractions"        : @"pnphalcashextractions",
+                           @"userCoupons"               : @"pnpusercoupons",
+                           @"loyalties"                 : @"pnployalties",
+                           @"requestedRequests"         : @"pnprequestedrequests"
                            };
     return self;
 }
@@ -372,22 +377,21 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 -(void) getNotificationsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                            andErrorCallback:(PnPGenericErrorHandler) errorHandler
                          andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler{
-    
+    NSPredicate *p = [NSPredicate predicateWithFormat:@"read == NO"];
     [self getNotifications:^(NSArray *data) {
         if(data != nil){
-            if(successHandler) successHandler(data);
+            if(successHandler) successHandler([data filteredArrayUsingPredicate:p]);
             if(refreshHandler){
                 [super getNotificationsWithSuccessCallback:^(NSArray *data) {
                     [self storeNotifications:data];
-                    refreshHandler(data);
+                    refreshHandler([data filteredArrayUsingPredicate:p]);
                 } andErrorCallback:errorHandler];
-                
             }
         }else{
             
             [super getNotificationsWithSuccessCallback:^(NSArray *data) {
                 [self storeNotifications:data];
-                if(successHandler)successHandler(data);
+                if(successHandler)successHandler([data filteredArrayUsingPredicate:p]);
             } andErrorCallback:errorHandler];
             
         }
@@ -403,6 +407,36 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                            andRefreshCallback:nil];
     
 }
+
+-(void) getReadNotificationsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                               andErrorCallback:(PnPGenericErrorHandler) errorHandler
+                             andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler{
+    [self getNotifications:^(NSArray *data) {
+        if(data != nil){
+            if(successHandler) successHandler(data);
+            if(refreshHandler){
+                [super getNotificationsWithSuccessCallback:^(NSArray *data) {
+                    [self storeNotifications:data];
+                    refreshHandler(data);
+                } andErrorCallback:errorHandler];
+            }
+        }else{
+            [super getNotificationsWithSuccessCallback:^(NSArray *data) {
+                [self storeNotifications:data];
+                if(successHandler)successHandler(data);
+            } andErrorCallback:errorHandler];
+        }
+    }];
+}
+
+-(void) getReadNotificationsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                               andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    [self getReadNotificationsWithSuccessCallback:successHandler
+                             andErrorCallback:errorHandler
+                           andRefreshCallback:nil];
+}
+
+
 
 -(void) deleteNotifications:(NSSet *) notifications
         withSuccessCallback:(PnPSuccessHandler)successHandler
@@ -978,16 +1012,52 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 
 #pragma mark - Payment requests
 
+
+-(void) getPendingPaymentRequestsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+                                    andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+    [self getPendingPaymentRequestsWithSuccessCallback:successHandler
+                                      andErrorCallback:errorHandler
+                                    andRefreshCallback:nil];
+    
+}
+
+-(void) getPendingPaymentRequestsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+                                    andErrorCallback:(PnPGenericErrorHandler)errorHandler
+                                  andRefreshCallback:(PnPGenericNSAarraySucceddHandler)refreshHandler{
+        NSPredicate *p = [NSPredicate predicateWithFormat:@"status == %@",@"PE"];
+    [self getPaymentRequestsOnSuccess:^(NSArray *data) {
+        if(data != nil){
+            data = [data filteredArrayUsingPredicate:p];
+            if(successHandler) successHandler(data);
+            if(refreshHandler){
+                [super getPaymentRequestsWithSuccessCallback:^(NSArray *data) {
+                    [self storePaymentRequests:data];
+                    data = [data filteredArrayUsingPredicate:p];
+                    refreshHandler(data);
+                } andErrorCallback:errorHandler];
+            }
+        }else{
+            [super getPaymentRequestsWithSuccessCallback:^(NSArray *data) {
+                [self storePaymentRequests:data];
+                data = [data filteredArrayUsingPredicate:p];
+                if(successHandler) successHandler(data);
+            } andErrorCallback:errorHandler];
+        }
+    }];
+
+    
+}
+
 -(void) getPaymentRequestsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
                              andErrorCallback:(PnPGenericErrorHandler)errorHandler
                            andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler{
-    
     [self getPaymentRequestsOnSuccess:^(NSArray *data) {
         if(data != nil){
             if(successHandler) successHandler(data);
             if(refreshHandler){
                 [super getPaymentRequestsWithSuccessCallback:^(NSArray *data) {
                     [self storePaymentRequests:data];
+
                     refreshHandler(data);
                 } andErrorCallback:errorHandler];
             }
@@ -998,6 +1068,89 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
             } andErrorCallback:errorHandler];
         }
     }];
+    
+}
+
+-(void) getRequestedPaymentRequestsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+                                      andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+    [self getRequestedPaymentRequestsWithSuccessCallback:successHandler
+                                        andErrorCallback:errorHandler
+                                      andRefreshCallback:nil];
+    
+}
+
+-(void) getRequestedPaymentRequestsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+                                      andErrorCallback:(PnPGenericErrorHandler)errorHandler
+                                    andRefreshCallback:(PnPGenericNSAarraySucceddHandler)refreshHandler{
+    [self getRequestedPaymentRequestsOnSuccess:^(NSArray *data) {
+        if(data != nil){
+            if(successHandler) successHandler(data);
+            if(refreshHandler){
+                [super getRequestedPaymentRequestsWithSuccessCallback:^(NSArray *data) {
+                    [self storeRequestedPaymentRequests:data];
+                    refreshHandler(data);
+                } andErrorCallback:errorHandler];
+            }
+        }else{
+            [super getRequestedPaymentRequestsWithSuccessCallback:^(NSArray *data) {
+                [self storeRequestedPaymentRequests:data];
+                if(successHandler) successHandler(data);
+            } andErrorCallback:errorHandler];
+        }
+    }];
+    
+}
+
+
+-(void) getPendingRequestedPaymentRequestsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+                                      andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+    [self getPendingRequestedPaymentRequestsWithSuccessCallback:successHandler
+                                        andErrorCallback:errorHandler
+                                      andRefreshCallback:nil];
+    
+}
+
+-(void) getPendingRequestedPaymentRequestsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+                                      andErrorCallback:(PnPGenericErrorHandler)errorHandler
+                                    andRefreshCallback:(PnPGenericNSAarraySucceddHandler)refreshHandler{
+    NSPredicate *p = [NSPredicate predicateWithFormat:@"status == %@",@"PE"];
+    [self getRequestedPaymentRequestsOnSuccess:^(NSArray *data) {
+        if(data != nil){
+            data = [data filteredArrayUsingPredicate:p];
+            if(successHandler) successHandler(data);
+            if(refreshHandler){
+                [super getRequestedPaymentRequestsWithSuccessCallback:^(NSArray *data) {
+                    [self storeRequestedPaymentRequests:data];
+                    data = [data filteredArrayUsingPredicate:p];
+                    refreshHandler(data);
+                } andErrorCallback:errorHandler];
+            }
+        }else{
+            [super getRequestedPaymentRequestsWithSuccessCallback:^(NSArray *data) {
+                [self storeRequestedPaymentRequests:data];
+                data = [data filteredArrayUsingPredicate:p];
+                if(successHandler) successHandler(data);
+            } andErrorCallback:errorHandler];
+        }
+    }];
+    
+}
+
+
+-(void) cancelRequestedPaymentRequest:(PNPPaymentRequest *)request
+                  withSuccessCallback:(PnPSuccessHandler)successHandler
+                     andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+    [super cancelRequestedPaymentRequest:request
+            withSuccessCallback:^{
+                [self getPendingRequestedPaymentRequestsWithSuccessCallback:^(NSArray *data) {
+                    NSMutableArray *a = [NSMutableArray arrayWithArray:data];
+                    [a removeObject:request];
+                    [self storeRequestedPaymentRequests:a];
+                    if(successHandler) successHandler();
+
+                } andErrorCallback:errorHandler];
+            }
+               andErrorCallback:errorHandler];
     
 }
 
@@ -1090,7 +1243,19 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 
 
 
+-(void) getRequestedPaymentRequestsOnSuccess:(PnPGenericNSAarraySucceddHandler) successHandler{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            NSArray *requests = [NSKeyedUnarchiver unarchiveObjectWithFile:
+                                    [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"requestedRequests"]]];
 
+        if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(requests);} );
+    });
+}
+
+-(void) storeRequestedPaymentRequests:(NSArray *) requests{
+        [NSKeyedArchiver archiveRootObject:requests
+                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"requestedRequests"]]];
+}
 
 
 #pragma mark - Halcash methods
@@ -1217,6 +1382,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 }
 
 
+
 -(void) getWalletRechargesOnSuccess:(PnPGenericNSAarraySucceddHandler) successHandler{
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         if(_walletRecharges == nil){
@@ -1235,6 +1401,329 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     });
 }
 
+
+#pragma mark - Coupons & Fidelity
+
+-(void) getCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                         andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+
+    [self getCouponsWithSuccessCallback:successHandler
+                           andErrorCallback:errorHandler
+                         andRefreshCallback:nil];
+
+}
+
+-(void) getCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                         andErrorCallback:(PnPGenericErrorHandler) errorHandler
+                       andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler{
+ 
+    [self getCoupons:^(NSArray *data) {
+        if(data != nil){
+            if(successHandler) successHandler(data);
+            if(refreshHandler){
+                [super getCouponsWithSuccessCallback:^(NSArray *data) {
+                    [self storeUserCoupons:data];
+                    refreshHandler(data);
+                } andErrorCallback:errorHandler];
+            }
+        }else{
+            [super getCouponsWithSuccessCallback:^(NSArray *data){
+                [self storeUserCoupons:data];
+                if(successHandler) successHandler(data);
+            } andErrorCallback:errorHandler];
+        }
+    }];
+    
+}
+
+
+-(void) getDiscoverableCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                                 andErrorCallback:(PnPGenericErrorHandler) errorHandler
+                               andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"favorite == NO AND class != %@ AND class != %@ AND status != %@",[PNPCPLoyalty class],[PNPCPExchange class],@"US"];
+    NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"viewed" ascending:NO];
+    
+    if(refreshHandler){
+        [self getCouponsWithSuccessCallback:^(NSArray *data) {
+            data = [data filteredArrayUsingPredicate:predicate];
+            data = [data sortedArrayUsingDescriptors:@[descriptor]];
+            if(successHandler)successHandler(data);
+        } andErrorCallback:errorHandler andRefreshCallback:^(NSArray *data) {
+            data = [data filteredArrayUsingPredicate:predicate];
+            data = [data sortedArrayUsingDescriptors:@[descriptor]];
+            refreshHandler(data);
+        }];
+    }else{
+        [self getCouponsWithSuccessCallback:^(NSArray *data) {
+            data = [data filteredArrayUsingPredicate:predicate];
+            data = [data sortedArrayUsingDescriptors:@[descriptor]];
+            if(successHandler)successHandler(data);
+        } andErrorCallback:errorHandler];
+    }
+    
+
+    
+}
+
+-(void) getDiscoverableCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                                 andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    [self getDiscoverableCouponsWithSuccessCallback:successHandler
+                                   andErrorCallback:errorHandler
+                                 andRefreshCallback:nil];
+    
+}
+
+-(void) getUserCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                         andErrorCallback:(PnPGenericErrorHandler) errorHandler
+                       andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"favorite == YES AND status != %@",@"US"];
+    if(refreshHandler){
+        [self getCouponsWithSuccessCallback:^(NSArray *data) {
+            data = [data filteredArrayUsingPredicate:predicate];
+            if(successHandler)successHandler(data);
+        } andErrorCallback:errorHandler andRefreshCallback:^(NSArray *data) {
+            data = [data filteredArrayUsingPredicate:predicate];
+            if(refreshHandler)refreshHandler(data);
+        }];
+    }else{
+        [self getCouponsWithSuccessCallback:^(NSArray *data) {
+            data = [data filteredArrayUsingPredicate:predicate];
+            if(successHandler)successHandler(data);
+        } andErrorCallback:errorHandler];
+    }
+}
+
+-(void) getUserCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                         andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+
+
+    [self getUserCouponsWithSuccessCallback:successHandler
+                           andErrorCallback:errorHandler
+                         andRefreshCallback:nil];
+    
+}
+
+-(void) getCouponsForLoyaltyId:(NSNumber *) loyaltyId
+           withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+              andErrorCallback:(PnPGenericErrorHandler) errorHandler
+            andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"loyaltyIdentifier == %@ AND favorite == NO AND class == %@ AND status != %@",loyaltyId,[PNPCPLoyalty class],@"US"];
+    if(refreshHandler){
+        [self getCouponsWithSuccessCallback:^(NSArray *data){
+            data = [data filteredArrayUsingPredicate:predicate];
+            if(successHandler)successHandler(data);
+        } andErrorCallback:errorHandler andRefreshCallback:^(NSArray *data) {
+            data = [data filteredArrayUsingPredicate:predicate];
+            if(refreshHandler)refreshHandler(data);
+        }];
+    }else{
+        [self getCouponsWithSuccessCallback:^(NSArray *data) {
+            data = [data filteredArrayUsingPredicate:predicate];
+            if(successHandler)successHandler(data);
+        } andErrorCallback:errorHandler];
+    }
+}
+
+-(void) getCouponsForLoyaltyId:(NSNumber *) loyaltyId
+           withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+              andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+
+    [self getCouponsForLoyaltyId:loyaltyId
+             withSuccessCallback:successHandler
+                andErrorCallback:errorHandler
+              andRefreshCallback:nil];
+    
+}
+
+
+
+-(void) deleteCoupon:(PNPCoupon *)coupon
+ withSuccessCallback:(PnPSuccessHandler)successHandler
+    andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+    
+    [super deleteCoupon:coupon withSuccessCallback:^{
+        [self getCoupons:^(NSArray *data){
+            NSMutableArray *c = [NSMutableArray arrayWithArray:data];
+            [c removeObject:coupon];
+            [self storeUserCoupons:c];
+            if(successHandler)successHandler();
+        }];
+    }andErrorCallback:errorHandler];
+    
+}
+
+-(void) markCouposAsRead:(PNPCoupon *)coupon
+     withSuccessCallback:(PnPSuccessHandler)successHandler
+        andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+    [super markCouposAsRead:coupon withSuccessCallback:^{
+        [self getCoupons:^(NSArray *data){
+            NSMutableArray *c = [NSMutableArray arrayWithArray:data];
+            [c removeObject:coupon];
+            coupon.viewed = YES;
+            [c addObject:coupon];
+            [self storeUserCoupons:c];
+            if(successHandler)successHandler();
+        }];
+        
+    } andErrorCallback:errorHandler];
+}
+
+-(void) addCouponToFavorites:(PNPCoupon *) coupon
+         withSuccessCallback:(PnPSuccessHandler) successHandler
+            andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    [super addCouponToFavorites:coupon
+            withSuccessCallback:^{
+                [self getCoupons:^(NSArray *data) {
+                    NSMutableArray *c = [NSMutableArray arrayWithArray:data];
+                    [c removeObject:coupon];
+                    coupon.favorite = YES;
+                    
+                    [c addObject:coupon];
+                    [self storeUserCoupons:c];
+                    if(successHandler) successHandler();
+                }];
+            }
+               andErrorCallback:errorHandler];
+}
+
+-(void) getCouponWithCode:(NSString *) code
+      withSuccessCallback:(PnPCouponSuccessHandler) successHandler
+         andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    NSPredicate *p = [NSPredicate predicateWithFormat:@"ccode == %@",code];
+    [super getCouponsWithSuccessCallback:^(NSArray *data) {
+        NSLog(@"%@",code);
+        NSLog(@"%@",data);
+        PNPCoupon *c = [[data filteredArrayUsingPredicate:p] firstObject];
+        if(!c){
+            if(errorHandler) return errorHandler([[PNPGenericWebserviceError alloc]
+                                                  initWithDomain:@"PNPGenericWebserviceError"
+                                                  code:-6060
+                                                  userInfo:nil]);
+        }
+        if (successHandler)successHandler(c);
+    } andErrorCallback:errorHandler];
+}
+
+
+
+
+-(void) getUserLoyaltiesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+                           andErrorCallback:(PnPGenericErrorHandler)errorHandler
+                         andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"registered == YES"];
+    [self getLoyalties:^(NSArray *loyalties) {
+        if(loyalties != nil){
+            loyalties = [loyalties filteredArrayUsingPredicate:predicate];
+            if(successHandler) successHandler(loyalties);
+            if(refreshHandler){
+                [super getLoyaltiesWithSuccessCallback:^(NSArray *d) {
+                    [self storeLoyalties:d];
+                    d = [d filteredArrayUsingPredicate:predicate];
+                    refreshHandler(d);
+                } andErrorCallback:errorHandler];
+            }
+        }else{
+            [super getLoyaltiesWithSuccessCallback:^(NSArray *data) {
+                [self storeLoyalties:data];
+                data = [data filteredArrayUsingPredicate:predicate];
+                successHandler(data);
+            } andErrorCallback:errorHandler];
+        }
+    }];
+}
+
+-(void) getUserLoyaltiesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+                           andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+    [self getUserLoyaltiesWithSuccessCallback:successHandler
+                             andErrorCallback:errorHandler
+                           andRefreshCallback:nil];
+    
+}
+
+-(void) getLoyaltiesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+                       andErrorCallback:(PnPGenericErrorHandler)errorHandler
+                     andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"registered == NO"];
+    [self getLoyalties:^(NSArray *loyalties) {
+        if(loyalties != nil){
+            loyalties = [loyalties filteredArrayUsingPredicate:predicate];
+            if(successHandler) successHandler(loyalties);
+            if(refreshHandler){
+                [super getLoyaltiesWithSuccessCallback:^(NSArray *d) {
+                    [self storeLoyalties:d];
+                    d = [d filteredArrayUsingPredicate:predicate];
+                    refreshHandler(d);
+                } andErrorCallback:errorHandler];
+            }
+        }else{
+            [super getLoyaltiesWithSuccessCallback:^(NSArray *data) {
+                [self storeLoyalties:data];
+                data = [data filteredArrayUsingPredicate:predicate];
+                if(successHandler)successHandler(data);
+            } andErrorCallback:errorHandler];
+        }
+    }];
+    
+    
+}
+
+-(void) getLoyaltiesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+                       andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+    [self getLoyaltiesWithSuccessCallback:successHandler
+                         andErrorCallback:errorHandler
+                       andRefreshCallback:nil];
+}
+
+
+-(void) subscribeToLoyalty:(PNPLoyalty *)loyalty
+                    params:(NSDictionary *)params
+       withSuccessCallback:(PnPSuccessHandler)successHandler
+          andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+    
+    [super subscribeToLoyalty:loyalty
+                       params:params
+          withSuccessCallback:^{
+              [self getLoyalties:^(NSArray *data) {
+                  NSMutableArray *dd = [NSMutableArray arrayWithArray:data];
+                  [dd removeObject:loyalty];
+                  loyalty.registered = true;
+                  [dd addObject:loyalty];
+                  [self storeLoyalties:dd];
+                  if(successHandler) successHandler();
+              }];
+          }
+             andErrorCallback:errorHandler];
+    
+}
+
+-(void) getLoyalties:(PnPGenericNSAarraySucceddHandler) successHandler{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        NSArray *loyalties = [NSKeyedUnarchiver unarchiveObjectWithFile:
+                            [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"loyalties"]]];
+        if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(loyalties);} );
+    });
+}
+-(void) storeLoyalties:(NSArray *) loyalties{
+        [NSKeyedArchiver archiveRootObject:loyalties
+                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"loyalties"]]];
+
+}
+
+-(void) getCoupons:(PnPGenericNSAarraySucceddHandler) successHandler{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+           NSArray *coupons = [NSKeyedUnarchiver unarchiveObjectWithFile:
+                                [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"userCoupons"]]];
+
+        if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(coupons);} );
+    });
+}
+
+-(void) storeUserCoupons:(NSArray *) coupons{
+    [NSKeyedArchiver archiveRootObject:coupons
+                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"userCoupons"]]];
+}
 
 #pragma mark - Static data
 
@@ -1258,10 +1747,6 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
             } andErrorCallback:errorHandler];
         }
     }];
-    
-    
-    
-    
 }
 
 -(void) getCountriesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
@@ -1293,7 +1778,6 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 }
 
 #pragma mark - Logout methods
-
 -(void) logout{
     [super logout];
     self.user = nil;

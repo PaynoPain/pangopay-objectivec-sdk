@@ -34,11 +34,14 @@ typedef void(^PnpPangoDataSuccessHandler)(PNPPango *pango);
 typedef void(^PnpUserAvatarSuccessHandler)(UIImage *avatar);
 typedef void(^PnPGenericNSAarraySucceddHandler)(NSArray * data);
 typedef void(^PnPNSNumberSucceddHandler)(NSNumber * number);
+typedef void(^PnPNSStringSucceddHandler)(NSString * string);
 typedef void(^PnPTransactionReceiverSuccessHandler)(PNPTransactionReceiverUser * receiver);
 typedef void(^PnPPaymentRequestSuccessHandler)(PNPPaymentRequest * request);
 typedef void(^PnPSecureRechargeHandler)(NSURL * url);
 typedef void(^PnPOrderSuccessHandler)(PNPOrder * order);
 typedef void(^PnPCommerceOrderSuccessHandler)(PNPCommerceOrder * order);
+typedef void(^PnPLoyaltyUserDataSuccessHandler)(PNPLoyaltyUserData * data);
+typedef void(^PnPCouponSuccessHandler)(PNPCoupon * coupon);
 + (instancetype)sharedInstance;
 
 
@@ -296,6 +299,14 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 
 #pragma mark - Payment request methods
 
+
+-(void) getRequestedPaymentRequestsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                            andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) cancelRequestedPaymentRequest:(PNPPaymentRequest *) request
+         withSuccessCallback:(PnPSuccessHandler) successHandler
+            andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 -(void) getPaymentRequestsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                              andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
@@ -315,6 +326,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                        andAmount:(NSNumber *) amount
              withSuccessCallback:(PnPSuccessHandler) successHandler
                 andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 
 
 #pragma mark - Halcash methods
@@ -378,10 +390,67 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 							 andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 
+#pragma mark - Coupons & Fidelity
+
+-(void) getCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                         andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) deleteCoupon:(PNPCoupon *) coupon
+ withSuccessCallback:(PnPSuccessHandler) successHandler
+    andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) markCouposAsRead:(PNPCoupon *) coupon
+ withSuccessCallback:(PnPSuccessHandler) successHandler
+    andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) addCouponToFavorites:(PNPCoupon *) coupon
+         withSuccessCallback:(PnPSuccessHandler) successHandler
+            andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) getLoyaltiesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                       andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) subscribeToLoyalty:(PNPLoyalty *) loyalty
+                    params:(NSDictionary *) params
+       withSuccessCallback:(PnPSuccessHandler) successHandler
+          andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) getUserDataForLoyalty:(PNPLoyalty *) loyalty
+          withSuccessCallback:(PnPLoyaltyUserDataSuccessHandler) successHandler
+             andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) exchangeCouponForPNPLoyaltyExchange:(PNPLoyaltyExchanges *) exchange
+                                 memberCode:(NSString *) code
+                        withSuccessCallback:(PnPNSStringSucceddHandler) successHandler
+                           andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) getCouponWithCode:(NSString *) code
+            withSuccessCallback:(PnPCouponSuccessHandler) successHandler
+               andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 #pragma mark - Static data
 
 -(void) getCountriesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                        andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+
+#pragma mark - Festivals
+
+-(void) registerFestivalUserWithEmail:(NSString *) email
+                             password:(NSString *) password
+                                 name:(NSString *) name
+                              surname:(NSString *) surname
+                               prefix:(NSString *) prefix
+                                phone:(NSString *) phone
+                                  pin:(NSNumber *) pin
+                                 male:(BOOL ) isMale
+                            birthdate:(NSDate *) date
+                            reference:(NSString *) reference
+                  withSuccessCallback:(PnPSuccessHandler) successHandler
+                     andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+
+-(void) checkFestivalGift;
 
 @end
 
@@ -397,6 +466,9 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 @interface PNPProductionEnvironment : PNPEnvironment
 
 @end
+
+
+
 
 
 
