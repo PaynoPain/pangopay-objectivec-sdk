@@ -2205,6 +2205,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     
 }
 
+
 -(void) extractFromPango:(PNPPango *) pango
                   amount:(NSNumber *) amount
      withSuccessCallback:(PnPSuccessHandler) successHandler
@@ -2390,6 +2391,65 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     
     
 }
+-(void) getPangoCommission:(PNPPango *) pango
+           withMethod:(NSString *) method
+          withAmount:(NSNumber *) amount
+  withSuccessCallback:(PnPSuccessHandler) successHandler
+     andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    if(![self isUserLoggedIn ]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    amount = [NSNumber numberWithDouble:([amount doubleValue] * 100)];
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"transactions/get_commission"]
+                   usingParameters:@{@"controller":@"pangos",@"method":method,@"pango_id":pango.identifier,@"amount":amount}
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
+                       if(!error){
+                           @try {
+
+                               NSError *parseError;
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"get_commission"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc]
+                                                                   initWithDomain:parseError.domain
+                                                                   code:[parseError code]
+                                                                   userInfo:parseError.userInfo]);
+                                  
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   if(successHandler)successHandler([self clearAmount:[responseDictionary objectForKey:@"data"]]);
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                            NSLog(@"%@",error);
+                       }
+                   }];
+}
+
+
+
 
 #pragma mark - Send Payment methods
 
@@ -2418,7 +2478,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
                                                                                                    options:0
                                                                                                      error:&parseError]
-                                                                   objectForKey:@"get_commission"];
+                                                                   objectForKey:@"get"];
                                if(parseError){
                                    if(errorHandler) errorHandler( [[PNPNotAJsonError alloc]
                                                                    initWithDomain:parseError.domain
@@ -3041,6 +3101,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                    }];
     
 }
+
 
 -(void) cancelRequestedPaymentRequest:(PNPPaymentRequest *) request
                   withSuccessCallback:(PnPSuccessHandler) successHandler

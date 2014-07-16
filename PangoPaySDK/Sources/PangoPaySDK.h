@@ -242,6 +242,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
   withSuccessCallback:(PnPSuccessHandler) successHandler
      andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
+
 -(void) extractFromPango:(PNPPango *) pango
                   amount:(NSNumber *) amount
      withSuccessCallback:(PnPSuccessHandler) successHandler
@@ -250,6 +251,13 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 -(void) getPangoMovements:(PNPPango *) pango
       withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
          andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) getPangoCommission:(PNPPango *) pango
+           withMethod:(NSString *) method
+           withAmount:(NSNumber *) amount
+  withSuccessCallback:(PnPSuccessHandler) successHandler
+     andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 
 
 #pragma mark - Send Payment methods
@@ -293,8 +301,6 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 -(void) cancelPendingTransaction:(PNPTransactionPending *) transaction
              withSuccessCallback:(PnPSuccessHandler) successHandler
                 andErrorCallback:(PnPGenericErrorHandler) errorHandler;
-
-
 
 
 #pragma mark - Payment request methods
