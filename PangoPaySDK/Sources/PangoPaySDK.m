@@ -3975,6 +3975,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                                objectForKey:@"send_mx"];
                            if(parseError){
                                if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                               
                                                                                                   code:[parseError code]
                                                                                               userInfo:parseError.userInfo]);
                                return;
@@ -3982,7 +3983,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 						   
                            if([[responseDictionary objectForKey:@"success"] boolValue]){
 							   
-							   NSString* barCodeURL = [[responseDictionary objectForKey:@"data"] valueForKey:@"0"];
+							   NSString* barCodeURL = [[responseDictionary objectForKey:@"data"] valueForKey:@"url"];
 							   
                                if(successHandler)successHandler(barCodeURL);
                            }else{
