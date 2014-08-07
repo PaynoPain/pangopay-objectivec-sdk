@@ -160,6 +160,15 @@
                      andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler;
 
 
+#pragma mark - Catalogue
+
+
+-(void) getProductCategoriesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                               andErrorCallback:(PnPGenericErrorHandler) errorHandler
+                             andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler;
+
+
+
 #pragma mark - Static data
 
 -(void) getCountriesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler

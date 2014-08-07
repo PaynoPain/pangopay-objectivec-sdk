@@ -458,6 +458,14 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 -(void) checkFestivalGift;
 
+
+
+#pragma mark - Catalogue
+
+-(void) getProductCategoriesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                        andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+
 @end
 
 @interface PNPEnvironment : NSObject

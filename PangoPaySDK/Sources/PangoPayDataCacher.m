@@ -62,7 +62,8 @@
                            @"halcashExtractions"        : @"pnphalcashextractions",
                            @"userCoupons"               : @"pnpusercoupons",
                            @"loyalties"                 : @"pnployalties",
-                           @"requestedRequests"         : @"pnprequestedrequests"
+                           @"requestedRequests"         : @"pnprequestedrequests",
+                           @"catalogue"                 : @"pnpcatalogue"
                            };
     return self;
 }
@@ -1720,9 +1721,59 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     });
 }
 
+
+
 -(void) storeUserCoupons:(NSArray *) coupons{
     [NSKeyedArchiver archiveRootObject:coupons
                                     toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"userCoupons"]]];
+}
+
+
+#pragma mark - Catalogue
+
+-(void) getProductCategoriesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                               andErrorCallback:(PnPGenericErrorHandler) errorHandler
+                             andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler{
+    
+    [self getCatalogue:^(NSArray *data) {
+        if(data!= nil){
+            if(successHandler) successHandler(data);
+            if(refreshHandler){
+                [super getProductCategoriesWithSuccessCallback:^(NSArray *data){
+                    [self storeCatalogue:data];
+                    refreshHandler(data);
+                } andErrorCallback:errorHandler];
+            }
+        }else{
+            [super getProductCategoriesWithSuccessCallback:^(NSArray *data){
+                [self storeCatalogue:data];
+                if(successHandler) successHandler(data);
+            } andErrorCallback:errorHandler];
+        }
+
+    }];
+    
+}
+-(void) getProductCategoriesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                               andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+
+    [self getProductCategoriesWithSuccessCallback:successHandler
+                                 andErrorCallback:errorHandler
+                               andRefreshCallback:nil];
+}
+
+-(void) storeCatalogue:(NSArray *) catalogue{
+    [NSKeyedArchiver archiveRootObject:catalogue
+                                toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"catalogue"]]];
+}
+
+-(void) getCatalogue:(PnPGenericNSAarraySucceddHandler) successHandler{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        NSArray *catalogue = [NSKeyedUnarchiver unarchiveObjectWithFile:
+                            [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"catalogue"]]];
+        
+        if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(catalogue);} );
+    });
 }
 
 #pragma mark - Static data
@@ -1776,6 +1827,8 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
         if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(self.countries);} );
     });
 }
+
+
 
 #pragma mark - Logout methods
 -(void) logout{

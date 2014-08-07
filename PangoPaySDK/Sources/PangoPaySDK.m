@@ -4776,6 +4776,102 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
     
 }
 
+#pragma mark - Catalogue
+
+-(void) getProductCategoriesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                        andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    NSError *jerror;
+    NSMutableDictionary *paramDicc = [NSMutableDictionary new];
+    [paramDicc setObject:@1 forKey:@"products"];
+    NSString *pparams = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:paramDicc
+                                                                                       options:0
+                                                                                         error:&jerror]
+                                              encoding:NSUTF8StringEncoding];
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"ProductCatalog/call.json"]
+                   usingParameters:@{
+                                     @"action":[NSString stringWithFormat:@"list/categories.json"],
+                                     @"fields": pparams,
+                                     }
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"call"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   NSArray *data = [responseDictionary objectForKey:@"data"];
+                                   NSMutableArray *categories = [NSMutableArray new];
+                                   NSPredicate *productsPredicate = [NSPredicate predicateWithFormat:@"Category.parent_id != %@",[NSNull null]];
+                                   NSArray *products = [data filteredArrayUsingPredicate:productsPredicate];
+
+                                   NSMutableArray *pproducts = [NSMutableArray new];
+                                   for (NSDictionary *p in products) {
+                                       NSMutableArray *variants = [NSMutableArray new];
+                                       for (NSDictionary * v in [p objectForKey:@"Product"]){
+                                           [variants addObject:[[PNPCVariant alloc] initWithName:[v objectForKey:@"name"] price:[self clearAmount:[v objectForKey:@"price"]]]];
+                                       }
+                                       [pproducts addObject:[[PNPCProduct alloc] initWithIdentifier:[[p objectForKey:@"Category"] objectForKey:@"id"] name:[[p objectForKey:@"Category"] objectForKey:@"name"] imgUrl:[[p objectForKey:@"Category"] objectForKey:@"img_url"] variants:variants]];
+                                       
+                                       NSPredicate *categoryPredicate = [NSPredicate predicateWithFormat:@"Category.id == %@",[[p objectForKey:@"Category"] objectForKey:@"parent_id"]];
+                                       
+                                       NSArray *ccc = [data filteredArrayUsingPredicate:categoryPredicate];
+                                       
+                                       if(ccc.count == 1){
+                                           NSDictionary *category = [ccc firstObject];
+                                           [categories addObject:[[PNPCCategory alloc] initWithIdentifier:[[category objectForKey:@"Category"] objectForKey:@"id"] name:[[category objectForKey:@"Category"] objectForKey:@"name"] imgUrl:[[category objectForKey:@"Category"] objectForKey:@"img_url"] products:pproducts]];
+                                       }
+                                   }
+                                   if(successHandler) successHandler(categories);
+                                   
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                   }];
+    
+    
+    
+    
+    
+    
+    
+    
+    
+}
+
+
 #pragma mark - Private Methods
 -(NSNumber *) clearAmount:(NSNumber *)n{
     return [NSNumber numberWithDouble:[n doubleValue]/100];
@@ -4870,7 +4966,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 @implementation PNPSandboxEnvironment
 
 -(id) init{
-    self = [super initWithUrl:[NSURL URLWithString:@"https://pre-core.paynopain.com"]];
+    self = [super initWithUrl:[NSURL URLWithString:@"https://demo-core.paynopain.com"]];
     return self;
 }
 

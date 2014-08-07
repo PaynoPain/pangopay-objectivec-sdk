@@ -64,7 +64,6 @@
     if (!self) {
         return nil;
     }
-    
     self.username   = [decoder decodeObjectForKey:@"username"];
     self.name       = [decoder decodeObjectForKey:@"name"    ];
     self.surname    = [decoder decodeObjectForKey:@"surname" ];
@@ -1678,3 +1677,103 @@ andOptionValues:(NSArray *)optionValues
     [aCoder encodeObject:_code forKey:@"code"];
 }
 @end
+
+@implementation PNPCCategory
+
+-(id) initWithIdentifier:(NSNumber *)identifier name:(NSString *)name imgUrl:(NSString *)url products:(NSArray *)products{
+    self = [super init];
+    if(!self) return nil;
+    _identifier = identifier;
+    _name = name;
+    _imgUrl = url;
+    _products = products;
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:_identifier forKey:@"identifier"];
+    [aCoder encodeObject:_name forKey:@"name"];
+    [aCoder encodeObject:_imgUrl forKey:@"imgUrl"];
+    [aCoder encodeObject:_products forKey:@"products"];
+}
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if(!self) return nil;
+    _identifier = [aDecoder decodeObjectForKey:@"identifier"];
+    _name = [aDecoder decodeObjectForKey:@"name"];
+    _imgUrl = [aDecoder decodeObjectForKey:@"imgUrl"];
+    _products = [aDecoder decodeObjectForKey:@"products"];
+    return self;
+}
+
+-(NSString *) description{
+    return [NSString stringWithFormat:@"ID: %@ NAME: %@ IMGURL: %@ PRODUCTS: %@ \n",_identifier,_name,_imgUrl,_products];
+}
+
+@end
+
+@implementation PNPCProduct
+
+-(id) initWithIdentifier:(NSNumber *)identifier
+                    name:(NSString *)name
+                  imgUrl:(NSString *)imgUrl
+                variants:(NSArray *)variants{
+    self = [super init];
+    if(!self) return nil;
+    _identifier = identifier;
+    _name = name;
+    _imgUrl = imgUrl;
+    _variants = variants;
+    return self;
+}
+
+-(void)encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:_identifier forKey:@"identifier"];
+    [aCoder encodeObject:_name forKey:@"name"];
+    [aCoder encodeObject:_imgUrl forKey:@"imgUrl"];
+    [aCoder encodeObject:_variants forKey:@"variants"];
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if(!self) return nil;
+    _identifier = [aDecoder decodeObjectForKey:@"identifier"];
+    _name = [aDecoder decodeObjectForKey:@"name"];
+    _imgUrl = [aDecoder decodeObjectForKey:@"imgUrl"];
+    _variants = [aDecoder decodeObjectForKey:@"variants"];
+    return self;
+}
+-(NSString *) description{
+    return [NSString stringWithFormat:@"ID: %@  NAME: %@ IMGURL: %@ VARIANTS: %@ \n",_identifier,_name,_imgUrl,_variants];
+}
+
+@end
+
+@implementation PNPCVariant
+
+-(id) initWithName:(NSString *)name price:(NSNumber *)price{
+    self = [super init];
+    if(!self) return nil;
+    _name = name;
+    _price = price;
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:_name forKey:@"name"];
+    [aCoder encodeObject:_price forKey:@"price"];
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if(!self) return nil;
+    _name = [aDecoder decodeObjectForKey:@"name"];
+    _price = [aDecoder decodeObjectForKey:@"price"];
+    return self;
+}
+-(NSString *) description{
+    return [NSString stringWithFormat:@"NAME: %@ PRICE: %@ \n",_name,_price];
+}
+@end
+
+

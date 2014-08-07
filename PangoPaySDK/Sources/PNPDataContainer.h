@@ -709,3 +709,42 @@
              lastPoints:(NSNumber *) lastPoints
                    code:(NSString *) code;
 @end
+
+@interface PNPCCategory : NSObject <NSCoding>
+
+-(id) initWithIdentifier:(NSNumber *) identifier
+                    name:(NSString *) name
+                  imgUrl:(NSString *) url
+                products:(NSArray *) products;
+
+@property (strong,nonatomic) NSString *name;
+@property (strong,nonatomic) NSString *imgUrl;
+@property (strong,nonatomic) NSArray *products;
+@property (strong,nonatomic) NSNumber *identifier;
+
+@end
+
+
+@interface PNPCProduct : NSObject <NSCoding>
+
+-(id) initWithIdentifier:(NSNumber *) identifier
+                    name:(NSString *) name
+                  imgUrl:(NSString *) imgUrl
+                variants:(NSArray *) variants;
+
+@property (strong,nonatomic) NSString *name;
+@property (strong,nonatomic) NSString *imgUrl;
+@property (strong,nonatomic) NSArray *variants;
+@property (strong,nonatomic) NSNumber *identifier;
+
+@end
+
+@interface PNPCVariant : NSObject <NSCoding>
+
+-(id) initWithName:(NSString *) name
+             price:(NSNumber *) price;
+
+@property (strong,nonatomic) NSString *name;
+@property (strong,nonatomic) NSNumber *price;
+
+@end
