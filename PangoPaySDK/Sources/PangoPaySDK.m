@@ -4831,13 +4831,24 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                        }
                                        [pproducts addObject:[[PNPCProduct alloc] initWithIdentifier:[[p objectForKey:@"Category"] objectForKey:@"id"] name:[[p objectForKey:@"Category"] objectForKey:@"name"] imgUrl:[[p objectForKey:@"Category"] objectForKey:@"img_url"] variants:variants]];
                                        
-                                       NSPredicate *categoryPredicate = [NSPredicate predicateWithFormat:@"Category.id == %@",[[p objectForKey:@"Category"] objectForKey:@"parent_id"]];
+                                       NSPredicate *categoryPredicate = [NSPredicate predicateWithFormat:@"identifier == %@",[[p objectForKey:@"Category"] objectForKey:@"parent_id"]];
                                        
-                                       NSArray *ccc = [data filteredArrayUsingPredicate:categoryPredicate];
+                                       NSArray *ccc = [categories filteredArrayUsingPredicate:categoryPredicate];
                                        
                                        if(ccc.count == 1){
-                                           NSDictionary *category = [ccc firstObject];
-                                           [categories addObject:[[PNPCCategory alloc] initWithIdentifier:[[category objectForKey:@"Category"] objectForKey:@"id"] name:[[category objectForKey:@"Category"] objectForKey:@"name"] imgUrl:[[category objectForKey:@"Category"] objectForKey:@"img_url"] products:pproducts]];
+                                           PNPCCategory *c = [ccc firstObject];
+                                           [categories removeObject:c];
+                                           NSMutableArray *oldProduct = [NSMutableArray arrayWithArray:c.products];
+                                           [oldProduct addObject:pproducts];
+                                           c.products = oldProduct;
+                                           [categories addObject:c];
+                                       }else{
+                                           categoryPredicate = [NSPredicate predicateWithFormat:@"Category.id == %@",[[p objectForKey:@"Category"] objectForKey:@"parent_id"]];
+                                           ccc = [data filteredArrayUsingPredicate:categoryPredicate];
+                                           if(ccc.count == 1){
+                                               NSDictionary *category = [ccc firstObject];
+                                               [categories addObject:[[PNPCCategory alloc] initWithIdentifier:[[category objectForKey:@"Category"] objectForKey:@"id"] name:[[category objectForKey:@"Category"] objectForKey:@"name"] imgUrl:[[category objectForKey:@"Category"] objectForKey:@"img_url"] products:pproducts]];
+                                           }
                                        }
                                    }
                                    if(successHandler) successHandler(categories);
