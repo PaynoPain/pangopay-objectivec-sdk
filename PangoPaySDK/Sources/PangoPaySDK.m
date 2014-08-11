@@ -4823,8 +4823,9 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                    NSPredicate *productsPredicate = [NSPredicate predicateWithFormat:@"Category.parent_id != %@",[NSNull null]];
                                    NSArray *products = [data filteredArrayUsingPredicate:productsPredicate];
 
-                                   NSMutableArray *pproducts = [NSMutableArray new];
                                    for (NSDictionary *p in products) {
+                                       NSMutableArray *pproducts = [NSMutableArray new];
+
                                        NSMutableArray *variants = [NSMutableArray new];
                                        for (NSDictionary * v in [p objectForKey:@"Product"]){
                                            [variants addObject:[[PNPCVariant alloc] initWithName:[v objectForKey:@"name"] price:[self clearAmount:[v objectForKey:@"price"]]]];
