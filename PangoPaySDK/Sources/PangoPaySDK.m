@@ -4846,7 +4846,9 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                            PNPCCategory *c = [ccc firstObject];
                                            [categories removeObject:c];
                                            NSMutableArray *oldProduct = [NSMutableArray arrayWithArray:c.products];
-                                           [oldProduct addObject:pproducts];
+                                           for (PNPCProduct *pp in pproducts) {
+                                               [oldProduct addObject:pp];
+                                           }
                                            c.products = oldProduct;
                                            [categories addObject:c];
                                        }else{
