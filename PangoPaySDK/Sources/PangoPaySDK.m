@@ -4820,6 +4820,12 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    NSArray *data = [responseDictionary objectForKey:@"data"];
                                    NSMutableArray *categories = [NSMutableArray new];
+                                   NSPredicate *categoryPredicate = [NSPredicate predicateWithFormat:@"Category.parent_id == %@",[NSNull null]];
+                                   NSArray *fcategories = [data filteredArrayUsingPredicate:categoryPredicate];
+                                   for (NSDictionary *d in fcategories){
+                                       [categories addObject:[[PNPCCategory alloc] initWithIdentifier:[[d objectForKey:@"Category"] objectForKey:@"id"] name:[[d objectForKey:@"Category"] objectForKey:@"name"] imgUrl:[[d objectForKey:@"Category"] objectForKey:@"img_url"] products:nil]];
+                                   }
+                                   
                                    NSPredicate *productsPredicate = [NSPredicate predicateWithFormat:@"Category.parent_id != %@",[NSNull null]];
                                    NSArray *products = [data filteredArrayUsingPredicate:productsPredicate];
 
@@ -4872,15 +4878,74 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                            if(errorHandler)errorHandler([self handleErrors:error]);
                        }
                    }];
+}
+
+
+-(void) addCategoryWithName:(NSString *) name
+                   andImage:(UIImage *) image
+        withSuccessCallback:(PnPSuccessHandler) successHandler
+           andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
     
+    NSData *imageData = UIImageJPEGRepresentation(image, 0.5);
+    NSString *base64encodedImage = [imageData base64EncodedString];
     
+    base64encodedImage = [NSString stringWithFormat:@"data:image/jpg;base64,%@",base64encodedImage];
     
+    NSError *jerror;
     
+    NSMutableDictionary *paramDicc = [NSMutableDictionary new];
+    [paramDicc setObject:name forKey:@"name"];
+    [paramDicc setObject:base64encodedImage forKey:@"img_url"];
     
+    NSString *pparams = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:paramDicc
+                                                                                       options:0
+                                                                                         error:&jerror]
+                                              encoding:NSUTF8StringEncoding];
     
-    
-    
-    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"ProductCatalog/call.json"]
+                   usingParameters:@{
+                                     @"action":[NSString stringWithFormat:@"categories.json"],
+                                     @"fields": pparams,
+                                     }
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"call"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   if(successHandler) successHandler();
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                   }];
 }
 
 
@@ -4891,7 +4956,6 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 
 -(NSError *) handleErrors:(NSError *) error{
-    
     if([error code] == 401){
         PNPUnuthorizedAccessError * e = [[PNPUnuthorizedAccessError alloc] initWithDomain:@"PNPConnectionError"
                                                                                      code:[error code]

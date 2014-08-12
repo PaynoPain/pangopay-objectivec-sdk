@@ -465,6 +465,11 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 -(void) getProductCategoriesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                         andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
+-(void) addCategoryWithName:(NSString *) name
+                   andImage:(UIImage *) image
+        withSuccessCallback:(PnPSuccessHandler) successHandler
+           andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 
 @end
 
