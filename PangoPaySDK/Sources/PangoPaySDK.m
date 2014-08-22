@@ -4834,7 +4834,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
                                        NSMutableArray *variants = [NSMutableArray new];
                                        for (NSDictionary * v in [p objectForKey:@"Product"]){
-                                           [variants addObject:[[PNPCVariant alloc] initWithName:[v objectForKey:@"name"] price:[self clearAmount:[v objectForKey:@"price"]]]];
+                                           [variants addObject:[[PNPCVariant alloc] initWithName:[v objectForKey:@"name"] price:[self clearAmount:[v objectForKey:@"price"]] identifier:[v objectForKey:@"id"]]];
                                        }
                                        [pproducts addObject:[[PNPCProduct alloc] initWithIdentifier:[[p objectForKey:@"Category"] objectForKey:@"id"] name:[[p objectForKey:@"Category"] objectForKey:@"name"] imgUrl:[[p objectForKey:@"Category"] objectForKey:@"img_url"] variants:variants]];
                                        
@@ -4922,7 +4922,6 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                        if(!error){
                            @try {
                                NSError *parseError;
-                               NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
                                NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
                                                                                                    options:0
                                                                                                      error:&parseError]
@@ -4935,6 +4934,11 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                }
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    if(successHandler) successHandler();
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
                                }
                            }
                            @catch (NSException *exception) {
@@ -4948,6 +4952,610 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                            if(errorHandler)errorHandler([self handleErrors:error]);
                        }
                    }];
+}
+
+-(void) deleteCategory:(PNPCCategory *) category
+   withSuccessCallback:(PnPSuccessHandler) successHandler
+      andErrorCallback:(PnPGenericErrorHandler ) errorHandler{
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+
+    
+    NSError *jerror;
+    
+    NSMutableDictionary *paramDicc = [NSMutableDictionary new];
+
+    [paramDicc setObject:@"remove" forKey:@"reason"];
+    [paramDicc setObject:@1 forKey:@"removeProducts"];
+    
+    NSString *pparams = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:paramDicc
+                                                                                       options:0
+                                                                                         error:&jerror]
+                                              encoding:NSUTF8StringEncoding];
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"ProductCatalog/call.json"]
+                   usingParameters:@{
+                                     @"action":[NSString stringWithFormat:@"categories/%@/delete.json",category.identifier],
+                                     @"fields": pparams,
+                                     }
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"call"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   if(successHandler) successHandler();
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                   }];
+    
+}
+
+
+
+-(void) deleteProduct:(PNPCProduct *) product
+  withSuccessCallback:(PnPSuccessHandler) successHandler
+     andErrorCallback:(PnPGenericErrorHandler ) errorHandler{
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+    
+    NSError *jerror;
+    
+    NSMutableDictionary *paramDicc = [NSMutableDictionary new];
+    
+    [paramDicc setObject:@"remove" forKey:@"reason"];
+    [paramDicc setObject:@1 forKey:@"removeProducts"];
+    
+    NSString *pparams = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:paramDicc
+                                                                                       options:0
+                                                                                         error:&jerror]
+                                              encoding:NSUTF8StringEncoding];
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"ProductCatalog/call.json"]
+                   usingParameters:@{
+                                     @"action":[NSString stringWithFormat:@"categories/%@/delete.json",product.identifier],
+                                     @"fields": pparams,
+                                     }
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"call"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   if(successHandler) successHandler();
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                   }];
+}
+
+
+-(void) deleteVariant:(PNPCVariant *) variant
+  withSuccessCallback:(PnPSuccessHandler) successHandler
+     andErrorCallback:(PnPGenericErrorHandler ) errorHandler{
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+    
+    NSError *jerror;
+    
+    NSMutableDictionary *paramDicc = [NSMutableDictionary new];
+    
+    [paramDicc setObject:@"remove" forKey:@"reason"];
+    
+    NSString *pparams = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:paramDicc
+                                                                                       options:0
+                                                                                         error:&jerror]
+                                              encoding:NSUTF8StringEncoding];
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"ProductCatalog/call.json"]
+                   usingParameters:@{
+                                     @"action":[NSString stringWithFormat:@"products/%@/delete.json",variant.identifer],
+                                     @"fields": pparams,
+                                     }
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"call"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   if(successHandler) successHandler();
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                   }];
+    
+}
+
+
+-(void) updateCategory:(PNPCCategory *) category
+                 image:(UIImage *) image
+   withSuccessCallback:(PnPSuccessHandler) successHandler
+      andErrorCallback:(PnPGenericErrorHandler ) errorHandler{
+    
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+    
+    NSError *jerror;
+    
+    NSMutableDictionary *paramDicc = [NSMutableDictionary new];
+    
+    [paramDicc setObject:category.name forKey:@"name"];
+    NSData *imageData = UIImageJPEGRepresentation(image, 0.5);
+    NSString *base64encodedImage = [imageData base64EncodedString];
+    
+    base64encodedImage = [NSString stringWithFormat:@"data:image/jpg;base64,%@",base64encodedImage];
+    
+    [paramDicc setObject:base64encodedImage forKey:@"img_url"];
+    
+    NSString *pparams = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:paramDicc
+                                                                                       options:0
+                                                                                         error:&jerror]
+                                              encoding:NSUTF8StringEncoding];
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"ProductCatalog/call.json"]
+                   usingParameters:@{
+                                     @"action":[NSString stringWithFormat:@"categories/%@/edit.json",category.identifier],
+                                     @"fields": pparams,
+                                    }
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           
+                           @try {
+                               NSError *parseError;
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"call"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   if(successHandler) successHandler();
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                   }];
+
+}
+
+
+-(void) addProduct:(PNPCProduct *) product
+       forCategory:(PNPCCategory *) category
+             image:(UIImage *) image
+withSuccessCallback:(PnPSuccessHandler) successHandler
+  andErrorCallback:(PnPGenericErrorHandler ) errorHandler{
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    NSError *jerror;
+    NSMutableDictionary *paramDicc = [NSMutableDictionary new];
+    [paramDicc setObject:product.name forKey:@"name"];
+    NSData *imageData = UIImageJPEGRepresentation(image, 0.5);
+    NSString *base64encodedImage = [imageData base64EncodedString];
+    base64encodedImage = [NSString stringWithFormat:@"data:image/jpg;base64,%@",base64encodedImage];
+    [paramDicc setObject:base64encodedImage forKey:@"img_url"];
+    [paramDicc setObject:category.identifier forKey:@"category_id"];
+    
+    NSString *pparams = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:paramDicc
+                                                                                       options:0
+                                                                                         error:&jerror]
+                                              encoding:NSUTF8StringEncoding];
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"ProductCatalog/call.json"]
+                   usingParameters:@{
+                                     @"action":[NSString stringWithFormat:@"categories.json"],
+                                     @"fields": pparams,
+                                     }
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           
+                           @try {
+                               NSError *parseError;
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"call"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   product.identifier = [responseDictionary objectForKey:@"data"];
+                                   int __block count = 0;
+                                   for (PNPCVariant *v in product.variants) {
+                                       [self addProductVariant:v forProduct:product withSuccessHandler:^{
+                                           if(++count == product.variants.count){
+                                               if(successHandler) successHandler();
+                                           }
+                                       } andErrorHandler:errorHandler];
+                                   }
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                   }];
+}
+
+-(void) updateProduct:(PNPCProduct *) product
+                image:(UIImage *) image
+  withSuccessCallback:(PnPSuccessHandler) successHandler
+     andErrorCallback:(PnPGenericErrorHandler ) errorHandler{
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    NSError *jerror;
+    NSMutableDictionary *paramDicc = [NSMutableDictionary new];
+    [paramDicc setObject:product.name forKey:@"name"];
+    NSData *imageData = UIImageJPEGRepresentation(image, 0.5);
+    NSString *base64encodedImage = [imageData base64EncodedString];
+    base64encodedImage = [NSString stringWithFormat:@"data:image/jpg;base64,%@",base64encodedImage];
+    [paramDicc setObject:base64encodedImage forKey:@"img_url"];
+    
+    NSString *pparams = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:paramDicc
+                                                                                       options:0
+                                                                                         error:&jerror]
+                                              encoding:NSUTF8StringEncoding];
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"ProductCatalog/call.json"]
+                   usingParameters:@{
+                                     @"action":[NSString stringWithFormat:@"categories/%@/edit.json",product.identifier],
+                                     @"fields": pparams,
+                                     }
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           
+                           @try {
+                               NSError *parseError;
+                               NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"call"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   int __block count = 0;
+                                   for (PNPCVariant *v in product.variants) {
+                                       
+                                       if(v.identifer == nil){
+                                           [self addProductVariant:v forProduct:product withSuccessHandler:^{
+                                               if(++count == product.variants.count){
+                                                   if(successHandler) successHandler();
+                                               }
+                                           } andErrorHandler:errorHandler];
+                                       }else{
+                                           [self updateVariant:v withSuccessHandler:^{
+                                               if(++count == product.variants.count){
+                                                   if(successHandler) successHandler();
+                                               }
+                                           } andErrorHandler:errorHandler];
+                                       }
+
+                                   }
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                   }];
+
+    
+    
+    
+    
+}
+
+-(void) addProductVariant:(PNPCVariant *) variant
+               forProduct:(PNPCProduct *) product
+       withSuccessHandler:(PnPSuccessHandler ) successHandler
+          andErrorHandler:(PnPGenericErrorHandler) errorHandler{
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+    
+    
+    NSError *jerror;
+    NSMutableDictionary *paramDicc = [NSMutableDictionary new];
+    [paramDicc setObject:variant.name forKey:@"name"];
+    NSLog(@"PRODUCTO %@",product);
+    [paramDicc setObject:product.identifier forKey:@"category_id"];
+    
+    NSNumber *price = [NSNumber numberWithFloat:variant.price.floatValue * 100];
+    
+    [paramDicc setObject:price forKey:@"price"];
+    
+    NSString *pparams = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:paramDicc
+                                                                                       options:0
+                                                                                         error:&jerror]
+                                              encoding:NSUTF8StringEncoding];
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"ProductCatalog/call.json"]
+                   usingParameters:@{
+                                     @"action":[NSString stringWithFormat:@"products.json"],
+                                     @"fields": pparams,
+                                     }
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           
+                           @try {
+                               NSError *parseError;
+
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"call"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   
+                                   if(successHandler) successHandler();
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                   }];
+    
+
+    
+    
+    
+}
+
+
+-(void) updateVariant:(PNPCVariant *) variant
+   withSuccessHandler:(PnPSuccessHandler ) successHandler
+      andErrorHandler:(PnPGenericErrorHandler) errorHandler{
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    NSError *jerror;
+    NSMutableDictionary *paramDicc = [NSMutableDictionary new];
+    [paramDicc setObject:variant.name forKey:@"name"];
+    NSNumber *price = [NSNumber numberWithFloat:variant.price.floatValue * 100];
+
+    [paramDicc setObject:price forKey:@"price"];
+    
+    NSString *pparams = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:paramDicc
+                                                                                       options:0
+                                                                                         error:&jerror]
+                                              encoding:NSUTF8StringEncoding];
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"ProductCatalog/call.json"]
+                   usingParameters:@{
+                                     @"action":[NSString stringWithFormat:@"products/%@/edit.json",variant.identifer],
+                                     @"fields": pparams,
+                                     }
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           
+                           @try {
+                               NSError *parseError;
+                               NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"call"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   if(successHandler) successHandler();
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                   }];
+    
+
+    
 }
 
 

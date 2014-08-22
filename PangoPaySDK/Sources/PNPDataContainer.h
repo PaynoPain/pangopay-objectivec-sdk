@@ -742,9 +742,11 @@
 @interface PNPCVariant : NSObject <NSCoding>
 
 -(id) initWithName:(NSString *) name
-             price:(NSNumber *) price;
+             price:(NSNumber *) price
+        identifier:(NSNumber *) identifier;
 
 @property (strong,nonatomic) NSString *name;
 @property (strong,nonatomic) NSNumber *price;
+@property (strong,nonatomic) NSNumber *identifer;
 
 @end

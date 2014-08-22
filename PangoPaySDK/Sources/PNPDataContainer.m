@@ -1743,6 +1743,7 @@ andOptionValues:(NSArray *)optionValues
     _variants = [aDecoder decodeObjectForKey:@"variants"];
     return self;
 }
+
 -(NSString *) description{
     return [NSString stringWithFormat:@"ID: %@  NAME: %@ IMGURL: %@ VARIANTS: %@ \n",_identifier,_name,_imgUrl,_variants];
 }
@@ -1751,17 +1752,21 @@ andOptionValues:(NSArray *)optionValues
 
 @implementation PNPCVariant
 
--(id) initWithName:(NSString *)name price:(NSNumber *)price{
+-(id) initWithName:(NSString *) name
+             price:(NSNumber *) price
+        identifier:(NSNumber *) identifier{
     self = [super init];
     if(!self) return nil;
     _name = name;
     _price = price;
+    _identifer = identifier;
     return self;
 }
 
 -(void) encodeWithCoder:(NSCoder *)aCoder{
     [aCoder encodeObject:_name forKey:@"name"];
     [aCoder encodeObject:_price forKey:@"price"];
+    [aCoder encodeObject:_identifer forKey:@"identifier"];
 }
 
 -(id) initWithCoder:(NSCoder *)aDecoder{
@@ -1769,10 +1774,11 @@ andOptionValues:(NSArray *)optionValues
     if(!self) return nil;
     _name = [aDecoder decodeObjectForKey:@"name"];
     _price = [aDecoder decodeObjectForKey:@"price"];
+    _identifer = [aDecoder decodeObjectForKey:@"identifier"];
     return self;
 }
 -(NSString *) description{
-    return [NSString stringWithFormat:@"NAME: %@ PRICE: %@ \n",_name,_price];
+    return [NSString stringWithFormat:@"NAME: %@ PRICE: %@ IDENTIFIER %@\n",_name,_price,_identifer];
 }
 @end
 

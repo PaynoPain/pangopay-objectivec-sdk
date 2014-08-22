@@ -470,6 +470,47 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
         withSuccessCallback:(PnPSuccessHandler) successHandler
            andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
+-(void) deleteCategory:(PNPCCategory *) category
+   withSuccessCallback:(PnPSuccessHandler) successHandler
+      andErrorCallback:(PnPGenericErrorHandler ) errorHandler;
+
+-(void) deleteProduct:(PNPCProduct *) product
+  withSuccessCallback:(PnPSuccessHandler) successHandler
+     andErrorCallback:(PnPGenericErrorHandler ) errorHandler;
+
+-(void) deleteVariant:(PNPCVariant *) variant
+   withSuccessCallback:(PnPSuccessHandler) successHandler
+      andErrorCallback:(PnPGenericErrorHandler ) errorHandler;
+
+
+-(void) updateCategory:(PNPCCategory *) category
+                 image:(UIImage *) image
+   withSuccessCallback:(PnPSuccessHandler) successHandler
+      andErrorCallback:(PnPGenericErrorHandler ) errorHandler;
+
+
+-(void) addProduct:(PNPCProduct *) product
+       forCategory:(PNPCCategory *) category
+                 image:(UIImage *) image
+   withSuccessCallback:(PnPSuccessHandler) successHandler
+      andErrorCallback:(PnPGenericErrorHandler ) errorHandler;
+
+
+-(void) updateProduct:(PNPCProduct *) product
+             image:(UIImage *) image
+withSuccessCallback:(PnPSuccessHandler) successHandler
+  andErrorCallback:(PnPGenericErrorHandler ) errorHandler;
+
+-(void) addProductVariant:(PNPCVariant *) variant
+               forProduct:(PNPCProduct *) product
+       withSuccessHandler:(PnPSuccessHandler ) successHandler
+          andErrorHandler:(PnPGenericErrorHandler) errorHandler;
+
+-(void) updateVariant:(PNPCVariant *) variant
+   withSuccessHandler:(PnPSuccessHandler ) successHandler
+      andErrorHandler:(PnPGenericErrorHandler) errorHandler;
+
+
 
 @end
 
