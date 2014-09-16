@@ -228,6 +228,11 @@
 
 -(void) getCommerceDataWithSuccessCallback:(PnpCommerceDataSuccessHandler)successHandler
                           andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+    
+    if(![self isUserLoggedIn ]){
+        NSLog(@"No user logged in.");
+        return;
+    }
 
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"ComUsers/commerce_data"]
@@ -236,6 +241,44 @@
                            timeout:PNP_REQUEST_TIMEOUT
                sendProgressHandler:nil
                    responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               
+                               
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"commerce_data"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   PNPCommerce *c = [[PNPCommerce alloc] initWithIdentifier:[[responseDictionary objectForKey:@"data"] objectForKey:@"id"] commerceId:[[[responseDictionary objectForKey:@"data"] objectForKey:@"location_data"] objectForKey:@"commerce_id"]];
+                                   if(successHandler)  successHandler(c);
+                                   
+                               }else{
+                                   if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
+                                                                   initWithDomain:@"PNPGenericWebserviceError"
+                                                                   code:-6060
+                                                                   userInfo:nil]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc] initWithDomain:@"PNPMalformedJson"
+                                                                                                      code:-2020
+                                                                                                  userInfo:nil]);
+                               
+                           }
+                       }else{
+                           if(errorHandler) errorHandler([self handleErrors:error]);
+                           
+                       }
+                       
                        NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
                    }];
 }
@@ -348,6 +391,117 @@
                    }];
 }
 
+-(void) getProvincesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"register/provinces"]
+                   usingParameters:nil
+                       withAccount:nil
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                         if(!error){
+                           @try {
+                               NSError *parseError;
+                               
+                               
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"provinces"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   NSArray *data = [responseDictionary objectForKey:@"data"];
+                                   NSMutableArray *provinces  = [NSMutableArray new];
+                                   for(NSDictionary *d in data){
+                                       [provinces addObject:[[d objectForKey:@"Province"] objectForKey:@"province"]];
+                                   }
+                                   if(successHandler)  successHandler(provinces);
+                               }else{
+                                   if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
+                                                                   initWithDomain:@"PNPGenericWebserviceError"
+                                                                   code:-6060
+                                                                   userInfo:responseDictionary ]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc] initWithDomain:@"PNPMalformedJson"
+                                                                                                      code:-2020
+                                                                                                  userInfo:nil]);
+                               
+                           }
+                       }else{
+                           if(errorHandler) errorHandler([self handleErrors:error]);
+                           
+                       }
+                   }];
+    
+}
+
+-(void) getCitysForProvince:(NSString *) province
+        withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+           andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"register/provinces"]
+                   usingParameters:nil
+                       withAccount:nil
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               
+                               
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"provinces"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   NSArray *data = [responseDictionary objectForKey:@"data"];
+                                   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"Province.province contains[cd] %@",province];
+                                   data = [data filteredArrayUsingPredicate:predicate];
+                                   NSArray *cities = [[data firstObject] objectForKey:@"City"];
+                                   NSMutableArray *cityStrings = [NSMutableArray new];
+                                   for (NSDictionary *c in cities){
+                                       [cityStrings addObject:[c objectForKey:@"city"]];
+                                   }
+                                   if(successHandler)  successHandler(cityStrings);
+                               }else{
+                                   if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
+                                                                   initWithDomain:@"PNPGenericWebserviceError"
+                                                                   code:-6060
+                                                                   userInfo:responseDictionary ]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc] initWithDomain:@"PNPMalformedJson"
+                                                                                                      code:-2020
+                                                                                                  userInfo:nil]);
+                               
+                           }
+                       }else{
+                           if(errorHandler) errorHandler([self handleErrors:error]);
+                           
+                       }
+                   }];
+    
+}
+
 -(void) registerUserWithUsername:(NSString *)username
                         password:(NSString *)password
                             name:(NSString *)name
@@ -356,6 +510,8 @@
                           prefix:(NSString *)prefix
                            phone:(NSString *)phone
                              pin:(NSNumber *)pin
+                            city:(NSString *) city
+                        province:(NSString *) province
                             male:(BOOL )isMale
                        birthdate:(NSDate *) date
              withSuccessCallback:(PnPSuccessHandler) successHandler
@@ -372,6 +528,8 @@
     [params setObject:prefix    forKey:@"prefix"];
     [params setObject:phone     forKey:@"phone"];
     [params setObject:pin       forKey:@"pin"];
+    [params setObject:city      forKey:@"city"];
+    [params setObject:province  forKey:@"province"];
     [params setObject:[df stringFromDate:date] forKey:@"birthdate"];
     
     if(isMale){
@@ -853,6 +1011,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                                                    options:0
                                                                                                      error:&parseError]
                                                                    objectForKey:@"change_phone"];
+                               NSLog(@"%@",responseDictionary);
                                if(parseError){
                                    if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
                                                                                                       code:[parseError code]
@@ -1211,6 +1370,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                                                                    options:0
                                                                                                      error:&parseError]
                                                                    objectForKey:@"edit"];
+                               NSLog(@"%@",responseDictionary);
                                if(parseError){
                                    if(errorHandler && !hasCalledBack) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
                                                                                                                         code:[parseError code]
@@ -3274,6 +3434,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     
 }
 
+
 -(void) confirmPaymentRequest:(PNPPaymentRequest *) request
                           pin:(NSString *) pin
           withSuccessCallback:(PnPSuccessHandler) successHandler
@@ -3444,6 +3605,77 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     
     
 }
+
+-(void) getCommerceOrdersWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                               errorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"orders/get_orders"]
+                   usingParameters: nil
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
+
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"get_orders"];
+                               
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   NSMutableArray *orders = [NSMutableArray new];
+                                   for (NSDictionary *d in [responseDictionary objectForKey:@"data"]) {
+
+                                       NSDictionary *orderDic = [d objectForKey:@"order"];
+                                       NSDictionary *payerDic = [orderDic objectForKey:@"payer"];
+                                       NSArray *orderLines = [d objectForKey:@"order_lines"];
+                                       NSDateFormatter *df = [[NSDateFormatter alloc] init];
+                                       [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+                                       [df setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
+                                       if([payerDic isKindOfClass:[NSArray class]]){
+                                           payerDic = [NSDictionary new];
+                                       }
+                                       
+                                       PNPCommerceOrder *o = [[PNPCommerceOrder alloc] initWithIdentifier:[orderDic objectForKey:@"id"] reference:[orderDic objectForKey:@"reference"] type:[orderDic objectForKey:@"type"] concept:[orderDic objectForKey:@"concept"] status:[orderDic objectForKey:@"status"] amount:[self clearAmount:[orderDic objectForKey:@"amount"]] netAmount:[self clearAmount:[orderDic objectForKey:@"net_amount"]] currencySymbol:[[orderDic objectForKey:@"currency"] objectForKey:@"symbol"] mail:[payerDic objectForKey:@"mail"] userId:[payerDic objectForKey:@"user_id"] name:[payerDic objectForKey:@"name"] surname:[payerDic objectForKey:@"surname"] prefix:[payerDic objectForKey:@"prefix"] phone:[payerDic objectForKey:@"phone"] created:[df dateFromString:[orderDic objectForKey:@"created"]] orderLines:orderLines];
+                                       [orders addObject:o];
+                                       if(successHandler) successHandler(orders);
+                                   }
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                   }];
+    
+    
+    
+}
+
 
 
 #pragma mark - Halcash Methods
@@ -3695,7 +3927,8 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 
 
 -(void) createOrderWithConcept:(NSString *) concept
-                        amount:(NSNumber *) amount
+                          cart:(Cart *) cart
+                          type:(NSString *) type
            withSuccessCallback:(PnPSuccessStringHandler) successHandler
               andErrorCallback:(PnPGenericErrorHandler) errorHandler{
     
@@ -3703,52 +3936,124 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
         NSLog(@"No user logged in.");
         return;
     }
+    NSNumber *amount = [NSNumber numberWithDouble:[[cart getPrice] doubleValue] * 100];
+    NSNumber *netAmount = [NSNumber numberWithDouble:[[cart getPriceWithoutGlobalDiscount] doubleValue] * 100];
     
-    amount = [NSNumber numberWithDouble:[amount doubleValue] * 100];
     
-    [NXOAuth2Request performMethod:@"POST"
-                        onResource:[self generateUrl:@"orders/create"]
-                   usingParameters: @{@"concept":concept,@"amount":amount}
-                       withAccount:self.userAccount
-                           timeout:PNP_REQUEST_TIMEOUT
-               sendProgressHandler:nil
-                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
-                       if(!error){
-                           @try {
-                               NSError *parseError;
-                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
-                                                                                                   options:0
-                                                                                                     error:&parseError]
-                                                                   objectForKey:@"create"];
-                               if(parseError){
-                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
-                                                                                                      code:[parseError code]
-                                                                                                  userInfo:parseError.userInfo]);
-                                   return;
-                               }
-                               
-                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+    NSMutableArray *orderLines = [NSMutableArray new];
+    
+    for (CartItem * c in cart.cartItems) {
+
+        if([c.product.getPrice floatValue] > 0){
+            NSMutableDictionary *oLine = [NSMutableDictionary new];
+            [oLine setObject:[NSNumber numberWithDouble:[[c.product getPrice] doubleValue] * 100] forKey:@"amount"];
+            [oLine setObject:@"product" forKey:@"type"];
+            [oLine setObject:c.product.name forKey:@"name"];
+            if(c.product.externalId){
+                [oLine setObject:c.product.externalId forKey:@"external_id"];
+            }
+            [oLine setObject:[c getQuantity] forKey:@"number"];
+            [orderLines addObject:oLine];
+            oLine = [NSMutableDictionary new];
+            if([c getDiscount] &&  ![c getDiscount].comesFromCoupon){
+                [oLine setObject:@"discount" forKey:@"type"];
+                [oLine setObject:[NSNumber numberWithDouble:[[[c getDiscount] getPrice] doubleValue] * 100] forKey:@"amount"];
+                [oLine setObject:[[c getDiscount] getDiscountPercentage] forKey:@"number"];
+                [oLine setObject:[NSString stringWithFormat:NSLocalizedString(@"Descuento aplicado al producto %@",nil),c.product.name] forKey:@"name"];
+                [orderLines addObject:oLine];
+            }
+
+        }
+    }
+    NSMutableDictionary *oLine = [NSMutableDictionary new];
+    if([cart getDiscount] && ![cart getDiscount].comesFromCoupon){
+        [oLine setObject:@"discount" forKey:@"type"];
+        [oLine setObject:[NSNumber numberWithDouble:[[[cart getDiscount] getPrice] doubleValue] * 100] forKey:@"amount"];
+        [oLine setObject:[[cart getDiscount] getDiscountPercentage] forKey:@"number"];
+        [oLine setObject:NSLocalizedString(@"Descuento aplicado a la compra",nil) forKey:@"name"];
+    }
+    
+    [self getProductCategoriesWithSuccessCallback:^(NSArray *data) {
+        for (PNPCoupon *c in cart.coupons){
+            [oLine setObject:@"coupon" forKey:@"type"];
+            [oLine setObject:c.ccode forKey:@"external_id"];
+            if(c.gift.length > 0){
+                [oLine setObject:@0 forKey:@"amount"];
+                [oLine setObject:@0 forKey:@"number"];
+                [oLine setObject:[NSString stringWithFormat:NSLocalizedString(@"%@ de regalo",nil),c.gift] forKey:@"name"];
+            }else if(c.percentageAmount.floatValue > 0 && c.productId){
+                NSPredicate *p = [NSPredicate predicateWithFormat:@"products.variants.identifier == %@",c.productId];
+                NSArray *sResult = [data filteredArrayUsingPredicate:p];
+                p = [NSPredicate predicateWithFormat:@"variants.identifier == %@",c.productId];
+                sResult = [(NSArray *)[sResult firstObject] filteredArrayUsingPredicate:p];
+                PNPCProduct *product = [sResult firstObject];
+                p = [NSPredicate predicateWithFormat:@"identifier == %@",c.productId];
+                sResult = [[sResult firstObject] filteredArrayUsingPredicate:p];
+                PNPCVariant *variant = [sResult firstObject];
+                NSNumber *priceWithDiscount = [NSNumber numberWithDouble:[variant.price doubleValue] - [variant.price doubleValue] * [c.percentageAmount doubleValue]/100];
+                [oLine setObject:priceWithDiscount forKey:@"amount"];
+                [oLine setObject:[NSNumber numberWithDouble:[c.percentageAmount doubleValue] * 100] forKey:@"number"];
+                [oLine setObject:[NSString stringWithFormat:NSLocalizedString(@"Descuento aplicado al producto %@",nil),product.name] forKey:@"name"];
+            }else if(c.percentageAmount.floatValue > 0){
+                [oLine setObject:[[cart getDiscount] getPrice] forKey:@"amount"];
+                [oLine setObject:[NSNumber numberWithDouble:[c.percentageAmount doubleValue] * 100] forKey:@"number"];
+                [oLine setObject:NSLocalizedString(@"Descuento aplicado a la compra",nil) forKey:@"name"];
+            }
+            [orderLines addObject:oLine];
+        }
+
+        NSError *jerror;
+        NSString *jOrderLines = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:orderLines
+                                                                                           options:0
+                                                                                             error:&jerror]
+                                                  encoding:NSUTF8StringEncoding];
+
+        [NXOAuth2Request performMethod:@"POST"
+                            onResource:[self generateUrl:@"orders/create"]
+                       usingParameters: @{@"concept":concept,@"amount":amount,@"net_amount":netAmount,@"lines":jOrderLines,@"type":type}
+                           withAccount:self.userAccount
+                               timeout:PNP_REQUEST_TIMEOUT
+                   sendProgressHandler:nil
+                       responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
+                           NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                           if(!error){
+                               @try {
+                                   NSError *parseError;
+                                   NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                       options:0
+                                                                                                         error:&parseError]
+                                                                       objectForKey:@"create"];
+                                   if(parseError){
+                                       if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                          code:[parseError code]
+                                                                                                      userInfo:parseError.userInfo]);
+                                       return;
+                                   }
                                    
-                                   if(successHandler) successHandler([[responseDictionary objectForKey:@"data"] objectForKey:@"reference"]);
-                                   
-                               }else{
-                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
-                                                                 initWithDomain:@"PNPGenericWebserviceError"
-                                                                 code:-6060
-                                                                 userInfo:responseDictionary]);
+                                   if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                       
+                                       if(successHandler) successHandler([[responseDictionary objectForKey:@"data"] objectForKey:@"reference"]);
+                                       
+                                   }else{
+                                       if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                     initWithDomain:@"PNPGenericWebserviceError"
+                                                                     code:-6060
+                                                                     userInfo:responseDictionary]);
+                                   }
                                }
+                               @catch (NSException *exception) {
+                                   NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                                   if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                                  initWithDomain:@"PNPMalformedJson"
+                                                                  code:-2020
+                                                                  userInfo:nil]);
+                               }
+                           }else{
+                               if(errorHandler)errorHandler([self handleErrors:error]);
                            }
-                           @catch (NSException *exception) {
-                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
-                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
-                                                              initWithDomain:@"PNPMalformedJson"
-                                                              code:-2020
-                                                              userInfo:nil]);
-                           }
-                       }else{
-                           if(errorHandler)errorHandler([self handleErrors:error]);
-                       }
-                   }];
+                       }];
+        
+    } andErrorCallback:errorHandler];
     
 }
 
@@ -3777,8 +4082,6 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                                                      error:&parseError]
                                                                    objectForKey:@"get_orders"];
                                
-
-                               
                                NSLog(@"%@",responseDictionary);
                                if(parseError){
                                    if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
@@ -3799,9 +4102,10 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    NSDateFormatter *df = [[NSDateFormatter alloc] init];
                                    [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
                                    [df setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
-                                   NSDictionary *payerDic = [[[responseDictionary objectForKey:@"data"] objectAtIndex:0] objectForKey:@"payer_data"];
-                                   PNPCommerceOrder *c = [[PNPCommerceOrder alloc] initWithIdentifier:[orderDic objectForKey:@"id"] reference:[orderDic objectForKey:@"reference"] mail:[payerDic objectForKey:@"mail"] userId:[payerDic objectForKey:@"user_id"] name:[payerDic objectForKey:@"name"] surname:[payerDic objectForKey:@"surname"] prefix:[payerDic objectForKey:@"prefix"] phone:[payerDic objectForKey:@"phone"] created:[df dateFromString:[orderDic objectForKey:@"created"]]];
-                                   if(successHandler) successHandler(c);
+                                   NSDictionary *payerDic = [orderDic objectForKey:@"payer"];
+                                   NSLog(@"%@",payerDic);
+                                   PNPCommerceOrder *o = [[PNPCommerceOrder alloc] initWithIdentifier:[orderDic objectForKey:@"id"] reference:[orderDic objectForKey:@"reference"] type:[orderDic objectForKey:@"type"] concept:[orderDic objectForKey:@"concept"] status:[orderDic objectForKey:@"status"] amount:[self clearAmount:[orderDic objectForKey:@"amount"]] netAmount:[self clearAmount:[orderDic objectForKey:@"net_amount"]] currencySymbol:[[orderDic objectForKey:@"currency"] objectForKey:@"symbol"] mail:[payerDic objectForKey:@"mail"] userId:[payerDic objectForKey:@"user_id"] name:[payerDic objectForKey:@"name"] surname:[payerDic objectForKey:@"surname"] prefix:[payerDic objectForKey:@"prefix"] phone:[payerDic objectForKey:@"phone"] created:[df dateFromString:[orderDic objectForKey:@"created"]] orderLines:[[[responseDictionary objectForKey:@"data"] objectAtIndex:0] objectForKey:@"order_lines"]];
+                                   if(successHandler) successHandler(o);
                                }else{
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
@@ -4076,6 +4380,79 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 #pragma mark - Coupons & Fidelity
 
+-(void) shareCoupon:(PNPCoupon *) coupon toMail:(NSString *) mail withSuccessCallback:(PnPSuccessHandler) successHandler andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+    [self getUserDataWithSuccessCallback:^(PNPUser *user) {
+        NSError *jerror;
+        NSMutableDictionary *paramDicc = [NSMutableDictionary new];
+        [paramDicc setObject:coupon.ccode forKey:@"coupon_code"];
+        [paramDicc setObject:mail forKey:@"to"];
+        [paramDicc setObject:@"no-reply@aywant.com" forKey:@"from"];
+        [paramDicc setObject:[NSString stringWithFormat:NSLocalizedString(@"%@ %@ te comparte un cupón a través de Aywant", nil),user.name,user.surname] forKey:@"subject"];
+        
+        NSString *pparams = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:paramDicc
+                                                                                           options:0
+                                                                                             error:&jerror]
+                                                  encoding:NSUTF8StringEncoding];
+        NSLog(@"%@",pparams);
+        
+        [NXOAuth2Request performMethod:@"POST"
+                            onResource:[self generateUrl:@"coupons/user_call"]
+                       usingParameters:@{
+                                         @"action":@"notifications/share_coupon.json",
+                                         @"method": @"post",
+                                         @"fields": pparams,
+                                         }
+                           withAccount:self.userAccount
+                               timeout:PNP_REQUEST_TIMEOUT
+                   sendProgressHandler:nil
+                       responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                           NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                           if(!error){
+                               @try {
+                                   NSError *parseError;
+                                   NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                       options:0
+                                                                                                         error:&parseError]
+                                                                       objectForKey:@"user_call"];
+                                   if(parseError){
+                                       if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                          code:[parseError code]
+                                                                                                      userInfo:parseError.userInfo]);
+                                       return;
+                                   }
+                                   if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                       if(successHandler) successHandler();
+                                   }else{
+                                       if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                     initWithDomain:@"PNPGenericWebserviceError"
+                                                                     code:-6060
+                                                                     userInfo:responseDictionary]);
+                                   }
+                               }
+                               @catch (NSException *exception) {
+                                   NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                                   if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                                  initWithDomain:@"PNPMalformedJson"
+                                                                  code:-2020
+                                                                  userInfo:nil]);
+                               }
+                           }else{
+                               if(errorHandler)errorHandler([self handleErrors:error]);
+                           }
+                           
+                       }];
+
+
+    } andErrorCallback:errorHandler];
+    
+    
+}
+
 -(void) getCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                          andErrorCallback:(PnPGenericErrorHandler) errorHandler{
     
@@ -4135,7 +4512,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                            }else if ([type isEqualToString:@"loyalty"]){
                                                class = [PNPCPLoyalty class ];
                                            }
-                                           PNPCoupon *c = [[class alloc] initWithCode:NULL_TO_NIL([d objectForKey:@"code"]) identifier:NULL_TO_NIL([d objectForKey:@"coupon_id"]) loyaltyIdentifier:NULL_TO_NIL([d objectForKey:@"loyalty_id"]) actualUses:NULL_TO_NIL([d objectForKey:@"actual_uses"]) limitUses:NULL_TO_NIL([d objectForKey:@"limit_uses"]) companyName:NULL_TO_NIL([d objectForKey:@"company_name"]) title:NULL_TO_NIL([d objectForKey:@"title"]) description:NULL_TO_NIL([d objectForKey:@"description"]) shortDescription:NULL_TO_NIL([d objectForKey:@"description_short"]) logoUrl:NULL_TO_NIL([d objectForKey:@"logo"]) brandLogoUrl:NULL_TO_NIL([d objectForKey:@"logo_brand"]) startDate:[df dateFromString:NULL_TO_NIL([d objectForKey:@"start_date"])] endDate:[df dateFromString:NULL_TO_NIL([d objectForKey:@"end_date"])] fixedAmount:[self clearAmount:NULL_TO_NIL([d objectForKey:@"fixed_amount"])] percentageAmount:[self clearAmount:NULL_TO_NIL([d objectForKey:@"percentage_amount"])] gift:NULL_TO_NIL([d objectForKey:@"gift"]) favorite:[[d objectForKey:@"favorite"] boolValue] viewed:[[d objectForKey:@"viewed"] boolValue] status:NULL_TO_NIL([d objectForKey:@"status"])];
+                                           PNPCoupon *c = [[class alloc] initWithCode:NULL_TO_NIL([d objectForKey:@"code"]) identifier:NULL_TO_NIL([d objectForKey:@"coupon_id"]) loyaltyIdentifier:NULL_TO_NIL([d objectForKey:@"loyalty_id"]) actualUses:NULL_TO_NIL([d objectForKey:@"actual_uses"]) limitUses:NULL_TO_NIL([d objectForKey:@"limit_uses"]) companyName:NULL_TO_NIL([d objectForKey:@"company_name"]) title:NULL_TO_NIL([d objectForKey:@"title"]) description:NULL_TO_NIL([d objectForKey:@"description"]) shortDescription:NULL_TO_NIL([d objectForKey:@"description_short"]) logoUrl:NULL_TO_NIL([d objectForKey:@"logo"]) brandLogoUrl:NULL_TO_NIL([d objectForKey:@"logo_brand"]) startDate:[df dateFromString:NULL_TO_NIL([d objectForKey:@"start_date"])] endDate:[df dateFromString:NULL_TO_NIL([d objectForKey:@"end_date"])] fixedAmount:[self clearAmount:NULL_TO_NIL([d objectForKey:@"fixed_amount"])] percentageAmount:[self clearAmount:NULL_TO_NIL([d objectForKey:@"percentage_amount"])] gift:NULL_TO_NIL([d objectForKey:@"gift"]) favorite:[[d objectForKey:@"favorite"] boolValue] viewed:[[d objectForKey:@"viewed"] boolValue] status:NULL_TO_NIL([d objectForKey:@"status"] ) productId:NULL_TO_NIL([d objectForKey:@"product_id"])];
 
                                            [coupons addObject:c];
                                        }
@@ -4673,6 +5050,251 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
     
 }
 
+-(void) getCouponDetailsForCode:(NSString *) couponCode
+            withSuccessCallback:(PnPCouponSuccessHandler) successHandler
+               andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+
+    
+    [self getCommerceDataWithSuccessCallback:^(PNPCommerce *commerce) {
+        NSError *jerror;
+        NSMutableDictionary *paramDicc = [NSMutableDictionary new];
+        [paramDicc setObject:commerce.commerceId forKey:@"commerce_id"];
+        NSString *pparams = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:paramDicc
+                                                                                           options:0
+                                                                                             error:&jerror]
+                                                  encoding:NSUTF8StringEncoding];
+        
+        [NXOAuth2Request performMethod:@"POST"
+                            onResource:[self generateUrl:@"coupons/commerce_call"]
+                       usingParameters:@{
+                                         @"action":[NSString stringWithFormat:@"coupons/%@.json",couponCode],
+                                         @"method": @"get",
+                                         @"fields": pparams,
+                                         }
+                           withAccount:self.userAccount
+                               timeout:PNP_REQUEST_TIMEOUT
+                   sendProgressHandler:nil
+                       responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                           NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                           if(!error){
+                               @try {
+                                   
+                                   NSError *parseError;
+                                   NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                       options:0
+                                                                                                         error:&parseError]
+                                                                       objectForKey:@"commerce_call"];
+                                   if(parseError){
+                                       if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                          code:[parseError code]
+                                                                                                      userInfo:parseError.userInfo]);
+                                       return;
+                                   }
+                                   if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                       NSDateFormatter *df = [[NSDateFormatter alloc] init];
+                                       [df setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
+                                       [df setDateFormat:@"yyyy-MM-dd"];
+                                       NSDictionary *d = [responseDictionary objectForKey:@"data"];
+                                           @try {
+                                               Class class = [PNPCoupon class];
+                                               NSString *type =[d objectForKey:@"type"];
+                                               if([type isEqualToString:@"coupon"]){
+                                                   if([[d objectForKey:@"limit_uses"] intValue] == 1){
+                                                       class = [PNPCPOneTime class];
+                                                   }else{
+                                                       class = [PNPCPMultiUssage class];
+                                                   }
+                                               }else if ( [type isEqualToString:@"onceaday"]){
+                                                   class = [PNPCPDaily class];
+                                               }else if([type isEqualToString:@"stamp"]){
+                                                   class = [PNPCPStampCard class];
+                                               }else if ([type isEqualToString:@"exchange"]){
+                                                   class = [PNPCPExchange class];
+                                               }else if ([type isEqualToString:@"loyalty"]){
+                                                   class = [PNPCPLoyalty class ];
+                                               }
+                                               PNPCoupon *c = [[class alloc] initWithCode:couponCode identifier:nil loyaltyIdentifier:nil actualUses:NULL_TO_NIL([d objectForKey:@"actual_uses"]) limitUses:NULL_TO_NIL([d objectForKey:@"limit_uses"]) companyName:nil title:nil description:nil shortDescription:nil logoUrl:nil brandLogoUrl:nil startDate:nil endDate:[df dateFromString:NULL_TO_NIL([d objectForKey:@"end_date"])] fixedAmount:[self clearAmount:NULL_TO_NIL([d objectForKey:@"fixed_amount"])] percentageAmount:[self clearAmount:NULL_TO_NIL([d objectForKey:@"percentage_amount"])] gift:NULL_TO_NIL([d objectForKey:@"gift"]) favorite:NO viewed:NO status:nil productId:NULL_TO_NIL([d objectForKey:@"product_id"])];
+                                               
+                                               if(successHandler) successHandler(c);
+
+                                           }
+                                           @catch (NSException *exception) {
+                                               NSLog(@"no se ha podido parsear el coupon %@ por el error %@",d,exception);
+                                               if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                             initWithDomain:@"PNPGenericWebserviceError"
+                                                                             code:-6060
+                                                                             userInfo:responseDictionary]);
+                                           }
+                                   }else{
+                                       if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                     initWithDomain:@"PNPGenericWebserviceError"
+                                                                     code:-6060
+                                                                     userInfo:responseDictionary]);
+                                   }
+                               }
+                               @catch (NSException *exception) {
+                                   NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                                   if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                                  initWithDomain:@"PNPMalformedJson"
+                                                                  code:-2020
+                                                                  userInfo:nil]);
+                               }
+                           }else{
+                               if(errorHandler)errorHandler([self handleErrors:error]);
+                           }
+                       }];
+
+
+    } andErrorCallback:errorHandler];
+    
+
+    
+    
+}
+
+
+-(void) exchangeCoupon:(NSString *) couponCode
+   withSuccessCallback:(PnPSuccessHandler)successHandler
+      andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+    
+    [self getCommerceDataWithSuccessCallback:^(PNPCommerce *commerce) {
+        NSError *jerror;
+        NSMutableDictionary *paramDicc = [NSMutableDictionary new];
+        [paramDicc setObject:commerce.commerceId forKey:@"commerce_id"];
+        NSString *pparams = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:paramDicc
+                                                                                           options:0
+                                                                                             error:&jerror]
+                                                  encoding:NSUTF8StringEncoding];
+        
+        [NXOAuth2Request performMethod:@"POST"
+                            onResource:[self generateUrl:@"coupons/commerce_call"]
+                       usingParameters:@{
+                                         @"action":[NSString stringWithFormat:@"coupons/%@.json",couponCode],
+                                         @"method": @"post",
+                                         @"fields": pparams,
+                                         }
+                           withAccount:self.userAccount
+                               timeout:PNP_REQUEST_TIMEOUT
+                   sendProgressHandler:nil
+                       responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                           NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                           if(!error){
+                               @try {
+                                   
+                                   NSError *parseError;
+                                   NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                       options:0
+                                                                                                         error:&parseError]
+                                                                       objectForKey:@"commerce_call"];
+                                   if(parseError){
+                                       if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                          code:[parseError code]
+                                                                                                      userInfo:parseError.userInfo]);
+                                       return;
+                                   }
+                                   if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                       if(successHandler) successHandler();
+                                   }else{
+                                       if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                     initWithDomain:@"PNPGenericWebserviceError"
+                                                                     code:-6060
+                                                                     userInfo:responseDictionary]);
+                                   }
+                               }
+                               @catch (NSException *exception) {
+                                   NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                                   if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                                  initWithDomain:@"PNPMalformedJson"
+                                                                  code:-2020
+                                                                  userInfo:nil]);
+                               }
+                           }else{
+                               if(errorHandler)errorHandler([self handleErrors:error]);
+                           }
+                       }];
+        
+        
+    } andErrorCallback:errorHandler];
+}
+
+
+-(void) getFidelityForCode:(NSString *) code
+       withSuccessCallback:(PnPSuccessHandler)successHandler
+          andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+        
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"coupons/user_call"]
+                     usingParameters:@{
+                                         @"action":[NSString stringWithFormat:@"loyalty_member/%@/info.json",code],
+                                         @"method": @"get",
+                                         @"fields":@"{}",
+                                         }
+                           withAccount:self.userAccount
+                               timeout:PNP_REQUEST_TIMEOUT
+                   sendProgressHandler:nil
+                       responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                           NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                           if(!error){
+                               @try {
+                                   
+                                   NSError *parseError;
+                                   NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                       options:0
+                                                                                                         error:&parseError]
+                                                                       objectForKey:@"user_call"];
+                                   if(parseError){
+                                       if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                          code:[parseError code]
+                                                                                                      userInfo:parseError.userInfo]);
+                                       return;
+                                   }
+                                   if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                       NSDictionary *loyaltyBenefit = [[[[responseDictionary objectForKey:@"data"] objectForKey:@"Loyalty"]  objectForKey:@"LoyaltyBenefit"] firstObject];
+                                       NSNumber *percentageDiscount = [ self clearAmount:[loyaltyBenefit objectForKey:@"percentage_amount"]];
+                                                                              
+                                       
+                                       if(successHandler) successHandler();
+                                   }else{
+                                       if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                     initWithDomain:@"PNPGenericWebserviceError"
+                                                                     code:-6060
+                                                                     userInfo:responseDictionary]);
+                                   }
+                               }
+                               @catch (NSException *exception) {
+                                   NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                                   if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                                  initWithDomain:@"PNPMalformedJson"
+                                                                  code:-2020
+                                                                  userInfo:nil]);
+                               }
+                           }else{
+                               if(errorHandler)errorHandler([self handleErrors:error]);
+                           }
+                       }];
+}
+
+
+
+
+
 #pragma mark - Festivals
 
 -(void) registerFestivalUserWithEmail:(NSString *) email
@@ -4806,7 +5428,6 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                        if(!error){
                            @try {
                                NSError *parseError;
-                               NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
                                NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
                                                                                                    options:0
                                                                                                      error:&parseError]
@@ -4823,7 +5444,13 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                    NSPredicate *categoryPredicate = [NSPredicate predicateWithFormat:@"Category.parent_id == %@",[NSNull null]];
                                    NSArray *fcategories = [data filteredArrayUsingPredicate:categoryPredicate];
                                    for (NSDictionary *d in fcategories){
-                                       [categories addObject:[[PNPCCategory alloc] initWithIdentifier:[[d objectForKey:@"Category"] objectForKey:@"id"] name:[[d objectForKey:@"Category"] objectForKey:@"name"] imgUrl:[[d objectForKey:@"Category"] objectForKey:@"img_url"] products:nil]];
+                                       NSString *cname =[[d objectForKey:@"Category"] objectForKey:@"name"];
+                                       if (cname.length > 0) {
+                                           cname = [cname stringByReplacingCharactersInRange:NSMakeRange(0,1)
+                                                                                  withString:[[cname substringToIndex:1] uppercaseString]];
+                                       }
+                                       
+                                       [categories addObject:[[PNPCCategory alloc] initWithIdentifier:[[d objectForKey:@"Category"] objectForKey:@"id"] name:cname imgUrl:[[d objectForKey:@"Category"] objectForKey:@"img_url"] products:nil]];
                                    }
                                    
                                    NSPredicate *productsPredicate = [NSPredicate predicateWithFormat:@"Category.parent_id != %@",[NSNull null]];
@@ -5373,7 +6000,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                }
                                            } andErrorHandler:errorHandler];
                                        }else{
-                                           [self updateVariant:v withSuccessHandler:^{
+                                           [self updateVariant:v fromProduct:product withSuccessHandler:^{
                                                if(++count == product.variants.count){
                                                    if(successHandler) successHandler();
                                                }
@@ -5489,6 +6116,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 
 -(void) updateVariant:(PNPCVariant *) variant
+          fromProduct:(PNPCProduct *) product
    withSuccessHandler:(PnPSuccessHandler ) successHandler
       andErrorHandler:(PnPGenericErrorHandler) errorHandler{
     
@@ -5500,6 +6128,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
     NSMutableDictionary *paramDicc = [NSMutableDictionary new];
     [paramDicc setObject:variant.name forKey:@"name"];
     NSNumber *price = [NSNumber numberWithFloat:variant.price.floatValue * 100];
+    [paramDicc setObject:product.identifier forKey:@"category_id"];
 
     [paramDicc setObject:price forKey:@"price"];
     
@@ -5507,6 +6136,8 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                                                        options:0
                                                                                          error:&jerror]
                                               encoding:NSUTF8StringEncoding];
+    
+    NSLog(@"%@",pparams);
     
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"ProductCatalog/call.json"]

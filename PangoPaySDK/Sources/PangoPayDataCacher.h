@@ -160,6 +160,13 @@
                      andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler;
 
 
+#pragma mark - Commerce methods
+
+
+-(void) getCommerceOrdersWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+                               errorCallback:(PnPGenericErrorHandler)errorHandler
+                             refreshCallback:(PnPGenericNSAarraySucceddHandler)refreshHandler;
+
 #pragma mark - Catalogue
 
 

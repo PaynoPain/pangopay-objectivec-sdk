@@ -120,6 +120,8 @@
 @implementation PNPCommerce
 
 -(void) encodeWithCoder:(NSCoder *)encoder{
+    [encoder encodeObject:_commerceId forKey:@"commerceId"];
+    [encoder encodeObject:_identifier forKey:@"identifier"];
 }
 
 -(id) initWithCoder:(NSCoder *)decoder{
@@ -127,6 +129,19 @@
     if (!self) {
         return nil;
     }
+    _identifier = [decoder decodeObjectForKey:@"identifier"];
+    _commerceId = [decoder decodeObjectForKey:@"commerceId"];
+    return self;
+}
+
+-(id) initWithIdentifier:(NSNumber *) identifier
+              commerceId:(NSNumber *) commerceId{
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+    _commerceId = commerceId;
+    _identifier = identifier;
     return self;
 }
 
@@ -1173,17 +1188,30 @@
 
 -(id) initWithIdentifier:(NSNumber *) identifier
                reference:(NSString *) reference
+                    type:(NSString *) type
+                 concept:(NSString *) concept
+                  status:(NSString *) status
+                  amount:(NSNumber *) amount
+               netAmount:(NSNumber *) netAmount
+          currencySymbol:(NSString *) currencySymbol
                     mail:(NSString *) mail
                   userId:(NSNumber *) userId
                     name:(NSString *) name
                  surname:(NSString *) surname
                   prefix:(NSString *) prefix
                    phone:(NSString *) phone
-                 created:(NSDate *)created{
+                 created:(NSDate *) created
+              orderLines:(NSArray *) orderLines{
     self = [super  init];
     if(!self) return nil;
     self.identifier = identifier;
     self.reference = reference;
+    self.type = type;
+    self.concept = concept;
+    self.status = status;
+    self.amount = amount;
+    self.netAmount = netAmount;
+    self.currencySymbol = currencySymbol;
     self.mail = mail;
     self.userId = userId;
     self.name = name;
@@ -1191,14 +1219,24 @@
     self.phone = phone;
     self.prefix = prefix;
     self.created = created;
+    self.orderLines = orderLines;
     return self;
 }
 
 -(id) initWithCoder:(NSCoder *)aDecoder{
     self = [super  init];
     if(!self) return nil;
+    
     self.identifier = [aDecoder decodeObjectForKey:@"identifier"];
     self.reference = [aDecoder decodeObjectForKey:@"reference"];
+    self.type = [aDecoder decodeObjectForKey:@"type"];
+    self.concept = [aDecoder decodeObjectForKey:@"concept"];
+    self.status = [aDecoder decodeObjectForKey:@"status"];
+    self.amount = [aDecoder decodeObjectForKey:@"amount"];
+    self.netAmount = [aDecoder decodeObjectForKey:@"netAmount"];
+    self.currencySymbol = [aDecoder decodeObjectForKey:@"currencySymbol"];
+    self.orderLines = [aDecoder decodeObjectForKey:@"orderLines"];
+    
     self.mail = [aDecoder decodeObjectForKey:@"mail"];
     self.userId = [aDecoder decodeObjectForKey:@"userId"];
     self.name = [aDecoder decodeObjectForKey:@"name"];
@@ -1206,13 +1244,21 @@
     self.prefix =[aDecoder decodeObjectForKey:@"prefix"];
     self.phone =[aDecoder decodeObjectForKey:@"phone"];
     self.created=[aDecoder decodeObjectForKey:@"created"];
-    return self;
     
+    return self;
 }
 
 -(void) encodeWithCoder:(NSCoder *)aCoder{
     [aCoder encodeObject:_identifier forKey:@"identifier"];
     [aCoder encodeObject:_reference forKey:@"reference"];
+    [aCoder encodeObject:_type forKey:@"type"];
+    [aCoder encodeObject:_concept forKey:@"concept"];
+    [aCoder encodeObject:_status forKey:@"status"];
+    [aCoder encodeObject:_amount forKey:@"amount"];
+    [aCoder encodeObject:_netAmount forKey:@"netAmount"];
+    [aCoder encodeObject:_currencySymbol forKey:@"currencySymbol"];
+    [aCoder encodeObject:_orderLines forKey:@"orderLines"];
+    
     [aCoder encodeObject:_mail forKey:@"mail"];
     [aCoder encodeObject:_userId forKey:@"userId"];
     [aCoder encodeObject:_name forKey:@"name"];
@@ -1225,7 +1271,6 @@
 -(NSString *) description{
     return [NSString stringWithFormat:@"\nID: %@ \n Reference: %@ mail: %@ \n userId: %@ \n name: %@ \n surname: %@ \n Prefix: %@ \n Phone: %@ \n Created: %@",_identifier,_reference,_mail,_userId,_name,_surname,_prefix,_phone,_created];
 }
-
 
 
 @end
@@ -1251,7 +1296,8 @@
               gift:(NSString *) gift
           favorite:(BOOL) favorite
             viewed:(BOOL) viewed
-            status:(NSString *)status{
+            status:(NSString *)status
+         productId:(NSNumber *) productId{
     
     self = [super init];
     if(!self) return nil;
@@ -1275,6 +1321,7 @@
     _percentageAmount = percentageAmount;
     _gift = gift;
     _status = status;
+    _productId = productId;
     
     return self;
 }
@@ -1293,7 +1340,7 @@
     _limitUses = [aDecoder decodeObjectForKey:@"limitUses"];
     _companyName = [aDecoder decodeObjectForKey:@"companyName"];
     _title = [aDecoder decodeObjectForKey:@"title"];
-    _longDescription = [aDecoder decodeObjectForKey:@"_longDescription"];
+    _longDescription = [aDecoder decodeObjectForKey:@"longDescription"];
     _shortDescription = [aDecoder decodeObjectForKey:@"shortDescription"];
     _logoUrl = [aDecoder decodeObjectForKey:@"logoUrl"];
     _brandLogoUrl = [aDecoder decodeObjectForKey:@"brandLogoUrl"];
@@ -1304,7 +1351,7 @@
     _gift = [aDecoder decodeObjectForKey:@"gift"];
     _percentageAmount = [aDecoder decodeObjectForKey:@"percentageAmount"];
     _fixedAmount = [aDecoder decodeObjectForKey:@"fixedAmount"];
-    
+    _productId = [aDecoder decodeObjectForKey:@"productId"];
     return self;
 }
 
@@ -1318,7 +1365,7 @@
     [aCoder encodeBool:_favorite forKey:@"favorite"];
     [aCoder encodeBool:_viewed forKey:@"viewed"];
     [aCoder encodeObject:_title forKey:@"title"];
-    [aCoder encodeObject:_longDescription forKey:@"_longDescription"];
+    [aCoder encodeObject:_longDescription forKey:@"longDescription"];
     [aCoder encodeObject:_status forKey:@"status"];
     [aCoder encodeObject:_shortDescription forKey:@"shortDescription"];
     [aCoder encodeObject:_logoUrl forKey:@"logoUrl"];
@@ -1328,11 +1375,12 @@
     [aCoder encodeObject:_fixedAmount forKey:@"fixedAmount"];
     [aCoder encodeObject:_percentageAmount forKey:@"percentageAmount"];
     [aCoder encodeObject:_gift forKey:@"gift"];
+    [aCoder encodeObject:_productId forKey:@"productId"];
 }
 
 
 -(NSString *) description{
-    return [NSString stringWithFormat:@"CODE: %@,FAVORITE: %hhd, Viewed: %hhd , Id:%@, promoId:%@, actualUses:%@, limitUses:%@, companyName:%@, Title:%@, longDescr:%@, shortDescr:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@",_ccode,_favorite,_viewed,_identifier,_loyaltyIdentifier,_actualUses,_limitUses,_companyName,_title,_longDescription,_shortDescription,_logoUrl,_brandLogoUrl,_startDate,_endDate];
+    return [NSString stringWithFormat:@"CODE: %@,FAVORITE: %hhd, Viewed: %hhd , Id:%@, promoId:%@, actualUses:%@, limitUses:%@, companyName:%@, Title:%@, longDescr:%@, shortDescr:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ productId: %@",_ccode,_favorite,_viewed,_identifier,_loyaltyIdentifier,_actualUses,_limitUses,_companyName,_title,_longDescription,_shortDescription,_logoUrl,_brandLogoUrl,_startDate,_endDate,_productId];
 }
 
 

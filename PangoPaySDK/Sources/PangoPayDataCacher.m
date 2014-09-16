@@ -63,7 +63,8 @@
                            @"userCoupons"               : @"pnpusercoupons",
                            @"loyalties"                 : @"pnployalties",
                            @"requestedRequests"         : @"pnprequestedrequests",
-                           @"catalogue"                 : @"pnpcatalogue"
+                           @"catalogue"                 : @"pnpcatalogue",
+                           @"commerceOrders"            : @"pnpcommerceorders"
                            };
     return self;
 }
@@ -89,21 +90,16 @@
         if(user != nil){
             if(successHandler) successHandler(user);
             if(refreshHandler){
-                
                 [super getUserDataWithSuccessCallback:^(PNPUser *user) {
                     [self storeUser:user];
                     refreshHandler(user);
                 } andErrorCallback:errorHandler];
-                
             }
         }else{
-            
             [super getUserDataWithSuccessCallback:^(PNPUser *user) {
                 [self storeUser:user];
                 if(successHandler) successHandler(user);
             } andErrorCallback:errorHandler];
-            
-            
         }
     }];
 }
@@ -123,7 +119,6 @@
     [self getUserAvatarWithSuccessCallback:successHandler
                           andErrorCallback:errorHandler
                         andRefreshCallback:nil];
-    
 }
 
 -(void) getUserAvatarWithSuccessCallback:(PnpUserAvatarSuccessHandler) successHandler
@@ -1161,6 +1156,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     [self getPaymentRequestsWithSuccessCallback:nil
                                andErrorCallback:errorHandler
      andRefreshCallback:^(NSArray *data) {
+         NSLog(@"%@",data);
          NSPredicate *p = [NSPredicate predicateWithFormat:@"self.identifier.intValue == %d",[identifier intValue]];
          NSArray *f = [data filteredArrayUsingPredicate:p];
          if([f count] > 0){
@@ -1729,6 +1725,24 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 }
 
 
+#pragma mark - Commerce methods
+
+
+-(void) getCommerceOrders:(PnPGenericNSAarraySucceddHandler) successHandler{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        NSArray *orders = [NSKeyedUnarchiver unarchiveObjectWithFile:
+                            [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"commerceOrders"]]];
+        
+        if(successHandler) successHandler(orders); 
+    });
+}
+
+-(void) storeCommerceOrders:(NSArray *) orders{
+    [NSKeyedArchiver archiveRootObject:orders
+                                toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"commerceOrders"]]];
+}
+
+
 #pragma mark - Catalogue
 
 -(void) getProductCategoriesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
@@ -1737,15 +1751,21 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     
     [self getCatalogue:^(NSArray *data) {
         if(data!= nil){
+            NSSortDescriptor *s = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
+            data = [data sortedArrayUsingDescriptors:@[s]];
             if(successHandler) successHandler(data);
             if(refreshHandler){
                 [super getProductCategoriesWithSuccessCallback:^(NSArray *data){
+                    NSSortDescriptor *s = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
+                    data = [data sortedArrayUsingDescriptors:@[s]];
                     [self storeCatalogue:data];
                     refreshHandler(data);
                 } andErrorCallback:errorHandler];
             }
         }else{
             [super getProductCategoriesWithSuccessCallback:^(NSArray *data){
+                NSSortDescriptor *s = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
+                data = [data sortedArrayUsingDescriptors:@[s]];
                 [self storeCatalogue:data];
                 if(successHandler) successHandler(data);
             } andErrorCallback:errorHandler];

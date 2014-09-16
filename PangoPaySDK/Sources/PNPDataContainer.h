@@ -25,6 +25,7 @@
 
 
 @interface PNPUser : NSObject <NSCoding>
+
 -(id) initWithUsername:(NSString *) username
                   name:(NSString *) name
                surname:(NSString *) surname
@@ -43,9 +44,18 @@
 @property (strong,nonatomic) NSString *username;
 @property (strong,nonatomic) NSString *email;
 @property (strong,nonatomic) NSArray *limits;
+
 @end
 
+
 @interface PNPCommerce : NSObject <NSCoding>
+
+-(id) initWithIdentifier:(NSNumber *) identifier
+              commerceId:(NSNumber *) commerceId;
+
+@property (strong,nonatomic) NSNumber *identifier;
+@property (strong,nonatomic) NSNumber *commerceId;
+
 @end
 
 
@@ -472,27 +482,47 @@
 
 @end
 
+#define PNPCommerceOrderStatusOk @"AC"
+#define PNPCommerceOrderStatusCancelled @"CA"
 
 @interface PNPCommerceOrder : NSObject <NSCoding>
-@property (strong,nonatomic) NSString *reference;
 @property (strong,nonatomic) NSNumber *identifier;
+@property (strong,nonatomic) NSString *reference;
+@property (strong,nonatomic) NSString *type;
+@property (strong,nonatomic) NSString *concept;
+@property (strong,nonatomic) NSString *status;
+
+@property (strong,nonatomic) NSDate *created;
+
+
+@property (strong,nonatomic) NSNumber *amount;
+@property (strong,nonatomic) NSNumber *netAmount;
+@property (strong,nonatomic) NSString *currencySymbol;
+
 @property (strong,nonatomic) NSString *mail;
 @property (strong,nonatomic) NSNumber *userId;
 @property (strong,nonatomic) NSString *name;
 @property (strong,nonatomic) NSString *surname;
 @property (strong,nonatomic) NSString *prefix;
 @property (strong,nonatomic) NSString *phone;
-@property (strong,nonatomic) NSDate *created;
+@property (strong,nonatomic) NSArray *orderLines;
 
 -(id) initWithIdentifier:(NSNumber *) identifier
                reference:(NSString *) reference
+                    type:(NSString *) type
+                 concept:(NSString *) concept
+                  status:(NSString *) status
+                  amount:(NSNumber *) amount
+               netAmount:(NSNumber *) netAmount
+          currencySymbol:(NSString *) currencySymbol
                     mail:(NSString *) mail
                   userId:(NSNumber *) userId
                     name:(NSString *) name
                  surname:(NSString *) surname
                   prefix:(NSString *) prefix
                    phone:(NSString *) phone
-                 created:(NSDate *) created;
+                 created:(NSDate *) created
+              orderLines:(NSArray *) orderLines;
 
 
 
@@ -520,6 +550,8 @@
 @property (strong,nonatomic) NSString *logoUrl;
 @property (strong,nonatomic) NSString *brandLogoUrl;
 
+@property (strong,nonatomic) NSNumber *productId;
+
 @property (strong,nonatomic) NSDate *startDate;
 @property (strong,nonatomic) NSDate *endDate;
 
@@ -546,7 +578,8 @@
               gift:(NSString *) gift
           favorite:(BOOL) favorite
             viewed:(BOOL) viewed
-            status:(NSString *) status;
+            status:(NSString *) status
+         productId:(NSNumber *) productId;
 
 
 @end

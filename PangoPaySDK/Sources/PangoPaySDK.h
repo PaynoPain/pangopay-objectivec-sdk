@@ -12,7 +12,10 @@
 #import "PNPDataContainer.h"
 #import "Base64.h"
 #import <CoreLocation/CLLocation.h>
-
+#import "Cart.h"
+#import "CartItem.h"
+#import "Discount.h"
+#import "Product.h"
 #pragma mark - Client definitions
 
 
@@ -78,17 +81,24 @@ typedef void(^PnPCouponSuccessHandler)(PNPCoupon * coupon);
 -(NSURL *) generateAvatarUrlFromPrefix:(NSString *) prefix
                               andPhone:(NSString *) phone;
 
+-(void) getProvincesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                       andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
+-(void) getCitysForProvince:(NSString *) province
+        withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+           andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
--(void) registerUserWithUsername:(NSString *) username
-                        password:(NSString *) password
-                            name:(NSString *) name
-                         surname:(NSString *) surname
-                           email:(NSString *) email
-                          prefix:(NSString *) prefix
-                           phone:(NSString *) phone
-                             pin:(NSNumber *) pin
-                            male:(BOOL ) isMale
+-(void) registerUserWithUsername:(NSString *)username
+                        password:(NSString *)password
+                            name:(NSString *)name
+                         surname:(NSString *)surname
+                           email:(NSString *)email
+                          prefix:(NSString *)prefix
+                           phone:(NSString *)phone
+                             pin:(NSNumber *)pin
+                            city:(NSString *) city
+                        province:(NSString *) province
+                            male:(BOOL )isMale
                        birthdate:(NSDate *) date
              withSuccessCallback:(PnPSuccessHandler) successHandler
                 andErrorCallback:(PnPGenericErrorHandler) errorHandler;
@@ -201,6 +211,9 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
          withPin:(NSString *) pin
 withSuccessCallback:(PnPSuccessHandler)successHandler
    errorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) getCommerceOrdersWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                               errorCallback:(PnPGenericErrorHandler) errorHandler;
 
 
 #pragma mark - Notification Methods
@@ -364,9 +377,13 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 #define PNPOrderMailTypeComplete @"complete"
 #define PNPOrderMailTypeRefund @"cancel"
 
+#define PNPOrderCreationTypeCash @"cash"
+#define PNPOrderCreationTypeCreditCard @"credit_card"
+#define PNPOrderCreationTypeWallet @"wallet"
 
 -(void) createOrderWithConcept:(NSString *) concept
-                        amount:(NSNumber *) amount
+                          cart:(Cart *) cart
+                          type:(NSString *) type
            withSuccessCallback:(PnPSuccessStringHandler) successHandler
               andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
@@ -397,6 +414,8 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 
 #pragma mark - Coupons & Fidelity
+
+-(void) shareCoupon:(PNPCoupon *) coupon toMail:(NSString *) mail withSuccessCallback:(PnPSuccessHandler) successHandler andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) getCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                          andErrorCallback:(PnPGenericErrorHandler) errorHandler;
@@ -433,6 +452,19 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 -(void) getCouponWithCode:(NSString *) code
             withSuccessCallback:(PnPCouponSuccessHandler) successHandler
                andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) getCouponDetailsForCode:(NSString *) couponCode
+            withSuccessCallback:(PnPCouponSuccessHandler) successHandler
+               andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) exchangeCoupon:(NSString *) couponCode
+   withSuccessCallback:(PnPSuccessHandler)successHandler
+      andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) getFidelityForCode:(NSString *) code
+       withSuccessCallback:(PnPSuccessHandler)successHandler
+          andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 
 #pragma mark - Static data
 
@@ -501,15 +533,17 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 withSuccessCallback:(PnPSuccessHandler) successHandler
   andErrorCallback:(PnPGenericErrorHandler ) errorHandler;
 
+
+
 -(void) addProductVariant:(PNPCVariant *) variant
                forProduct:(PNPCProduct *) product
        withSuccessHandler:(PnPSuccessHandler ) successHandler
           andErrorHandler:(PnPGenericErrorHandler) errorHandler;
 
 -(void) updateVariant:(PNPCVariant *) variant
+          fromProduct:(PNPCProduct *) product
    withSuccessHandler:(PnPSuccessHandler ) successHandler
       andErrorHandler:(PnPGenericErrorHandler) errorHandler;
-
 
 
 @end
