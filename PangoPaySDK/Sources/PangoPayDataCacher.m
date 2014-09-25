@@ -64,7 +64,8 @@
                            @"loyalties"                 : @"pnployalties",
                            @"requestedRequests"         : @"pnprequestedrequests",
                            @"catalogue"                 : @"pnpcatalogue",
-                           @"commerceOrders"            : @"pnpcommerceorders"
+                           @"commerceOrders"            : @"pnpcommerceorders",
+
                            };
     return self;
 }
@@ -262,6 +263,83 @@
     });
 }
 
+
+-(void) getRawProvinceDataWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    [self getRawProvinces:^(NSArray *val) {
+        if(val != nil){
+            if(successHandler) successHandler(val);
+        }else{
+            [super getRawProvinceDataWithSuccessCallback:^(NSArray *data){
+                [self storeRawProvinces:data];
+                if(successHandler) successHandler(data);
+            } andErrorCallback:errorHandler];
+        }
+    }];
+}
+-(void) getRawProvinces:(PnPGenericNSAarraySucceddHandler) successHandler{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        NSString *pnpUserPath = [[self pnpDataDirectoryPath] stringByAppendingPathComponent:@"rawprovinces"];
+        NSArray *provinces  = [NSKeyedUnarchiver unarchiveObjectWithFile:pnpUserPath];
+        if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(provinces);} );
+    });
+}
+-(void) storeRawProvinces:(NSArray *) provinces{
+    NSString *pnpUserPath = [[self pnpDataDirectoryPath] stringByAppendingPathComponent:@"rawprovinces"];
+    [NSKeyedArchiver archiveRootObject:provinces toFile:pnpUserPath];
+}
+
+-(void) getProvincesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    [self getProvinces:^(NSArray *val) {
+        if(val != nil){
+            if(successHandler) successHandler(val);
+        }else{
+            [super getProvincesWithSuccessCallback:^(NSArray *data){
+                [self storeProvinces:data];
+                if(successHandler) successHandler(data);
+            } andErrorCallback:errorHandler];
+        }
+    }];
+
+}
+    
+-(void) getCitysForProvince:(NSString *) province withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    [self getCities:^(NSArray *data) {
+        if(data != nil){
+            if(successHandler) successHandler(data);
+        }else{
+            [super getCitysForProvince:province
+                   withSuccessCallback:^(NSArray * data){
+                       [self storeCities:data];
+                       if(successHandler) successHandler(data);
+                   } andErrorCallback:errorHandler];
+        }
+    }];
+    
+}
+-(void) getProvinces:(PnPGenericNSAarraySucceddHandler) successHandler{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            NSString *pnpUserPath = [[self pnpDataDirectoryPath] stringByAppendingPathComponent:@"provinces"];
+            NSArray *provinces  = [NSKeyedUnarchiver unarchiveObjectWithFile:pnpUserPath];
+        if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(provinces);} );
+    });
+}
+-(void) storeProvinces:(NSArray *) provinces{
+    NSString *pnpUserPath = [[self pnpDataDirectoryPath] stringByAppendingPathComponent:@"provinces"];
+    [NSKeyedArchiver archiveRootObject:provinces toFile:pnpUserPath];
+}
+
+-(void) getCities:(PnPGenericNSAarraySucceddHandler) successHandler{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        NSString *pnpUserPath = [[self pnpDataDirectoryPath] stringByAppendingPathComponent:@"cities"];
+        NSArray *cities  = [NSKeyedUnarchiver unarchiveObjectWithFile:pnpUserPath];
+        if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(cities);} );
+    });
+}
+-(void) storeCities:(NSArray *) cities{
+    NSString *pnpUserPath = [[self pnpDataDirectoryPath] stringByAppendingPathComponent:@"cities"];
+    [NSKeyedArchiver archiveRootObject:cities toFile:pnpUserPath];
+}
 
 #pragma mark - Credit cards
 
@@ -1574,7 +1652,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                 [self getCoupons:^(NSArray *data) {
                     NSMutableArray *c = [NSMutableArray arrayWithArray:data];
                     [c removeObject:coupon];
-                    coupon.favorite = YES;
+                    coupon.favorite = !coupon.favorite;
                     
                     [c addObject:coupon];
                     [self storeUserCoupons:c];
@@ -1618,14 +1696,14 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                 [super getLoyaltiesWithSuccessCallback:^(NSArray *d) {
                     [self storeLoyalties:d];
                     d = [d filteredArrayUsingPredicate:predicate];
-                    refreshHandler(d);
+                    if(refreshHandler)refreshHandler(d);
                 } andErrorCallback:errorHandler];
             }
         }else{
             [super getLoyaltiesWithSuccessCallback:^(NSArray *data) {
                 [self storeLoyalties:data];
                 data = [data filteredArrayUsingPredicate:predicate];
-                successHandler(data);
+                if(successHandler)successHandler(data);
             } andErrorCallback:errorHandler];
         }
     }];
@@ -1855,9 +1933,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 -(void) logout{
     [super logout];
     self.user = nil;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        [self deletePnpData];
-    });
+    [self deletePnpData];
 }
 
 - (NSString *) pnpDataDirectoryPath
@@ -1868,7 +1944,23 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 }
 
 -(void) deletePnpData{
+    _user = nil;
+    _avatar = nil;
+    _notifications = nil;
+    _pangos = nil;
+    _pangoMovements = nil;
+    _dataFileNames = nil;
+    _sentTransactions = nil;
+    _pendingTransactions = nil;
+    _receivedTransactions = nil;
+    _paymentRequests = nil;
+    _countries = nil;
+    _creditCards = nil;
+    _halcashExtractions = nil;
+    _walletRecharges = nil;
+    _validation = nil;
     for (id key in self.dataFileNames){
+        NSLog(@"%@",key);
         [[NSFileManager defaultManager] removeItemAtPath:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:key]] error:nil];
     }
 }

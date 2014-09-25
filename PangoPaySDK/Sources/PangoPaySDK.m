@@ -12,7 +12,7 @@
 
 #define     PNP_MOBILE_ACCOUNT_TYPE            @"paynopain"
 #define     PNP_MOBILE_ACCOUNT_IDENTIFIER_KEY  @"pnpaccount"
-#define     PNP_REQUEST_TIMEOUT                15
+#define     PNP_REQUEST_TIMEOUT                30
 #define NULL_TO_NIL(obj) ({ __typeof__ (obj) __obj = (obj); __obj == [NSNull null] ? nil : obj; })
 
 @interface PangoPaySDK ()
@@ -23,6 +23,9 @@
 @property (strong,nonatomic) NSArray *scope;
 @property (nonatomic)  BOOL userIsLoggedIn;
 @property (strong,nonatomic) NXOAuth2Account *userAccount;
+
+
+
 @end
 
 @implementation PangoPaySDK
@@ -36,6 +39,8 @@
     });
     return sharedInstance;
 }
+
+
 -(id) init{
     self = [super init];
     if(self){
@@ -391,63 +396,7 @@
                    }];
 }
 
--(void) getProvincesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler andErrorCallback:(PnPGenericErrorHandler) errorHandler{
-    
-    [NXOAuth2Request performMethod:@"POST"
-                        onResource:[self generateUrl:@"register/provinces"]
-                   usingParameters:nil
-                       withAccount:nil
-                           timeout:PNP_REQUEST_TIMEOUT
-               sendProgressHandler:nil
-                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
-                         if(!error){
-                           @try {
-                               NSError *parseError;
-                               
-                               
-                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
-                                                                                                   options:0
-                                                                                                     error:&parseError]
-                                                                   objectForKey:@"provinces"];
-                               if(parseError){
-                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
-                                                                                                      code:[parseError code]
-                                                                                                  userInfo:parseError.userInfo]);
-                                   return;
-                               }
-                               if([[responseDictionary objectForKey:@"success"] boolValue]){
-                                   NSArray *data = [responseDictionary objectForKey:@"data"];
-                                   NSMutableArray *provinces  = [NSMutableArray new];
-                                   for(NSDictionary *d in data){
-                                       [provinces addObject:[[d objectForKey:@"Province"] objectForKey:@"province"]];
-                                   }
-                                   if(successHandler)  successHandler(provinces);
-                               }else{
-                                   if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
-                                                                   initWithDomain:@"PNPGenericWebserviceError"
-                                                                   code:-6060
-                                                                   userInfo:responseDictionary ]);
-                               }
-                           }
-                           @catch (NSException *exception) {
-                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
-                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc] initWithDomain:@"PNPMalformedJson"
-                                                                                                      code:-2020
-                                                                                                  userInfo:nil]);
-                               
-                           }
-                       }else{
-                           if(errorHandler) errorHandler([self handleErrors:error]);
-                           
-                       }
-                   }];
-    
-}
-
--(void) getCitysForProvince:(NSString *) province
-        withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
-           andErrorCallback:(PnPGenericErrorHandler) errorHandler{
-    
+-(void) getRawProvinceDataWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler andErrorCallback:(PnPGenericErrorHandler) errorHandler{
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"register/provinces"]
                    usingParameters:nil
@@ -472,14 +421,7 @@
                                }
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    NSArray *data = [responseDictionary objectForKey:@"data"];
-                                   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"Province.province contains[cd] %@",province];
-                                   data = [data filteredArrayUsingPredicate:predicate];
-                                   NSArray *cities = [[data firstObject] objectForKey:@"City"];
-                                   NSMutableArray *cityStrings = [NSMutableArray new];
-                                   for (NSDictionary *c in cities){
-                                       [cityStrings addObject:[c objectForKey:@"city"]];
-                                   }
-                                   if(successHandler)  successHandler(cityStrings);
+                                   if(successHandler) successHandler(data);
                                }else{
                                    if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
                                                                    initWithDomain:@"PNPGenericWebserviceError"
@@ -502,6 +444,31 @@
     
 }
 
+-(void) getProvincesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    [self getRawProvinceDataWithSuccessCallback:^(NSArray *data) {
+        NSMutableArray *provinces  = [NSMutableArray new];
+        for(NSDictionary *d in data){
+            [provinces addObject:[[d objectForKey:@"Province"] objectForKey:@"province"]];
+        }
+        if(successHandler)  successHandler(provinces);
+    } andErrorCallback:errorHandler];
+}
+
+-(void) getCitysForProvince:(NSString *) province
+        withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+           andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    [self getRawProvinceDataWithSuccessCallback:^(NSArray *data) {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"Province.province contains[cd] %@",province];
+        data = [data filteredArrayUsingPredicate:predicate];
+        NSArray *cities = [[data firstObject] objectForKey:@"City"];
+        NSMutableArray *cityStrings = [NSMutableArray new];
+        for (NSDictionary *c in cities){
+            [cityStrings addObject:[c objectForKey:@"city"]];
+        }
+        if(successHandler)  successHandler(cityStrings);
+    } andErrorCallback:errorHandler];
+}
+
 -(void) registerUserWithUsername:(NSString *)username
                         password:(NSString *)password
                             name:(NSString *)name
@@ -509,7 +476,7 @@
                            email:(NSString *)email
                           prefix:(NSString *)prefix
                            phone:(NSString *)phone
-                             pin:(NSNumber *)pin
+                             pin:(NSString *)pin
                             city:(NSString *) city
                         province:(NSString *) province
                             male:(BOOL )isMale
@@ -578,7 +545,7 @@
                                        if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
                                                                        initWithDomain:@"PNPGenericWebserviceError"
                                                                        code:-6060
-                                                                       userInfo:@{@"errors":@[@[[responseDictionary objectForKey:@"message"],[responseDictionary objectForKey:@"code"]]] }]);
+                                                                       userInfo:@{@"errors":@[@[[responseDictionary objectForKey:@"code"],[responseDictionary objectForKey:@"message"]]] }]);
                                    }
                                    
                                    
@@ -662,7 +629,7 @@
     
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"register/validate_user"]
-                   usingParameters:@{@"token":token}
+                   usingParameters:@{@"token":token,@"client_id":self.clientId,@"client_secret":self.clientSecret}
                        withAccount:nil
                            timeout:PNP_REQUEST_TIMEOUT
                sendProgressHandler:nil
@@ -670,7 +637,7 @@
                        if(!error){
                            @try {
                                NSError *parseError;
-                               
+                               NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
                                
                                NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
                                                                                                    options:0
@@ -4662,12 +4629,27 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 -(void) addCouponToFavorites:(PNPCoupon *) coupon
          withSuccessCallback:(PnPSuccessHandler) successHandler
             andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    NSError *jerror;
+    NSString *pparams;
+
+    if(coupon.favorite){
+        NSDictionary *paramDicc = @{@"remove":@1};
+        pparams=[[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:paramDicc
+                                                                                       options:0
+                                                                                         error:&jerror]
+                                              encoding:NSUTF8StringEncoding];
+    }else{
+        pparams = @"{}";
+    }
+
+
+
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"coupons/user_call"]
                    usingParameters:@{
                                      @"action":[NSString stringWithFormat:@"coupons/%@/favorite.json",coupon.ccode],
                                      @"method": @"post",
-                                     @"fields": @"{}",
+                                     @"fields": pparams,
                                      }
                        withAccount:self.userAccount
                            timeout:PNP_REQUEST_TIMEOUT

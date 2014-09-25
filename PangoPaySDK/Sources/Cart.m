@@ -19,6 +19,14 @@
 
 @implementation Cart
 
++ (instancetype)sharedInstance{
+    static id sharedInstance;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        sharedInstance = [[[self class] alloc] init];
+    });
+    return sharedInstance;
+}
 
 -(id)init {
     self = super.self;

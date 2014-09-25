@@ -81,6 +81,7 @@ typedef void(^PnPCouponSuccessHandler)(PNPCoupon * coupon);
 -(NSURL *) generateAvatarUrlFromPrefix:(NSString *) prefix
                               andPhone:(NSString *) phone;
 
+-(void) getRawProvinceDataWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 -(void) getProvincesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                        andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
@@ -95,7 +96,7 @@ typedef void(^PnPCouponSuccessHandler)(PNPCoupon * coupon);
                            email:(NSString *)email
                           prefix:(NSString *)prefix
                            phone:(NSString *)phone
-                             pin:(NSNumber *)pin
+                             pin:(NSString *)pin
                             city:(NSString *) city
                         province:(NSString *) province
                             male:(BOOL )isMale
