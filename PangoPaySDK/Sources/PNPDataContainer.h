@@ -688,7 +688,7 @@
 @property (strong,nonatomic) NSNumber *userId;
 
 @property (strong,nonatomic) NSString *title;
-@property (strong,nonatomic) NSString *description;
+@property (strong,nonatomic) NSString *descr;
 @property (strong,nonatomic) NSString *shortDescription;
 
 @property (strong,nonatomic) NSString *logoUrl;

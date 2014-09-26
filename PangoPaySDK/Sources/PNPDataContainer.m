@@ -1431,7 +1431,7 @@
     _identifier = identifier;
     _userId = userId;
     _title = title;
-    _description = description;
+    _descr = description;
     _shortDescription = shortDescription;
     _logoUrl = logoUrl;
     _status = status;
@@ -1454,7 +1454,7 @@
     _identifier = [aDecoder decodeObjectForKey:@"identifier"];
     _userId = [aDecoder decodeObjectForKey:@"userId"];
     _title = [aDecoder decodeObjectForKey:@"title"];
-    _description = [aDecoder decodeObjectForKey:@"description"];
+    _descr = [aDecoder decodeObjectForKey:@"description"];
     _shortDescription = [aDecoder decodeObjectForKey:@"shortDescription"];
     _logoUrl = [aDecoder decodeObjectForKey:@"logoUrl"];
     _status = [aDecoder decodeObjectForKey:@"status"];
@@ -1479,7 +1479,7 @@
     [aCoder encodeObject:_identifier forKey:@"identifier"];
     [aCoder encodeObject:_userId forKey:@"userId"];
     [aCoder encodeObject:_title forKey:@"title"];
-    [aCoder encodeObject:_description forKey:@"description"];
+    [aCoder encodeObject:_descr forKey:@"description"];
     [aCoder encodeObject:_shortDescription forKey:@"shortDescription"];
     [aCoder encodeObject:_logoUrl forKey:@"logoUrl"];
     [aCoder encodeObject:_status forKey:@"status"];
