@@ -16,6 +16,7 @@
 #define NULL_TO_NIL(obj) ({ __typeof__ (obj) __obj = (obj); __obj == [NSNull null] ? nil : obj; })
 
 @interface PangoPaySDK ()
+
 @property (strong,nonatomic) NSUserDefaults  *userDefaults;
 @property (strong,nonatomic) NSString * clientId;
 @property (strong,nonatomic) NSString * clientSecret;
@@ -262,7 +263,7 @@
                                    return;
                                }
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
-                                   PNPCommerce *c = [[PNPCommerce alloc] initWithIdentifier:[[responseDictionary objectForKey:@"data"] objectForKey:@"id"] commerceId:[[[responseDictionary objectForKey:@"data"] objectForKey:@"location_data"] objectForKey:@"commerce_id"]];
+                                   PNPCommerce *c = [[PNPCommerce alloc] initWithIdentifier:[[responseDictionary objectForKey:@"data"] objectForKey:@"id"] commerceId:[[[responseDictionary objectForKey:@"data"] objectForKey:@"location_data"] objectForKey:@"commerce_id"] name:[[[responseDictionary objectForKey:@"data"] objectForKey:@"location_data"] objectForKey:@"name"]];
                                    if(successHandler)  successHandler(c);
                                    
                                }else{
@@ -5494,7 +5495,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 -(void) addCategoryWithName:(NSString *) name
                    andImage:(UIImage *) image
-        withSuccessCallback:(PnPSuccessHandler) successHandler
+        withSuccessCallback:(PnPNSNumberSucceddHandler) successHandler
            andErrorCallback:(PnPGenericErrorHandler) errorHandler{
 
     if(![self userIsLoggedIn]){
@@ -5542,7 +5543,8 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                    return;
                                }
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
-                                   if(successHandler) successHandler();
+
+                                   if(successHandler) successHandler([responseDictionary objectForKey:@"data"]);
                                }else{
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"

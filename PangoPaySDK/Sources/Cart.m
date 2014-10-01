@@ -52,6 +52,7 @@
     _discount = discount;
 }
 -(Discount*)getDiscount {
+    _discount = [[Discount alloc] initWithBasePrice:[self getPriceWithoutGlobalDiscount] discount:[_discount getDiscountPercentage] comesFromCoupon:NO];
     return _discount;
 }
 -(void)removeDiscount{
@@ -75,7 +76,7 @@
     }
     
     if (_discount != nil) {
-        price = [NSNumber numberWithDouble:[price doubleValue] - [[_discount getPrice] doubleValue]] ;
+        price = [NSNumber numberWithDouble:[price doubleValue] - [[[self getDiscount] getPrice] doubleValue]] ;
     }
     return price;
 }

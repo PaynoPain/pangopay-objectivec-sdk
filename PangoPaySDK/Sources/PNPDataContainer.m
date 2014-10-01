@@ -122,6 +122,7 @@
 -(void) encodeWithCoder:(NSCoder *)encoder{
     [encoder encodeObject:_commerceId forKey:@"commerceId"];
     [encoder encodeObject:_identifier forKey:@"identifier"];
+    [encoder encodeObject:_name forKey:@"name"];
 }
 
 -(id) initWithCoder:(NSCoder *)decoder{
@@ -131,17 +132,20 @@
     }
     _identifier = [decoder decodeObjectForKey:@"identifier"];
     _commerceId = [decoder decodeObjectForKey:@"commerceId"];
+    _name = [decoder decodeObjectForKey:@"name"];
     return self;
 }
 
 -(id) initWithIdentifier:(NSNumber *) identifier
-              commerceId:(NSNumber *) commerceId{
+              commerceId:(NSNumber *) commerceId
+                    name:(NSString *)name{
     self = [super init];
     if (!self) {
         return nil;
     }
     _commerceId = commerceId;
     _identifier = identifier;
+    _name = name;
     return self;
 }
 

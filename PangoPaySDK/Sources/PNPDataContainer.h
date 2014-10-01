@@ -51,10 +51,12 @@
 @interface PNPCommerce : NSObject <NSCoding>
 
 -(id) initWithIdentifier:(NSNumber *) identifier
-              commerceId:(NSNumber *) commerceId;
+              commerceId:(NSNumber *) commerceId
+                    name:(NSString *) name;
 
 @property (strong,nonatomic) NSNumber *identifier;
 @property (strong,nonatomic) NSNumber *commerceId;
+@property (strong,nonatomic) NSString *name;
 
 @end
 

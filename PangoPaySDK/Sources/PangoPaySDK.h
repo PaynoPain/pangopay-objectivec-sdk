@@ -500,7 +500,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 -(void) addCategoryWithName:(NSString *) name
                    andImage:(UIImage *) image
-        withSuccessCallback:(PnPSuccessHandler) successHandler
+        withSuccessCallback:(PnPNSNumberSucceddHandler) successHandler
            andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) deleteCategory:(PNPCCategory *) category
