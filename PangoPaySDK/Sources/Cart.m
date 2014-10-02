@@ -19,6 +19,7 @@
 
 @implementation Cart
 
+
 + (instancetype)sharedInstance{
     static id sharedInstance;
     static dispatch_once_t once;
@@ -34,7 +35,15 @@
         return nil;
     }
     _cartItems = [NSMutableArray new];
+    _coupons = [NSMutableArray new];
+    _discount = nil;
     return self;
+}
+
+-(void) reset{
+    _cartItems = [NSMutableArray new];
+    _coupons = [NSMutableArray new];
+    _discount = nil;
 }
 
 -(id) initWithCoder:(NSCoder *)aDecoder{
@@ -52,6 +61,9 @@
     _discount = discount;
 }
 -(Discount*)getDiscount {
+    if(_discount == nil){
+        return nil;
+    }
     _discount = [[Discount alloc] initWithBasePrice:[self getPriceWithoutGlobalDiscount] discount:[_discount getDiscountPercentage] comesFromCoupon:NO];
     return _discount;
 }

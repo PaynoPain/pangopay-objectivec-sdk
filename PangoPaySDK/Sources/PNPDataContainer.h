@@ -562,6 +562,9 @@
 @property (strong,nonatomic) NSString * gift;
 @property (strong,nonatomic) NSString * status;
 
+@property (strong,nonatomic) NSString * type;
+
+
 -(id) initWithCode:(NSString *)code
         identifier:(NSNumber *)identifier
  loyaltyIdentifier:(NSNumber *)loyaltyIdentifier
@@ -581,7 +584,8 @@
           favorite:(BOOL) favorite
             viewed:(BOOL) viewed
             status:(NSString *) status
-         productId:(NSNumber *) productId;
+         productId:(NSNumber *) productId
+              type:(NSString *)type;
 
 
 @end

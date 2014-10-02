@@ -19,10 +19,12 @@
 @property (strong,nonatomic) NSMutableArray *coupons;
 @property (strong, nonatomic) PNPCommerceOrder *order;
 
+@property (strong,nonatomic) NSNumber *fidelityDiscount;
+
 -(void)setDiscount:(Discount*)discount;
 -(Discount*)getDiscount;
 -(void)removeDiscount;
 -(NSNumber*)getPriceWithoutGlobalDiscount;
-
+-(void) reset;
 
 @end

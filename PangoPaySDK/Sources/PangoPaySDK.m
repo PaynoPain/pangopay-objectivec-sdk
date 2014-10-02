@@ -263,7 +263,7 @@
                                    return;
                                }
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
-                                   PNPCommerce *c = [[PNPCommerce alloc] initWithIdentifier:[[responseDictionary objectForKey:@"data"] objectForKey:@"id"] commerceId:[[[responseDictionary objectForKey:@"data"] objectForKey:@"location_data"] objectForKey:@"commerce_id"] name:[[[responseDictionary objectForKey:@"data"] objectForKey:@"location_data"] objectForKey:@"name"]];
+                                   PNPCommerce *c = [[PNPCommerce alloc] initWithIdentifier:[[responseDictionary objectForKey:@"data"] objectForKey:@"id"] commerceId:[[[responseDictionary objectForKey:@"data"] objectForKey:@"location_data"] objectForKey:@"id"] name:[[[responseDictionary objectForKey:@"data"] objectForKey:@"location_data"] objectForKey:@"name"]];
                                    if(successHandler)  successHandler(c);
                                    
                                }else{
@@ -4480,7 +4480,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                            }else if ([type isEqualToString:@"loyalty"]){
                                                class = [PNPCPLoyalty class ];
                                            }
-                                           PNPCoupon *c = [[class alloc] initWithCode:NULL_TO_NIL([d objectForKey:@"code"]) identifier:NULL_TO_NIL([d objectForKey:@"coupon_id"]) loyaltyIdentifier:NULL_TO_NIL([d objectForKey:@"loyalty_id"]) actualUses:NULL_TO_NIL([d objectForKey:@"actual_uses"]) limitUses:NULL_TO_NIL([d objectForKey:@"limit_uses"]) companyName:NULL_TO_NIL([d objectForKey:@"company_name"]) title:NULL_TO_NIL([d objectForKey:@"title"]) description:NULL_TO_NIL([d objectForKey:@"description"]) shortDescription:NULL_TO_NIL([d objectForKey:@"description_short"]) logoUrl:NULL_TO_NIL([d objectForKey:@"logo"]) brandLogoUrl:NULL_TO_NIL([d objectForKey:@"logo_brand"]) startDate:[df dateFromString:NULL_TO_NIL([d objectForKey:@"start_date"])] endDate:[df dateFromString:NULL_TO_NIL([d objectForKey:@"end_date"])] fixedAmount:[self clearAmount:NULL_TO_NIL([d objectForKey:@"fixed_amount"])] percentageAmount:[self clearAmount:NULL_TO_NIL([d objectForKey:@"percentage_amount"])] gift:NULL_TO_NIL([d objectForKey:@"gift"]) favorite:[[d objectForKey:@"favorite"] boolValue] viewed:[[d objectForKey:@"viewed"] boolValue] status:NULL_TO_NIL([d objectForKey:@"status"] ) productId:NULL_TO_NIL([d objectForKey:@"product_id"])];
+                                           PNPCoupon *c = [[class alloc] initWithCode:NULL_TO_NIL([d objectForKey:@"code"]) identifier:NULL_TO_NIL([d objectForKey:@"coupon_id"]) loyaltyIdentifier:NULL_TO_NIL([d objectForKey:@"loyalty_id"]) actualUses:NULL_TO_NIL([d objectForKey:@"actual_uses"]) limitUses:NULL_TO_NIL([d objectForKey:@"limit_uses"]) companyName:NULL_TO_NIL([d objectForKey:@"company_name"]) title:NULL_TO_NIL([d objectForKey:@"title"]) description:NULL_TO_NIL([d objectForKey:@"description"]) shortDescription:NULL_TO_NIL([d objectForKey:@"description_short"]) logoUrl:NULL_TO_NIL([d objectForKey:@"logo"]) brandLogoUrl:NULL_TO_NIL([d objectForKey:@"logo_brand"]) startDate:[df dateFromString:NULL_TO_NIL([d objectForKey:@"start_date"])] endDate:[df dateFromString:NULL_TO_NIL([d objectForKey:@"end_date"])] fixedAmount:[self clearAmount:NULL_TO_NIL([d objectForKey:@"fixed_amount"])] percentageAmount:[self clearAmount:NULL_TO_NIL([d objectForKey:@"percentage_amount"])] gift:NULL_TO_NIL([d objectForKey:@"gift"]) favorite:[[d objectForKey:@"favorite"] boolValue] viewed:[[d objectForKey:@"viewed"] boolValue] status:NULL_TO_NIL([d objectForKey:@"status"] ) productId:NULL_TO_NIL([d objectForKey:@"product_id"]) type:nil];
 
                                            [coupons addObject:c];
                                        }
@@ -5051,6 +5051,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                                                            options:0
                                                                                              error:&jerror]
                                                   encoding:NSUTF8StringEncoding];
+        NSLog(@"%@",pparams);
         
         [NXOAuth2Request performMethod:@"POST"
                             onResource:[self generateUrl:@"coupons/commerce_call"]
@@ -5101,7 +5102,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                }else if ([type isEqualToString:@"loyalty"]){
                                                    class = [PNPCPLoyalty class ];
                                                }
-                                               PNPCoupon *c = [[class alloc] initWithCode:couponCode identifier:nil loyaltyIdentifier:nil actualUses:NULL_TO_NIL([d objectForKey:@"actual_uses"]) limitUses:NULL_TO_NIL([d objectForKey:@"limit_uses"]) companyName:nil title:nil description:nil shortDescription:nil logoUrl:nil brandLogoUrl:nil startDate:nil endDate:[df dateFromString:NULL_TO_NIL([d objectForKey:@"end_date"])] fixedAmount:[self clearAmount:NULL_TO_NIL([d objectForKey:@"fixed_amount"])] percentageAmount:[self clearAmount:NULL_TO_NIL([d objectForKey:@"percentage_amount"])] gift:NULL_TO_NIL([d objectForKey:@"gift"]) favorite:NO viewed:NO status:nil productId:NULL_TO_NIL([d objectForKey:@"product_id"])];
+                                               PNPCoupon *c = [[class alloc] initWithCode:couponCode identifier:nil loyaltyIdentifier:nil actualUses:NULL_TO_NIL([d objectForKey:@"actual_uses"]) limitUses:NULL_TO_NIL([d objectForKey:@"limit_uses"]) companyName:nil title:nil description:nil shortDescription:nil logoUrl:nil brandLogoUrl:nil startDate:nil endDate:[df dateFromString:NULL_TO_NIL([d objectForKey:@"end_date"])] fixedAmount:[self clearAmount:NULL_TO_NIL([d objectForKey:@"fixed_amount"])] percentageAmount:[self clearAmount:NULL_TO_NIL([d objectForKey:@"percentage_amount"])] gift:NULL_TO_NIL([d objectForKey:@"gift"]) favorite:NO viewed:NO status:nil productId:NULL_TO_NIL([d objectForKey:@"product_id"]) type:NULL_TO_NIL([d objectForKey:@"type"])];
                                                
                                                if(successHandler) successHandler(c);
 
@@ -5212,7 +5213,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 
 -(void) getFidelityForCode:(NSString *) code
-       withSuccessCallback:(PnPSuccessHandler)successHandler
+       withSuccessCallback:(PnPNSNumberSucceddHandler)successHandler
           andErrorCallback:(PnPGenericErrorHandler) errorHandler{
     
     
@@ -5253,7 +5254,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                        NSNumber *percentageDiscount = [ self clearAmount:[loyaltyBenefit objectForKey:@"percentage_amount"]];
                                                                               
                                        
-                                       if(successHandler) successHandler();
+                                       if(successHandler) successHandler(percentageDiscount);
                                    }else{
                                        if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                      initWithDomain:@"PNPGenericWebserviceError"

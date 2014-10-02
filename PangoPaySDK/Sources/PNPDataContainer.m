@@ -1301,7 +1301,8 @@
           favorite:(BOOL) favorite
             viewed:(BOOL) viewed
             status:(NSString *)status
-         productId:(NSNumber *) productId{
+         productId:(NSNumber *) productId
+              type:(NSString *)type{
     
     self = [super init];
     if(!self) return nil;
@@ -1326,6 +1327,7 @@
     _gift = gift;
     _status = status;
     _productId = productId;
+    _type = type;
     
     return self;
 }
@@ -1356,6 +1358,7 @@
     _percentageAmount = [aDecoder decodeObjectForKey:@"percentageAmount"];
     _fixedAmount = [aDecoder decodeObjectForKey:@"fixedAmount"];
     _productId = [aDecoder decodeObjectForKey:@"productId"];
+    _type = [aDecoder decodeObjectForKey:@"type"];
     return self;
 }
 
@@ -1379,12 +1382,13 @@
     [aCoder encodeObject:_fixedAmount forKey:@"fixedAmount"];
     [aCoder encodeObject:_percentageAmount forKey:@"percentageAmount"];
     [aCoder encodeObject:_gift forKey:@"gift"];
+    [aCoder encodeObject:_type forKey:@"type"];
     [aCoder encodeObject:_productId forKey:@"productId"];
 }
 
 
 -(NSString *) description{
-    return [NSString stringWithFormat:@"CODE: %@,FAVORITE: %hhd, Viewed: %hhd , Id:%@, promoId:%@, actualUses:%@, limitUses:%@, companyName:%@, Title:%@, longDescr:%@, shortDescr:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ productId: %@",_ccode,_favorite,_viewed,_identifier,_loyaltyIdentifier,_actualUses,_limitUses,_companyName,_title,_longDescription,_shortDescription,_logoUrl,_brandLogoUrl,_startDate,_endDate,_productId];
+    return [NSString stringWithFormat:@"CODE: %@,FAVORITE: %hhd, Viewed: %hhd , Id:%@, promoId:%@, actualUses:%@, limitUses:%@, companyName:%@, Title:%@, longDescr:%@, shortDescr:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ productId: %@ type:%@",_ccode,_favorite,_viewed,_identifier,_loyaltyIdentifier,_actualUses,_limitUses,_companyName,_title,_longDescription,_shortDescription,_logoUrl,_brandLogoUrl,_startDate,_endDate,_productId,_type];
 }
 
 

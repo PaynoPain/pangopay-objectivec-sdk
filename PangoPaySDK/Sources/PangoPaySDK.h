@@ -463,7 +463,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
       andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) getFidelityForCode:(NSString *) code
-       withSuccessCallback:(PnPSuccessHandler)successHandler
+       withSuccessCallback:(PnPNSNumberSucceddHandler)successHandler
           andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 
