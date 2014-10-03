@@ -412,7 +412,7 @@
 @implementation PNPTransactionEntity
 
 -(NSString *) tableString{
-    return @"";
+    return NSLocalizedString(@"Tipo de transacción desconocido", nil);
 }
 
 -(id) initWithCoder:(NSCoder *) decoder{
@@ -509,7 +509,7 @@
 }
 
 -(NSString *) tableString{
-    return [NSString stringWithFormat:@"%@",_name];
+    return [NSString stringWithFormat:@"%@ %@",NSLocalizedString(@"Pago en", nil),_name];
 }
 @end
 
@@ -538,7 +538,7 @@
 }
 
 -(NSString *) tableString{
-    return [NSString stringWithFormat:@"%@",_name];
+    return [NSString stringWithFormat:@"%@ %@",NSLocalizedString(@"Cancelación en",nil),_name];
 }
 
 
@@ -589,7 +589,7 @@
 }
 
 -(NSString *) tableString{
-    return [self description];
+    return NSLocalizedString(@"Extracción Hal-Cash", nil);
 }
 @end
 
@@ -718,7 +718,7 @@
 
 
 -(NSString *) tableString{
-    return @"Wallet Recharge";
+    return NSLocalizedString(@"Recarga monedero", nil);
 }
 
 -(NSString *) description{
@@ -727,10 +727,18 @@
 
 @end
 
+@implementation PNPTransactionEmitterRechargePromo
+
+-(NSString *) tableString{
+    return NSLocalizedString(@"Recarga promoción", nil);
+}
+
+@end
+
 @implementation PNPTransactionEmitterHalcash
 
 -(NSString *) tableString{
-    return @"Hal-Cash cancellation";
+    return NSLocalizedString(@"Cancelación Hal-Cash",nil);
 }
 
 -(NSString *) description{
@@ -1836,6 +1844,28 @@ andOptionValues:(NSArray *)optionValues
 -(NSString *) description{
     return [NSString stringWithFormat:@"NAME: %@ PRICE: %@ IDENTIFIER %@\n",_name,_price,_identifer];
 }
+@end
+
+@implementation PNPPromo
+
+-(id) initWithUserCount:(NSNumber *) userCound maxUserCount:(NSNumber *) maxUserCount active:(BOOL) active amount:(NSNumber *)amount identifier:(NSNumber *) identifier{
+    
+    self = [super init];
+    if(!self) return nil;
+    
+    _active = active;
+    _userCount = userCound;
+    _maxUserCount = maxUserCount;
+    _amount = amount;
+    _identifier = identifier;
+    
+    return self;
+}
+
+-(NSString *) description{
+    return [NSString stringWithFormat:@"UserCount: %@ MaxUserCount: %@ Amount: %@ Identifier: %@",_userCount,_maxUserCount,_amount,_identifier];
+}
+
 @end
 
 

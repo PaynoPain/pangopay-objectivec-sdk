@@ -45,6 +45,7 @@ typedef void(^PnPOrderSuccessHandler)(PNPOrder * order);
 typedef void(^PnPCommerceOrderSuccessHandler)(PNPCommerceOrder * order);
 typedef void(^PnPLoyaltyUserDataSuccessHandler)(PNPLoyaltyUserData * data);
 typedef void(^PnPCouponSuccessHandler)(PNPCoupon * coupon);
+typedef void(^PnPPromoSuccessHandler)(PNPPromo * promo);
 + (instancetype)sharedInstance;
 
 
@@ -491,6 +492,11 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 -(void) checkFestivalGift;
 
+
+#pragma mark - Promotions
+
+-(void) getPromotions:(PnPPromoSuccessHandler) successHandler
+     andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 
 #pragma mark - Catalogue

@@ -20,6 +20,7 @@
 @property (strong, nonatomic) PNPCommerceOrder *order;
 
 @property (strong,nonatomic) NSNumber *fidelityDiscount;
+@property (strong,nonatomic) NSString *fidelityIdentifier;
 
 -(void)setDiscount:(Discount*)discount;
 -(Discount*)getDiscount;

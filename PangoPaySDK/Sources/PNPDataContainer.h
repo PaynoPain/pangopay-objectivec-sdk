@@ -260,6 +260,10 @@
 @property (strong, nonatomic) NSURL *barcode;
 @end
 
+@interface PNPTransactionEmitterRechargePromo : PNPTransactionEmitterRecharge
+
+@end
+
 @interface PNPTransactionEmitterUser : PNPTransactionEmitter <NSCoding>
 
 @property (strong,nonatomic) NSString *name;
@@ -787,5 +791,20 @@
 @property (strong,nonatomic) NSString *name;
 @property (strong,nonatomic) NSNumber *price;
 @property (strong,nonatomic) NSNumber *identifer;
+
+@end
+
+@interface PNPPromo : NSObject
+
+@property BOOL active;
+
+@property (strong,nonatomic) NSNumber *userCount;
+@property (strong,nonatomic) NSNumber *maxUserCount;
+
+@property (strong,nonatomic) NSNumber *amount;
+
+@property (strong,nonatomic) NSNumber *identifier;
+
+-(id) initWithUserCount:(NSNumber *) userCound maxUserCount:(NSNumber *) maxUserCount active:(BOOL) active amount:(NSNumber *)amount identifier:(NSNumber *) identifier;
 
 @end

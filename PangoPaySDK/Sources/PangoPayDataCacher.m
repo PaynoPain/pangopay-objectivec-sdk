@@ -305,17 +305,11 @@
 }
     
 -(void) getCitysForProvince:(NSString *) province withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler andErrorCallback:(PnPGenericErrorHandler) errorHandler{
-    [self getCities:^(NSArray *data) {
-        if(data != nil){
-            if(successHandler) successHandler(data);
-        }else{
-            [super getCitysForProvince:province
+               [super getCitysForProvince:province
                    withSuccessCallback:^(NSArray * data){
-                       [self storeCities:data];
                        if(successHandler) successHandler(data);
                    } andErrorCallback:errorHandler];
-        }
-    }];
+    
     
 }
 -(void) getProvinces:(PnPGenericNSAarraySucceddHandler) successHandler{
@@ -330,17 +324,7 @@
     [NSKeyedArchiver archiveRootObject:provinces toFile:pnpUserPath];
 }
 
--(void) getCities:(PnPGenericNSAarraySucceddHandler) successHandler{
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        NSString *pnpUserPath = [[self pnpDataDirectoryPath] stringByAppendingPathComponent:@"cities"];
-        NSArray *cities  = [NSKeyedUnarchiver unarchiveObjectWithFile:pnpUserPath];
-        if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(cities);} );
-    });
-}
--(void) storeCities:(NSArray *) cities{
-    NSString *pnpUserPath = [[self pnpDataDirectoryPath] stringByAppendingPathComponent:@"cities"];
-    [NSKeyedArchiver archiveRootObject:cities toFile:pnpUserPath];
-}
+
 
 #pragma mark - Credit cards
 
