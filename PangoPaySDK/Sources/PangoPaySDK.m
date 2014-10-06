@@ -3903,13 +3903,13 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
            withSuccessCallback:(PnPSuccessStringHandler) successHandler
               andErrorCallback:(PnPGenericErrorHandler) errorHandler{
     
-    
     if(![self userIsLoggedIn]){
         NSLog(@"No user logged in.");
         return;
     }
-    NSNumber *amount = [NSNumber numberWithDouble:[[cart getPrice] doubleValue] * 100];
-    NSNumber *netAmount = [NSNumber numberWithDouble:[[cart getPriceWithoutGlobalDiscount] doubleValue] * 100];
+    NSNumber *amount = [NSNumber numberWithDouble:[[cart getPriceWithoutGlobalDiscount] doubleValue] * 100];
+    
+    NSNumber *netAmount = [NSNumber numberWithDouble:[[cart getPrice] doubleValue] * 100];
     
     
     NSMutableArray *orderLines = [NSMutableArray new];
@@ -3930,7 +3930,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
             if([c getDiscount] &&  ![c getDiscount].comesFromCoupon){
                 [oLine setObject:@"discount" forKey:@"type"];
                 [oLine setObject:[NSNumber numberWithDouble:[[[c getDiscount] getPrice] doubleValue] * 100] forKey:@"amount"];
-                [oLine setObject:[[c getDiscount] getDiscountPercentage] forKey:@"number"];
+                [oLine setObject:[NSNumber numberWithDouble:[[[c getDiscount] getDiscountPercentage] doubleValue] * 100] forKey:@"number"];
                 [oLine setObject:[NSString stringWithFormat:NSLocalizedString(@"Descuento aplicado al producto %@",nil),c.product.name] forKey:@"name"];
                 [orderLines addObject:oLine];
             }
@@ -3940,8 +3940,10 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     NSMutableDictionary *oLine = [NSMutableDictionary new];
     if(cart.fidelityDiscount){
         [oLine setObject:@"loyaltyDiscount" forKey:@"type"];
-        [oLine setObject:[NSNumber numberWithDouble:[[cart getPrice] doubleValue] - ([[cart getPrice] doubleValue] * [cart.fidelityDiscount doubleValue] / 100)] forKey:@"amount"];
-        [oLine setObject:cart.fidelityDiscount forKey:@"number"];
+        NSNumber *fidelityDiscount = [NSNumber numberWithDouble:[[cart getPrice] doubleValue] - ([[cart getPrice] doubleValue] * [cart.fidelityDiscount doubleValue] / 100)];
+        netAmount = [NSNumber numberWithDouble:[netAmount doubleValue] - [fidelityDiscount doubleValue]];
+        [oLine setObject:fidelityDiscount forKey:@"amount"];
+        [oLine setObject:[NSNumber numberWithDouble:[cart.fidelityDiscount doubleValue] * 100] forKey:@"number"];
         [oLine setObject:NSLocalizedString(@"Fidelización",nil) forKey:@"name"];
         [oLine setObject:cart.fidelityIdentifier forKey:@"external_id"];
         [orderLines addObject:oLine];
@@ -3952,14 +3954,14 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     if([cart getDiscount] && ![cart getDiscount].comesFromCoupon){
         [oLine setObject:@"discount" forKey:@"type"];
         [oLine setObject:[NSNumber numberWithDouble:[[[cart getDiscount] getPrice] doubleValue] * 100] forKey:@"amount"];
-        [oLine setObject:[[cart getDiscount] getDiscountPercentage] forKey:@"number"];
+        [oLine setObject:[NSNumber numberWithDouble:[[[cart getDiscount] getDiscountPercentage] doubleValue] * 100] forKey:@"number"];
         [oLine setObject:NSLocalizedString(@"Descuento aplicado a la compra",nil) forKey:@"name"];
         [orderLines addObject:oLine];
     }
     
     [self getProductCategoriesWithSuccessCallback:^(NSArray *data) {
         for (PNPCoupon *c in cart.coupons){
-            oLine = [NSMutableDictionary new];
+            NSMutableDictionary *oLine = [NSMutableDictionary new];
             [oLine setObject:@"coupon" forKey:@"type"];
             [oLine setObject:c.ccode forKey:@"external_id"];
             if(c.gift.length > 0){
