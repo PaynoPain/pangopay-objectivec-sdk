@@ -3903,6 +3903,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
            withSuccessCallback:(PnPSuccessStringHandler) successHandler
               andErrorCallback:(PnPGenericErrorHandler) errorHandler{
     
+    
     if(![self userIsLoggedIn]){
         NSLog(@"No user logged in.");
         return;
@@ -3943,7 +3944,9 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
         [oLine setObject:cart.fidelityDiscount forKey:@"number"];
         [oLine setObject:NSLocalizedString(@"Fidelización",nil) forKey:@"name"];
         [oLine setObject:cart.fidelityIdentifier forKey:@"external_id"];
+        [orderLines addObject:oLine];
     }
+
     
     oLine = [NSMutableDictionary new];
     if([cart getDiscount] && ![cart getDiscount].comesFromCoupon){
@@ -3956,6 +3959,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     
     [self getProductCategoriesWithSuccessCallback:^(NSArray *data) {
         for (PNPCoupon *c in cart.coupons){
+            oLine = [NSMutableDictionary new];
             [oLine setObject:@"coupon" forKey:@"type"];
             [oLine setObject:c.ccode forKey:@"external_id"];
             if(c.gift.length > 0){
@@ -3982,12 +3986,14 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
             }
             [orderLines addObject:oLine];
         }
-
         NSError *jerror;
         NSString *jOrderLines = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:orderLines
                                                                                            options:0
                                                                                              error:&jerror]
                                                   encoding:NSUTF8StringEncoding];
+        
+        
+    
 
         [NXOAuth2Request performMethod:@"POST"
                             onResource:[self generateUrl:@"orders/create"]
@@ -3996,7 +4002,8 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                timeout:PNP_REQUEST_TIMEOUT
                    sendProgressHandler:nil
                        responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
-                           NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                      
+
                            if(!error){
                                @try {
                                    NSError *parseError;
@@ -4012,7 +4019,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    }
                                    
                                    if([[responseDictionary objectForKey:@"success"] boolValue]){
-                                       
+
                                        if(successHandler) successHandler([[responseDictionary objectForKey:@"data"] objectForKey:@"reference"]);
                                        
                                    }else{
