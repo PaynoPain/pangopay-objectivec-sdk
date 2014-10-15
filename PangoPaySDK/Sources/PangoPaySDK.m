@@ -5701,9 +5701,9 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
                                        NSMutableArray *variants = [NSMutableArray new];
                                        for (NSDictionary * v in [p objectForKey:@"Product"]){
-                                           [variants addObject:[[PNPCVariant alloc] initWithName:[v objectForKey:@"name"] price:[self clearAmount:[v objectForKey:@"price"]] identifier:[v objectForKey:@"id"]]];
+                                           [variants addObject:[[PNPCVariant alloc] initWithName:[[v objectForKey:@"name"] stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:[[[v objectForKey:@"name"] substringToIndex:1] uppercaseString]] price:[self clearAmount:[v objectForKey:@"price"]] identifier:[v objectForKey:@"id"]]];
                                        }
-                                       [pproducts addObject:[[PNPCProduct alloc] initWithIdentifier:[[p objectForKey:@"Category"] objectForKey:@"id"] name:[[p objectForKey:@"Category"] objectForKey:@"name"] imgUrl:[[p objectForKey:@"Category"] objectForKey:@"img_url"] variants:variants]];
+                                       [pproducts addObject:[[PNPCProduct alloc] initWithIdentifier:[[p objectForKey:@"Category"] objectForKey:@"id"] name:[[[p objectForKey:@"Category"] objectForKey:@"name"] stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:[[[[p objectForKey:@"Category"] objectForKey:@"name"] substringToIndex:1] uppercaseString]] imgUrl:[[p objectForKey:@"Category"] objectForKey:@"img_url"] variants:variants]];
                                        
                                        NSPredicate *categoryPredicate = [NSPredicate predicateWithFormat:@"identifier == %@",[[p objectForKey:@"Category"] objectForKey:@"parent_id"]];
                                        

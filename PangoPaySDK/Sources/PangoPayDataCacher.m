@@ -1821,6 +1821,11 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                 [super getProductCategoriesWithSuccessCallback:^(NSArray *data){
                     NSSortDescriptor *s = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
                     data = [data sortedArrayUsingDescriptors:@[s]];
+                    NSMutableArray *array;
+                    for(PNPCCategory *category in data){
+                        category.products = [category.products sortedArrayUsingDescriptors:@[s]];
+                        [array addObject:category];
+                    }
                     [self storeCatalogue:data];
                     refreshHandler(data);
                 } andErrorCallback:errorHandler];
