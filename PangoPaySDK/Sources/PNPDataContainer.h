@@ -803,8 +803,10 @@
 
 @property (strong,nonatomic) NSNumber *amount;
 
+@property (strong,nonatomic) NSNumber *minAmount;
+
 @property (strong,nonatomic) NSNumber *identifier;
 
--(id) initWithUserCount:(NSNumber *) userCound maxUserCount:(NSNumber *) maxUserCount active:(BOOL) active amount:(NSNumber *)amount identifier:(NSNumber *) identifier;
+-(id) initWithUserCount:(NSNumber *) userCound maxUserCount:(NSNumber *) maxUserCount active:(BOOL) active amount:(NSNumber *)amount minAmount:(NSNumber *)minAMount identifier:(NSNumber *) identifier;
 
 @end

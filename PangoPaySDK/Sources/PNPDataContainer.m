@@ -1848,7 +1848,7 @@ andOptionValues:(NSArray *)optionValues
 
 @implementation PNPPromo
 
--(id) initWithUserCount:(NSNumber *) userCound maxUserCount:(NSNumber *) maxUserCount active:(BOOL) active amount:(NSNumber *)amount identifier:(NSNumber *) identifier{
+-(id) initWithUserCount:(NSNumber *) userCound maxUserCount:(NSNumber *) maxUserCount active:(BOOL) active amount:(NSNumber *)amount minAmount:(NSNumber *)minAMount identifier:(NSNumber *) identifier{
     
     self = [super init];
     if(!self) return nil;
@@ -1857,13 +1857,14 @@ andOptionValues:(NSArray *)optionValues
     _userCount = userCound;
     _maxUserCount = maxUserCount;
     _amount = amount;
+    _minAmount = minAMount;
     _identifier = identifier;
     
     return self;
 }
 
 -(NSString *) description{
-    return [NSString stringWithFormat:@"UserCount: %@ MaxUserCount: %@ Amount: %@ Identifier: %@",_userCount,_maxUserCount,_amount,_identifier];
+    return [NSString stringWithFormat:@"UserCount: %@ MaxUserCount: %@ Amount: %@ MinAmount: %@ Identifier: %@",_userCount,_maxUserCount,_amount,_minAmount,_identifier];
 }
 
 @end

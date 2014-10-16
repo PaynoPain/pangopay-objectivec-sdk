@@ -5559,7 +5559,57 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
                                    NSLog(@"%@",responseDictionary);
-                                   PNPPromo *p = [[PNPPromo alloc] initWithUserCount:[[responseDictionary objectForKey:@"data"] objectForKey:@"user_count"] maxUserCount:[[responseDictionary objectForKey:@"data"] objectForKey:@"max_user_count"] active:[[[responseDictionary objectForKey:@"data"] objectForKey:@"active"] boolValue] amount:[self clearAmount:[[responseDictionary objectForKey:@"data"] objectForKey:@"number"]] identifier:[[responseDictionary objectForKey:@"data"] objectForKey:@"id"]];
+                                   PNPPromo *p = [[PNPPromo alloc] initWithUserCount:[[responseDictionary objectForKey:@"data"] objectForKey:@"user_count"] maxUserCount:[[responseDictionary objectForKey:@"data"] objectForKey:@"max_user_count"] active:[[[responseDictionary objectForKey:@"data"] objectForKey:@"active"] boolValue] amount:[self clearAmount:[[responseDictionary objectForKey:@"data"] objectForKey:@"number"]] minAmount:nil identifier:[[responseDictionary objectForKey:@"data"] objectForKey:@"id"]];
+                                   if(successHandler) successHandler(p);
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                   }];
+    
+}
+
+-(void) getRechargePromotions:(PnPPromoSuccessHandler) successHandler
+     andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"promos/get"]
+                   usingParameters: @{@"type":@"extraRecharge"}
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"get"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               NSLog(@"%@",responseDictionary);
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   NSLog(@"%@",responseDictionary);
+                                   PNPPromo *p = [[PNPPromo alloc] initWithUserCount:[[responseDictionary objectForKey:@"data"] objectForKey:@"user_count"] maxUserCount:[[responseDictionary objectForKey:@"data"] objectForKey:@"max_user_count"] active:[[[responseDictionary objectForKey:@"data"] objectForKey:@"active"] boolValue] amount:[self clearAmount:[[responseDictionary objectForKey:@"data"] objectForKey:@"number"]] minAmount:[self clearAmount:[[responseDictionary objectForKey:@"data"] objectForKey:@"min_number"]] identifier:[[responseDictionary objectForKey:@"data"] objectForKey:@"id"]];
                                    if(successHandler) successHandler(p);
                                }else{
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]

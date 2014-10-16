@@ -497,6 +497,10 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 -(void) getPromotions:(PnPPromoSuccessHandler) successHandler
      andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) getRechargePromotions:(PnPPromoSuccessHandler) successHandler
+             andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 -(void) exchangePromo:(PNPPromo *) promo  withSuccessCallback: (PnPSuccessHandler) successHandler
      andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
