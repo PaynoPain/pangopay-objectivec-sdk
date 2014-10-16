@@ -2655,7 +2655,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                         onResource:[self generateUrl:@"transactions/send"]
                    usingParameters:@{@"amount":amount,@"prefix":prefix,@"phone":phone,@"pin":pin}
                        withAccount:self.userAccount
-                           timeout:PNP_REQUEST_TIMEOUT
+                           timeout:60
                sendProgressHandler:nil
                    responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
                        if(!error){
@@ -3419,7 +3419,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                         onResource:[self generateUrl:@"payment_requests/confirm"]
                    usingParameters: @{@"id":request.identifier,@"pin":pin}
                        withAccount:self.userAccount
-                           timeout:PNP_REQUEST_TIMEOUT
+                           timeout:60
                sendProgressHandler:nil
                    responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
                        if(!error){

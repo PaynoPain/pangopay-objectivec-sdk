@@ -1482,12 +1482,16 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
             if(successHandler) successHandler(data);
             if(refreshHandler){
                 [super getCouponsWithSuccessCallback:^(NSArray *data) {
+                    NSPredicate *p = [NSPredicate predicateWithFormat:@"endDate > %@",[NSDate date]];
+                    data = [data filteredArrayUsingPredicate:p];
                     [self storeUserCoupons:data];
                     refreshHandler(data);
                 } andErrorCallback:errorHandler];
             }
         }else{
             [super getCouponsWithSuccessCallback:^(NSArray *data){
+                NSPredicate *p = [NSPredicate predicateWithFormat:@"endDate > %@",[NSDate date]];
+                data = [data filteredArrayUsingPredicate:p];
                 [self storeUserCoupons:data];
                 if(successHandler) successHandler(data);
             } andErrorCallback:errorHandler];
