@@ -561,6 +561,9 @@
 @property (strong,nonatomic) NSDate *startDate;
 @property (strong,nonatomic) NSDate *endDate;
 
+@property (strong,nonatomic) NSArray *validDays;
+@property (strong,nonatomic) NSDictionary *timeRanges;
+
 @property (strong,nonatomic) NSNumber * fixedAmount;
 @property (strong,nonatomic) NSNumber * percentageAmount;
 @property (strong,nonatomic) NSString * gift;
@@ -582,6 +585,8 @@
       brandLogoUrl:(NSString *)brandLogoUrl
          startDate:(NSDate *)startDate
            endDate:(NSDate *)endDate
+        validDays:(NSArray *)validDays
+       timeRanges:(NSDictionary *)timeRanges
        fixedAmount:(NSNumber *) fixedAmount
   percentageAmount:(NSNumber *) percentageAmount
               gift:(NSString *) gift

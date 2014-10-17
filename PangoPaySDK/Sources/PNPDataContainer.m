@@ -1303,6 +1303,8 @@
       brandLogoUrl:(NSString *)brandLogoUrl
          startDate:(NSDate *)startDate
            endDate:(NSDate *)endDate
+        validDays:(NSArray *)validDays
+       timeRanges:(NSDictionary *)timeRanges
        fixedAmount:(NSNumber *) fixedAmount
   percentageAmount:(NSNumber *) percentageAmount
               gift:(NSString *) gift
@@ -1330,6 +1332,8 @@
     _brandLogoUrl = brandLogoUrl;
     _startDate = startDate;
     _endDate = endDate;
+    _validDays = validDays;
+    _timeRanges = timeRanges;
     _fixedAmount = fixedAmount;
     _percentageAmount = percentageAmount;
     _gift = gift;
