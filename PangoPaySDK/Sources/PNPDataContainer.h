@@ -562,7 +562,7 @@
 @property (strong,nonatomic) NSDate *endDate;
 
 @property (strong,nonatomic) NSArray *validDays;
-@property (strong,nonatomic) NSDictionary *timeRanges;
+@property (strong,nonatomic) NSArray *timeRanges;
 
 @property (strong,nonatomic) NSNumber * fixedAmount;
 @property (strong,nonatomic) NSNumber * percentageAmount;
@@ -586,7 +586,7 @@
          startDate:(NSDate *)startDate
            endDate:(NSDate *)endDate
         validDays:(NSArray *)validDays
-       timeRanges:(NSDictionary *)timeRanges
+       timeRanges:(NSArray *)timeRanges
        fixedAmount:(NSNumber *) fixedAmount
   percentageAmount:(NSNumber *) percentageAmount
               gift:(NSString *) gift
