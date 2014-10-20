@@ -5529,7 +5529,6 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 -(void) getPromotions:(PnPPromoSuccessHandler) successHandler
      andErrorCallback:(PnPGenericErrorHandler) errorHandler{
     
-    
     if(![self userIsLoggedIn]){
         NSLog(@"No user logged in.");
         return;
@@ -5544,6 +5543,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                            timeout:PNP_REQUEST_TIMEOUT
                sendProgressHandler:nil
                    responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
+
                        if(!error){
                            @try {
                                NSError *parseError;
@@ -5559,7 +5559,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                }
                                
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
-                                   NSLog(@"%@",responseDictionary);
+
                                    PNPPromo *p = [[PNPPromo alloc] initWithUserCount:[[responseDictionary objectForKey:@"data"] objectForKey:@"user_count"] maxUserCount:[[responseDictionary objectForKey:@"data"] objectForKey:@"max_user_count"] active:[[[responseDictionary objectForKey:@"data"] objectForKey:@"active"] boolValue] amount:[self clearAmount:[[responseDictionary objectForKey:@"data"] objectForKey:@"number"]] minAmount:nil identifier:[[responseDictionary objectForKey:@"data"] objectForKey:@"id"]];
                                    if(successHandler) successHandler(p);
                                }else{
