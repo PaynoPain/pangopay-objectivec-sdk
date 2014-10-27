@@ -6585,4 +6585,13 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 @end
 
+@implementation PNPPreProductionEnvironment
+
+-(id) init{
+    self=[super initWithUrl:[NSURL URLWithString:@"https://pre-core.paynopain.com"]];
+    return self;
+}
+
+@end
+
 
