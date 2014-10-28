@@ -72,6 +72,10 @@ typedef void(^PnPPromoSuccessHandler)(PNPPromo * promo);
 -(void) getUserAvatarWithSuccessCallback:(PnpUserAvatarSuccessHandler) successHandler
                         andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
+-(void) validatePinWithSuccessCallback:(NSString *)pin
+                   withSuccessCallback:(PnPSuccessHandler) successHandler
+                      andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 -(void) deleteUserAvatarWithSuccessCallback:(PnPSuccessHandler) successHandler
                            andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
