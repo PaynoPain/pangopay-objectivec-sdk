@@ -1304,7 +1304,7 @@
          startDate:(NSDate *)startDate
            endDate:(NSDate *)endDate
         validDays:(NSArray *)validDays
-       timeRanges:(NSDictionary *)timeRanges
+       timeRanges:(NSArray *)timeRanges
        fixedAmount:(NSNumber *) fixedAmount
   percentageAmount:(NSNumber *) percentageAmount
               gift:(NSString *) gift
@@ -1312,6 +1312,7 @@
             viewed:(BOOL) viewed
             status:(NSString *)status
          productId:(NSNumber *) productId
+          products:(NSArray *)products
               type:(NSString *)type{
     
     self = [super init];
@@ -1339,6 +1340,7 @@
     _gift = gift;
     _status = status;
     _productId = productId;
+    _products = products;
     _type = type;
     
     return self;
@@ -1370,6 +1372,7 @@
     _percentageAmount = [aDecoder decodeObjectForKey:@"percentageAmount"];
     _fixedAmount = [aDecoder decodeObjectForKey:@"fixedAmount"];
     _productId = [aDecoder decodeObjectForKey:@"productId"];
+    _products = [aDecoder decodeObjectForKey:@"products"];
     _type = [aDecoder decodeObjectForKey:@"type"];
     return self;
 }
@@ -1396,11 +1399,12 @@
     [aCoder encodeObject:_gift forKey:@"gift"];
     [aCoder encodeObject:_type forKey:@"type"];
     [aCoder encodeObject:_productId forKey:@"productId"];
+    [aCoder encodeObject:_products forKey:@"products"];
 }
 
 
 -(NSString *) description{
-    return [NSString stringWithFormat:@"CODE: %@,FAVORITE: %hhd, Viewed: %hhd , Id:%@, promoId:%@, actualUses:%@, limitUses:%@, companyName:%@, Title:%@, longDescr:%@, shortDescr:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ productId: %@ type:%@",_ccode,_favorite,_viewed,_identifier,_loyaltyIdentifier,_actualUses,_limitUses,_companyName,_title,_longDescription,_shortDescription,_logoUrl,_brandLogoUrl,_startDate,_endDate,_productId,_type];
+    return [NSString stringWithFormat:@"CODE: %@,FAVORITE: %hhd, Viewed: %hhd , Id:%@, promoId:%@, actualUses:%@, limitUses:%@, companyName:%@, Title:%@, longDescr:%@, shortDescr:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ productId: %@ products: %@ type:%@",_ccode,_favorite,_viewed,_identifier,_loyaltyIdentifier,_actualUses,_limitUses,_companyName,_title,_longDescription,_shortDescription,_logoUrl,_brandLogoUrl,_startDate,_endDate,_productId,_products,_type];
 }
 
 

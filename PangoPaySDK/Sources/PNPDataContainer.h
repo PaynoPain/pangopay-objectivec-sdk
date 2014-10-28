@@ -568,7 +568,7 @@
 @property (strong,nonatomic) NSNumber * percentageAmount;
 @property (strong,nonatomic) NSString * gift;
 @property (strong,nonatomic) NSString * status;
-
+@property (strong,nonatomic) NSArray * products;
 @property (strong,nonatomic) NSString * type;
 
 
@@ -594,6 +594,7 @@
             viewed:(BOOL) viewed
             status:(NSString *) status
          productId:(NSNumber *) productId
+          products:(NSArray *) products
               type:(NSString *)type;
 
 
