@@ -570,7 +570,7 @@
 @property (strong,nonatomic) NSString * status;
 @property (strong,nonatomic) NSArray * products;
 @property (strong,nonatomic) NSString * type;
-
+@property (strong,nonatomic) NSArray *giftProducts;
 
 -(id) initWithCode:(NSString *)code
         identifier:(NSNumber *)identifier
@@ -593,8 +593,8 @@
           favorite:(BOOL) favorite
             viewed:(BOOL) viewed
             status:(NSString *) status
-         productId:(NSNumber *) productId
           products:(NSArray *) products
+      giftProducts:(NSArray *) giftProducts
               type:(NSString *)type;
 
 
