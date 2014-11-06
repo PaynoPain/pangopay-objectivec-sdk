@@ -27,6 +27,14 @@
     _product = product;
     return self;
 }
+-(id)initWithProduct:(Product*)product createdFromCoupon:(PNPCoupon *) coupon{
+    self = [super init];
+    if (self == nil) { return nil; }
+    _quantity = @1;
+    _product = product;
+    _coupon = coupon;
+    return self;
+}
 
 -(id) initWithCoder:(NSCoder *)aDecoder{
     self = [super init];

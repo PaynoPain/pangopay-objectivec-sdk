@@ -8,10 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import "Price.h"
-
-@interface Discount : NSObject <Price,NSCoding>
+#import "PNPDataContainer.h"
+@interface Discount : NSObject <Price>
 
 @property BOOL comesFromCoupon;
+@property (strong,nonatomic) PNPCoupon *coupon;
 
 -(id)initWithBasePrice:(NSNumber*)price
               discount:(NSNumber*)discount
@@ -20,7 +21,9 @@
 -(id)initWithBasePrice:(NSNumber*)price
               discount:(NSNumber*)discount;
 
-
+-(id)initWithBasePrice:(NSNumber*)price
+              discount:(NSNumber*)discount
+                coupon:(PNPCoupon *)coupon;
 
 -(void)updateBasePrice:(NSNumber*)price;
 

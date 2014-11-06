@@ -8,15 +8,15 @@
 
 #import <Foundation/Foundation.h>
 #import "Price.h"
-
+#import "PNPDataContainer.h"
 @class Product;
 @class Discount;
 
 @interface CartItem : NSObject <Price,NSCoding>
 @property (strong, nonatomic) Product *product;
-
+@property (strong,nonatomic) PNPCoupon *coupon;
 -(id)initWithProduct:(Product*)product;
-
+-(id)initWithProduct:(Product*)product createdFromCoupon:(PNPCoupon *) coupon;
 
 -(void)setDiscount:(Discount*)discount;
 -(void)removeDiscount;

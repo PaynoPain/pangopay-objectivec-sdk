@@ -30,6 +30,8 @@
 
     return self;
 }
+
+
 -(id)initWithBasePrice:(NSNumber*)price
               discount:(NSNumber*)discount{
     self = [super init];
@@ -42,20 +44,16 @@
     return self;
 }
 
--(id) initWithCoder:(NSCoder *)aDecoder{
+-(id)initWithBasePrice:(NSNumber*)price
+              discount:(NSNumber*)discount
+                coupon:(PNPCoupon *)coupon{
     self = [super init];
     if (self == nil) { return nil; }
-    
-    _basePrice = [aDecoder decodeObjectForKey:@"baseprice"];
-    _discount = [aDecoder decodeObjectForKey:@"discount"];
-    _comesFromCoupon = [aDecoder decodeBoolForKey:@"comesFromCoupon"];
+    _basePrice = price;
+    _discount = discount;
+    _coupon = coupon;
+    _comesFromCoupon = YES;
     return self;
-}
-
--(void) encodeWithCoder:(NSCoder *)aCoder{
-    [aCoder encodeObject:_basePrice forKey:@"baseprice"];
-    [aCoder encodeObject:_discount forKey:@"discount"];
-    [aCoder encodeBool:_comesFromCoupon forKey:@"comesFromCoupon"];
 }
 
 -(NSNumber*)getPrice {
@@ -63,7 +61,7 @@
 }
 
 -(NSString*)description{
-    return [NSString stringWithFormat:@"price: %@ discount: %@ basePrice: %@", [self getPrice], _discount, _basePrice ];
+    return [NSString stringWithFormat:@"price: %@ discount: %@ basePrice: %@ coupon: %@", [self getPrice], _discount, _basePrice,_coupon];
 }
 
 -(void)updateBasePrice:(NSNumber*)price {
