@@ -13,10 +13,14 @@
 
 @class Discount;
 
-@interface Cart : NSObject <Price,NSCoding>
+@interface Cart : NSObject <Price>
 + (instancetype)sharedInstance;
+
 @property (strong, nonatomic) NSMutableArray *cartItems;
 @property (strong,nonatomic) NSMutableArray *coupons;
+
+@property (strong,nonatomic) NSMutableArray *couponGifts;
+
 @property (strong, nonatomic) PNPCommerceOrder *order;
 
 @property (strong,nonatomic) NSNumber *fidelityDiscount;

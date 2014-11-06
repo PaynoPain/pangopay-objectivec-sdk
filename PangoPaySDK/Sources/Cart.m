@@ -36,30 +36,23 @@
     }
     _cartItems = [NSMutableArray new];
     _coupons = [NSMutableArray new];
+    _couponGifts = [NSMutableArray new];
     _discount = nil;
     return self;
 }
 
 -(void) reset{
     _cartItems = [NSMutableArray new];
+    _couponGifts = [NSMutableArray new];
     _coupons = [NSMutableArray new];
     _discount = nil;
 }
 
--(id) initWithCoder:(NSCoder *)aDecoder{
-    self = super.self;
-    if (self == nil) {
-        return nil;
-    }
-    _cartItems = [aDecoder decodeObjectForKey:@"cartitems"];
-    _discount =[aDecoder decodeObjectForKey:@"discount"];
-    _order =[aDecoder decodeObjectForKey:@"order"];
-    return self;
-}
 
 -(void)setDiscount:(Discount*)discount {
     _discount = discount;
 }
+
 -(Discount*)getDiscount {
     if(_discount == nil){
         return nil;
@@ -71,11 +64,6 @@
     _discount = nil;
 }
 
--(void) encodeWithCoder:(NSCoder *)aCoder{
-    [aCoder encodeObject:_cartItems forKey:@"cartitems"];
-    [aCoder encodeObject:_discount forKey:@"discount"];
-    [aCoder encodeObject:_order forKey:@"order"];
-}
 
 
 

@@ -5274,7 +5274,6 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                    class = [PNPCPLoyalty class ];
                                                }
                                            PNPCoupon *c = [[class alloc] initWithCode:couponCode identifier:nil loyaltyIdentifier:nil actualUses:NULL_TO_NIL([d objectForKey:@"actual_uses"]) limitUses:NULL_TO_NIL([d objectForKey:@"limit_uses"]) companyName:nil title:nil description:nil shortDescription:nil logoUrl:nil brandLogoUrl:nil startDate:nil endDate:[df dateFromString:NULL_TO_NIL([d objectForKey:@"end_date"])] validDays:NULL_TO_NIL([d objectForKey:@"valid_days"]) timeRanges:NULL_TO_NIL([d objectForKey:@"time_ranges"]) fixedAmount:[self clearAmount:NULL_TO_NIL([d objectForKey:@"fixed_amount"])] percentageAmount:[self clearAmount:NULL_TO_NIL([d objectForKey:@"percentage_amount"])] gift:NULL_TO_NIL([d objectForKey:@"gift"]) favorite:NO viewed:NO status:nil  products:NULL_TO_NIL([d objectForKey:@"products"]) giftProducts:NULL_TO_NIL([d objectForKey:@"gift_products"]) type:NULL_TO_NIL([d objectForKey:@"type"])];
-                                               
                                                if(successHandler) successHandler(c);
 
                                            }

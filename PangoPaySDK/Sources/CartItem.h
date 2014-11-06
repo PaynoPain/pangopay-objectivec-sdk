@@ -14,6 +14,7 @@
 
 @interface CartItem : NSObject <Price,NSCoding>
 @property (strong, nonatomic) Product *product;
+
 -(id)initWithProduct:(Product*)product;
 
 
