@@ -1303,16 +1303,16 @@
       brandLogoUrl:(NSString *)brandLogoUrl
          startDate:(NSDate *)startDate
            endDate:(NSDate *)endDate
-        validDays:(NSArray *)validDays
-       timeRanges:(NSArray *)timeRanges
+         validDays:(NSArray *)validDays
+        timeRanges:(NSArray *)timeRanges
        fixedAmount:(NSNumber *) fixedAmount
   percentageAmount:(NSNumber *) percentageAmount
               gift:(NSString *) gift
           favorite:(BOOL) favorite
             viewed:(BOOL) viewed
-            status:(NSString *)status
-         productId:(NSNumber *) productId
-          products:(NSArray *)products
+            status:(NSString *) status
+          products:(NSArray *) products
+      giftProducts:(NSArray *) giftProducts
               type:(NSString *)type{
     
     self = [super init];
@@ -1339,8 +1339,9 @@
     _percentageAmount = percentageAmount;
     _gift = gift;
     _status = status;
-    _productId = productId;
     _products = products;
+    _giftProducts = giftProducts;
+    _type = type;
     _type = type;
     
     return self;
@@ -1371,7 +1372,7 @@
     _gift = [aDecoder decodeObjectForKey:@"gift"];
     _percentageAmount = [aDecoder decodeObjectForKey:@"percentageAmount"];
     _fixedAmount = [aDecoder decodeObjectForKey:@"fixedAmount"];
-    _productId = [aDecoder decodeObjectForKey:@"productId"];
+    _giftProducts =[aDecoder decodeObjectForKey:@"giftProducts"];
     _products = [aDecoder decodeObjectForKey:@"products"];
     _type = [aDecoder decodeObjectForKey:@"type"];
     return self;
@@ -1398,7 +1399,7 @@
     [aCoder encodeObject:_percentageAmount forKey:@"percentageAmount"];
     [aCoder encodeObject:_gift forKey:@"gift"];
     [aCoder encodeObject:_type forKey:@"type"];
-    [aCoder encodeObject:_productId forKey:@"productId"];
+    [aCoder encodeObject:_giftProducts forKey:@"giftProducts"];
     [aCoder encodeObject:_products forKey:@"products"];
 }
 
