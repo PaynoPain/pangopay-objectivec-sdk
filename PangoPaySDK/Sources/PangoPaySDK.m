@@ -530,6 +530,7 @@
                         province:(NSString *) province
                             male:(BOOL )isMale
                        birthdate:(NSDate *) date
+                    commerceCode:(NSString *) commerceCode
              withSuccessCallback:(PnPSuccessHandler) successHandler
                 andErrorCallback:(PnPGenericErrorHandler) errorHandler{
     
@@ -547,7 +548,7 @@
     [params setObject:city      forKey:@"city"];
     [params setObject:province  forKey:@"province"];
     [params setObject:[df stringFromDate:date] forKey:@"birthdate"];
-    
+    [params setObject:commerceCode forKey:@"commerce_code"];
     if(isMale){
         [params setObject:@"M" forKey:@"gender"];
     }else{
