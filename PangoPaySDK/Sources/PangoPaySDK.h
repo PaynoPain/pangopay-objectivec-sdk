@@ -106,6 +106,7 @@ typedef void(^PnPPromoSuccessHandler)(PNPPromo * promo);
                         province:(NSString *) province
                             male:(BOOL )isMale
                        birthdate:(NSDate *) date
+                    commerceCode:(NSString *) commerceCode
              withSuccessCallback:(PnPSuccessHandler) successHandler
                 andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
