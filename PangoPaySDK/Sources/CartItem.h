@@ -15,12 +15,15 @@
 @interface CartItem : NSObject <Price,NSCoding>
 @property (strong, nonatomic) Product *product;
 @property (strong,nonatomic) PNPCoupon *coupon;
+@property BOOL forceStampCount;
+@property BOOL isStampcard;
 -(id)initWithProduct:(Product*)product;
 -(id)initWithProduct:(Product*)product createdFromCoupon:(PNPCoupon *) coupon;
 
 -(void)setDiscount:(Discount*)discount;
 -(void)removeDiscount;
 -(Discount*)getDiscount;
+
 
 
 -(Product*)getProduct;
