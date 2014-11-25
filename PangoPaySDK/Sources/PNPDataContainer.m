@@ -1430,6 +1430,102 @@
 @implementation PNPCPLoyalty
 @end
 
+@implementation PNPCouponPromotion
+
+
+-(id) initWithIdentifier:(NSString *) identifier
+                   title:(NSString *) title
+         longDescription:(NSString *) longDescription
+        shortDescription:(NSString *) shortDescription
+                    type:(NSString *) type
+               validDays:(NSArray *) validDays
+                products:(NSArray *) products
+                 logoUrl:(NSString *) logoUrl
+            brandLogoUrl:(NSString *) brandLogoUrl
+             fixedAmount:(NSNumber *) fixedAmount
+        percentageAmount:(NSNumber *) percentageAmount
+                    gift:(NSString *) gift
+            giftProducts:(NSArray *) giftProducts
+              actualUses:(NSNumber *) actualUses
+               startDate:(NSDate *)startDate
+                 endDate:(NSDate *)endDate
+                  status:(NSString *) status{
+    self= [super init];
+    if(!self) return nil;
+    _identifier = identifier;
+    _title = title;
+    _longDescription = longDescription;
+    _shortDescription = shortDescription;
+    _type = type;
+    _validDays = validDays;
+    _products = products;
+    _logoUrl = logoUrl;
+    _brandLogoUrl = brandLogoUrl;
+    _fixedAmount =fixedAmount;
+    _percentageAmount = percentageAmount;
+    _gift = gift;
+    _giftProducts =giftProducts;
+    _actualUses = actualUses;
+    _status = status;
+    _startDate = startDate;
+    _endDate = endDate;
+    return self;
+}
+-(BOOL) isEqual:(id)object{
+    return [self.identifier isEqualToString:((PNPCouponPromotion *)object).identifier];
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if(!self) return nil;
+    _identifier = [aDecoder decodeObjectForKey:@"identifier"];
+    _title = [aDecoder decodeObjectForKey:@"title"];
+    _longDescription = [aDecoder decodeObjectForKey:@"longDescription"];
+    _shortDescription = [aDecoder decodeObjectForKey:@"shortDescription"];
+    _type = [aDecoder decodeObjectForKey:@"type"];
+    _validDays = [aDecoder decodeObjectForKey:@"validDays"];
+    _products = [aDecoder decodeObjectForKey:@"products"];
+    _logoUrl = [aDecoder decodeObjectForKey:@"logoUrl"];
+    _brandLogoUrl = [aDecoder decodeObjectForKey:@"brandLogoUrl"];
+    _fixedAmount =[aDecoder decodeObjectForKey:@"fixedAmount"];
+    _percentageAmount = [aDecoder decodeObjectForKey:@"percentageAmount"];
+    _gift = [aDecoder decodeObjectForKey:@"gift"];
+    _giftProducts = [aDecoder decodeObjectForKey:@"giftProducts"];
+    _actualUses = [aDecoder decodeObjectForKey:@"actualUses"];
+    _status = [aDecoder decodeObjectForKey:@"status"];
+    _startDate = [aDecoder decodeObjectForKey:@"startDate"];
+    _endDate = [aDecoder decodeObjectForKey:@"endDate"];
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:_identifier forKey:@"identifier"];
+    [aCoder encodeObject:_title forKey:@"title"];
+    [aCoder encodeObject:_longDescription forKey:@"longDescription"];
+    [aCoder encodeObject:_shortDescription forKey:@"shortDescription"];
+    [aCoder encodeObject:_type forKey:@"type"];
+    [aCoder encodeObject:_products forKey:@"products"];
+    [aCoder encodeObject:_logoUrl forKey:@"logoUrl"];
+    [aCoder encodeObject:_brandLogoUrl forKey:@"brandLogoUrl"];
+    [aCoder encodeObject:_fixedAmount forKey:@"fixedAmount"];
+    [aCoder encodeObject:_percentageAmount forKey:@"percentageAmount"];
+    [aCoder encodeObject:_gift forKey:@"gift"];
+    [aCoder encodeObject:_giftProducts forKey:@"giftProducts"];
+    [aCoder encodeObject:_actualUses forKey:@"actualUses"];
+    [aCoder encodeObject:_validDays forKey:@"validDays"];
+    [aCoder encodeObject:_status forKey:@"status"];
+    [aCoder encodeObject:_startDate forKey:@"startDate"];
+    [aCoder encodeObject:_endDate forKey:@"endDate"];
+}
+
+
+-(NSString *) description{
+    return [NSString stringWithFormat:@"Id: %@, title: %@, longDescription: %@ , shortDescription:%@,actualUses:%@, gift:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ products: %@ , gift_products: %@ ,type:%@ ,fixedAmount: %@, percentageAmount: %@, validDays: %@, status: %@",_identifier,_title,_longDescription,_shortDescription,_actualUses,_gift,_logoUrl,_brandLogoUrl,_startDate,_endDate,_products,_giftProducts,_type,_fixedAmount,_percentageAmount,_validDays, _status];
+
+}
+    @end
+
+
 
 @implementation PNPLoyalty
 

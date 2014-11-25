@@ -66,7 +66,7 @@
                            @"requestedRequests"         : @"pnprequestedrequests",
                            @"catalogue"                 : @"pnpcatalogue",
                            @"commerceOrders"            : @"pnpcommerceorders",
-
+                           @"userPromotions"            : @"pnpuserpromotions"
                            };
     return self;
 }
@@ -1500,6 +1500,41 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     
 }
 
+-(void) getCouponPromotionsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                     andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    [self getCouponPromotionsWithSuccessCallback:successHandler
+                       andErrorCallback:errorHandler
+                     andRefreshCallback:nil];
+    
+}
+
+-(void) getCouponPromotionsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                     andErrorCallback:(PnPGenericErrorHandler) errorHandler
+                   andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler{
+    
+    [self getCouponPromotions:^(NSArray *data) {
+        if(data != nil){
+            if(successHandler) successHandler(data);
+            if(refreshHandler){
+                [super getCouponPromotionsWithSuccessCallback:^(NSArray *data) {
+                    NSPredicate *p = [NSPredicate predicateWithFormat:@"endDate > %@",[NSDate date]];
+                    data = [data filteredArrayUsingPredicate:p];
+                    [self storeCouponPromotions:data];
+                    refreshHandler(data);
+                } andErrorCallback:errorHandler];
+            }
+        }else{
+            [super getCouponPromotionsWithSuccessCallback:^(NSArray *data){
+                NSPredicate *p = [NSPredicate predicateWithFormat:@"endDate > %@",[NSDate date]];
+                data = [data filteredArrayUsingPredicate:p];
+                [self storeCouponPromotions:data];
+                if(successHandler) successHandler(data);
+            } andErrorCallback:errorHandler];
+        }
+    }];
+    
+}
 
 -(void) getDiscoverableCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                                  andErrorCallback:(PnPGenericErrorHandler) errorHandler
@@ -1784,11 +1819,23 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     });
 }
 
-
-
 -(void) storeUserCoupons:(NSArray *) coupons{
     [NSKeyedArchiver archiveRootObject:coupons
-                                    toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"userCoupons"]]];
+                                toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"userPromotions"]]];
+}
+
+-(void) getCouponPromotions:(PnPGenericNSAarraySucceddHandler) successHandler{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        NSArray *promotions = [NSKeyedUnarchiver unarchiveObjectWithFile:
+                               [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"userPromotions"]]];
+        
+        if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(promotions);} );
+    });
+}
+
+-(void) storeCouponPromotions:(NSArray *) promotions{
+    [NSKeyedArchiver archiveRootObject:promotions
+                                toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"userPromotions"]]];
 }
 
 

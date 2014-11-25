@@ -618,7 +618,45 @@
 @interface PNPCPLoyalty : PNPCoupon
 @end
 
+@interface PNPCouponPromotion : NSObject <NSCoding>
 
+@property (strong,nonatomic) NSString *identifier;
+@property (strong,nonatomic) NSString *title;
+@property (strong,nonatomic) NSString *longDescription;
+@property (strong,nonatomic) NSString *shortDescription;
+@property (strong,nonatomic) NSString *type;
+@property (strong,nonatomic) NSArray *validDays;
+@property (strong,nonatomic) NSArray *products;
+@property (strong,nonatomic) NSString *logoUrl;
+@property (strong,nonatomic) NSString *brandLogoUrl;
+@property (strong,nonatomic) NSNumber * fixedAmount;
+@property (strong,nonatomic) NSNumber * percentageAmount;
+@property (strong,nonatomic) NSString * gift;
+@property (strong,nonatomic) NSArray *giftProducts;
+@property (strong,nonatomic) NSNumber *actualUses;
+@property (strong,nonatomic) NSDate *startDate;
+@property (strong,nonatomic) NSDate *endDate;
+@property (strong,nonatomic) NSString * status;
+
+
+-(id) initWithIdentifier:(NSString *) identifier
+                   title:(NSString *) title
+         longDescription:(NSString *) longDescription
+        shortDescription:(NSString *) shortDescription
+                    type:(NSString *) type
+               validDays:(NSArray *) validDays
+                products:(NSArray *) products
+                 logoUrl:(NSString *) logoUrl
+            brandLogoUrl:(NSString *) brandLogoUrl
+             fixedAmount:(NSNumber *) fixedAmount
+        percentageAmount:(NSNumber *) percentageAmount
+                    gift:(NSString *) gift
+            giftProducts:(NSArray *) giftProducts
+              actualUses:(NSNumber *) actualUses
+               startDate:(NSDate *)startDate
+                 endDate:(NSDate *)endDate
+                  status:(NSString *) status;
+@end
 
 
 @interface PNPLoyaltySuscriptionField : NSObject <NSCoding>

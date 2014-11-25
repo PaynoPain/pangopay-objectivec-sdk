@@ -4679,9 +4679,81 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                        }else{
                            if(errorHandler)errorHandler([self handleErrors:error]);
                        }
-                       NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                       //NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
                    }];
 }
+
+
+-(void) getCouponPromotionsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                     andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"coupons/user_call"]
+                   usingParameters:@{
+                                     @"action":@"promos.json",
+                                     @"method": @"get",
+                                     @"fields": @"{}",
+                                     }
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"user_call"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   NSDictionary *dataDic = [responseDictionary objectForKey:@"data"];
+                                   NSMutableArray *promos = [NSMutableArray new];
+                                   NSDateFormatter *df = [[NSDateFormatter alloc] init];
+                                   [df setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
+                                   [df setDateFormat:@"yyyy-MM-dd"];
+                                   for (NSDictionary *d in dataDic) {
+                                       @try {
+                                           NSDictionary *promo = [d objectForKey:@"Promo"];
+                                           PNPCouponPromotion *p = [[PNPCouponPromotion alloc] initWithIdentifier:NULL_TO_NIL([promo objectForKey:@"id"]) title:NULL_TO_NIL([promo objectForKey:@"title"]) longDescription: NULL_TO_NIL([promo objectForKey:@"description"]) shortDescription:NULL_TO_NIL([promo objectForKey:@"description_short"]) type:NULL_TO_NIL([promo objectForKey:@"type"]) validDays:NULL_TO_NIL([promo objectForKey:@"valid_days"]) products:NULL_TO_NIL([promo objectForKey:@"products"]) logoUrl:NULL_TO_NIL([promo objectForKey:@"logo"]) brandLogoUrl:NULL_TO_NIL([promo objectForKey:@"logo_brand"]) fixedAmount:NULL_TO_NIL([promo objectForKey:@"fixed_amount"]) percentageAmount:NULL_TO_NIL([promo objectForKey:@"percentage_amount"]) gift:NULL_TO_NIL([promo objectForKey:@"gift"]) giftProducts:NULL_TO_NIL([promo objectForKey:@"gift_products"]) actualUses:NULL_TO_NIL([promo objectForKey:@"actual_uses"]) startDate:[df dateFromString:NULL_TO_NIL([d objectForKey:@"start_date"])] endDate:[df dateFromString:NULL_TO_NIL([d objectForKey:@"end_date"])] status:NULL_TO_NIL([promo objectForKey:@"status"])];
+                                           [promos addObject:p];
+                                       }
+                                       @catch (NSException *exception) {
+                                           NSLog(@"no se ha podido parsear el coupon %@ por el error %@",d,exception);
+                                       }
+                                   }
+                                   if(successHandler) successHandler(promos);
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                       //NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                   }];
+}
+
 
 -(void) deleteCoupon:(PNPCoupon *) coupon
  withSuccessCallback:(PnPSuccessHandler) successHandler

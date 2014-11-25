@@ -427,6 +427,9 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 -(void) getCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                          andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
+-(void) getCouponPromotionsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                     andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 -(void) deleteCoupon:(PNPCoupon *) coupon
  withSuccessCallback:(PnPSuccessHandler) successHandler
     andErrorCallback:(PnPGenericErrorHandler) errorHandler;
