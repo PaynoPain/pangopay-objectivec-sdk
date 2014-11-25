@@ -1536,53 +1536,20 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     
 }
 
--(void) getDiscoverableCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
-                                 andErrorCallback:(PnPGenericErrorHandler) errorHandler
-                               andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler{
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"favorite == NO AND class != %@ AND class != %@ AND status != %@",[PNPCPLoyalty class],[PNPCPExchange class],@"US"];
-    NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"viewed" ascending:NO];
-    
-    if(refreshHandler){
-        [self getCouponsWithSuccessCallback:^(NSArray *data) {
-            data = [data filteredArrayUsingPredicate:predicate];
-            data = [data sortedArrayUsingDescriptors:@[descriptor]];
-            if(successHandler)successHandler(data);
-        } andErrorCallback:errorHandler andRefreshCallback:^(NSArray *data) {
-            data = [data filteredArrayUsingPredicate:predicate];
-            data = [data sortedArrayUsingDescriptors:@[descriptor]];
-            refreshHandler(data);
-        }];
-    }else{
-        [self getCouponsWithSuccessCallback:^(NSArray *data) {
-            data = [data filteredArrayUsingPredicate:predicate];
-            data = [data sortedArrayUsingDescriptors:@[descriptor]];
-            if(successHandler)successHandler(data);
-        } andErrorCallback:errorHandler];
-    }
-    
 
-    
-}
-
--(void) getDiscoverableCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
-                                 andErrorCallback:(PnPGenericErrorHandler) errorHandler{
-    [self getDiscoverableCouponsWithSuccessCallback:successHandler
-                                   andErrorCallback:errorHandler
-                                 andRefreshCallback:nil];
-    
-}
 
 -(void) getUserCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                          andErrorCallback:(PnPGenericErrorHandler) errorHandler
                        andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler{
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"favorite == YES AND status != %@",@"US"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"( (favorite == YES AND class == %@) || (class != %@) )  AND status != %@",[PNPCPLoyalty class],[PNPCPLoyalty class],@"US"];
     if(refreshHandler){
         [self getCouponsWithSuccessCallback:^(NSArray *data) {
             data = [data filteredArrayUsingPredicate:predicate];
             if(successHandler)successHandler(data);
         } andErrorCallback:errorHandler andRefreshCallback:^(NSArray *data) {
+
             data = [data filteredArrayUsingPredicate:predicate];
-            if(refreshHandler)refreshHandler(data);
+            refreshHandler(data);
         }];
     }else{
         [self getCouponsWithSuccessCallback:^(NSArray *data) {
@@ -1692,8 +1659,6 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     
     NSPredicate *p = [NSPredicate predicateWithFormat:@"ccode == %@",code];
     [super getCouponsWithSuccessCallback:^(NSArray *data) {
-        NSLog(@"%@",code);
-        NSLog(@"%@",data);
         PNPCoupon *c = [[data filteredArrayUsingPredicate:p] firstObject];
         if(!c){
             if(errorHandler) return errorHandler([[PNPGenericWebserviceError alloc]
@@ -1821,7 +1786,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 
 -(void) storeUserCoupons:(NSArray *) coupons{
     [NSKeyedArchiver archiveRootObject:coupons
-                                toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"userPromotions"]]];
+                                toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"userCoupons"]]];
 }
 
 -(void) getCouponPromotions:(PnPGenericNSAarraySucceddHandler) successHandler{

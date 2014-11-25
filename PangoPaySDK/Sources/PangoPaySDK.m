@@ -4633,6 +4633,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                            timeout:PNP_REQUEST_TIMEOUT
                sendProgressHandler:nil
                    responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+
                        if(!error){
                            @try {
                                NSError *parseError;
@@ -4640,7 +4641,6 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                                                                    options:0
                                                                                                      error:&parseError]
                                                                    objectForKey:@"user_call"];
-                               NSLog(@"%@",responseDictionary);
                                if(parseError){
                                    if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
                                                                                                       code:[parseError code]
@@ -4648,7 +4648,6 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                    return;
                                }
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
-                                   NSLog(@"%@",responseDictionary);
                                    NSDictionary *dataDic = [responseDictionary objectForKey:@"data"];
                                    NSMutableArray *coupons = [NSMutableArray new];
                                    NSDateFormatter *df = [[NSDateFormatter alloc] init];
@@ -4732,6 +4731,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                                                                    options:0
                                                                                                      error:&parseError]
                                                                    objectForKey:@"user_call"];
+                               
                                if(parseError){
                                    if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
                                                                                                       code:[parseError code]
@@ -4747,7 +4747,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                    for (NSDictionary *d in dataDic) {
                                        @try {
                                            NSDictionary *promo = [d objectForKey:@"Promo"];
-                                           PNPCouponPromotion *p = [[PNPCouponPromotion alloc] initWithIdentifier:NULL_TO_NIL([promo objectForKey:@"id"]) title:NULL_TO_NIL([promo objectForKey:@"title"]) longDescription: NULL_TO_NIL([promo objectForKey:@"description"]) shortDescription:NULL_TO_NIL([promo objectForKey:@"description_short"]) type:NULL_TO_NIL([promo objectForKey:@"type"]) validDays:NULL_TO_NIL([promo objectForKey:@"valid_days"]) products:NULL_TO_NIL([promo objectForKey:@"products"]) logoUrl:NULL_TO_NIL([promo objectForKey:@"logo"]) brandLogoUrl:NULL_TO_NIL([promo objectForKey:@"logo_brand"]) fixedAmount:NULL_TO_NIL([promo objectForKey:@"fixed_amount"]) percentageAmount:NULL_TO_NIL([promo objectForKey:@"percentage_amount"]) gift:NULL_TO_NIL([promo objectForKey:@"gift"]) giftProducts:NULL_TO_NIL([promo objectForKey:@"gift_products"]) actualUses:NULL_TO_NIL([promo objectForKey:@"actual_uses"]) startDate:[df dateFromString:NULL_TO_NIL([d objectForKey:@"start_date"])] endDate:[df dateFromString:NULL_TO_NIL([d objectForKey:@"end_date"])] status:NULL_TO_NIL([promo objectForKey:@"status"])];
+                                           PNPCouponPromotion *p = [[PNPCouponPromotion alloc] initWithIdentifier:NULL_TO_NIL([promo objectForKey:@"id"]) title:NULL_TO_NIL([promo objectForKey:@"title"]) longDescription: NULL_TO_NIL([promo objectForKey:@"description"]) shortDescription:NULL_TO_NIL([promo objectForKey:@"description_short"]) type:NULL_TO_NIL([promo objectForKey:@"type"]) validDays:NULL_TO_NIL([promo objectForKey:@"valid_days"]) products:NULL_TO_NIL([promo objectForKey:@"products"]) logoUrl:NULL_TO_NIL([promo objectForKey:@"logo"]) brandLogoUrl:NULL_TO_NIL([promo objectForKey:@"logo_brand"]) fixedAmount:NULL_TO_NIL([promo objectForKey:@"fixed_amount"]) percentageAmount:NULL_TO_NIL([promo objectForKey:@"percentage_amount"]) gift:NULL_TO_NIL([promo objectForKey:@"gift"]) giftProducts:NULL_TO_NIL([promo objectForKey:@"gift_products"]) actualUses:NULL_TO_NIL([promo objectForKey:@"actual_uses"]) startDate:[df dateFromString:NULL_TO_NIL([promo objectForKey:@"start_date"])] endDate:[df dateFromString:NULL_TO_NIL([promo objectForKey:@"end_date"])] status:NULL_TO_NIL([promo objectForKey:@"status"])];
                                            [promos addObject:p];
                                        }
                                        @catch (NSException *exception) {

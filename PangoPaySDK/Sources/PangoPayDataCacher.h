@@ -121,21 +121,11 @@
 
 #pragma mark - Coupons & Fidelity
 
--(void) getCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
-                         andErrorCallback:(PnPGenericErrorHandler) errorHandler
-                       andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler;
 
 -(void) getCouponPromotionsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                      andErrorCallback:(PnPGenericErrorHandler) errorHandler
                    andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler;
 
-
--(void) getDiscoverableCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
-                         andErrorCallback:(PnPGenericErrorHandler) errorHandler
-                       andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler;
-
--(void) getDiscoverableCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
-                                 andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) getUserCouponsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                      andErrorCallback:(PnPGenericErrorHandler) errorHandler
