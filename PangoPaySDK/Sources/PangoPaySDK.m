@@ -2937,13 +2937,10 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                                                             status:[d objectForKey:@"status"]
                                                                             created:created
                                                                             andEntity:entity]];
-                                           
                                        }
                                        @catch (NSException *exception) {
                                            NSLog(@"No se ha podido parsear las transaction %@ por el error %@",d,exception);
-
                                        }
- 
  
                                    }
                                    if(successHandler)successHandler(PNPTransactionsArray);
@@ -3964,26 +3961,48 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     NSMutableArray *orderLines = [NSMutableArray new];
     
     for (CartItem * c in cart.cartItems) {
-
         if([c.product.getPrice floatValue] > 0){
             NSMutableDictionary *oLine = [NSMutableDictionary new];
             [oLine setObject:[NSNumber numberWithDouble:[[c.product getPrice] doubleValue] * 100] forKey:@"amount"];
             [oLine setObject:@"product" forKey:@"type"];
-            [oLine setObject:c.product.name forKey:@"name"];
+            [oLine setObject:c.product.descr forKey:@"name"];
             if(c.product.externalId){
                 [oLine setObject:c.product.externalId forKey:@"external_id"];
             }
             [oLine setObject:[c getQuantity] forKey:@"number"];
             [orderLines addObject:oLine];
             oLine = [NSMutableDictionary new];
-            if([c getDiscount] &&  ![c getDiscount].comesFromCoupon){
+            if(([c getDiscount] &&  ![c getDiscount].comesFromCoupon )|| [[c getDiscount].coupon isKindOfClass:[PNPCPStampCard class]] ){
                 [oLine setObject:@"discount" forKey:@"type"];
                 [oLine setObject:[NSNumber numberWithDouble:[[[c getDiscount] getPrice] doubleValue] * 100] forKey:@"amount"];
                 [oLine setObject:[NSNumber numberWithDouble:[[[c getDiscount] getDiscountPercentage] doubleValue] * 100] forKey:@"number"];
                 [oLine setObject:[NSString stringWithFormat:NSLocalizedString(@"Descuento aplicado al producto %@",nil),c.product.name] forKey:@"name"];
                 [orderLines addObject:oLine];
             }
+        }else if ([c.coupon isKindOfClass:[PNPCPStampCard class]]){
+            NSMutableDictionary *oLine = [NSMutableDictionary new];
+            [oLine setObject:[NSNumber numberWithDouble:[[c.product getPrice] doubleValue] * 100] forKey:@"amount"];
+            [oLine setObject:@"product" forKey:@"type"];
+            [oLine setObject:[NSString stringWithFormat:@"%@ %@",c.product.descr,NSLocalizedString(@"de regalo", nil)] forKey:@"name"];
+            [oLine setObject:[c getQuantity] forKey:@"number"];
+            [oLine setObject:@0 forKey:@"amount"];
+            [oLine setObject:c.product.externalId forKey:@"external_id"];
+            [orderLines addObject:oLine];
+        }else if (c.isStampcard){
+            NSNumber *exchanges = [NSNumber numberWithInt:[[c getQuantity] intValue] - [c.coupon.actualUses intValue]];
+            NSMutableDictionary *oLine = [NSMutableDictionary new];
+            [oLine setObject:[NSNumber numberWithDouble:[[c.product getPrice] doubleValue] * 100] forKey:@"amount"];
+            [oLine setObject:@"coupon" forKey:@"type"];
 
+            [oLine setObject:exchanges forKey:@"number"];
+            [oLine setObject:@0 forKey:@"amount"];
+            for(PNPCoupon *coup in cart.coupons){
+                if([coup isKindOfClass:[PNPCPStampCard class]] && ((PNPCPStampCard *)coup).cartItem == c){
+                    [oLine setObject:coup.ccode forKey:@"external_id"];
+                    [oLine setObject:[NSString stringWithFormat:@"%@ %@/%@",NSLocalizedString(@"Stamp card", nil),[c getQuantity],coup.limitUses] forKey:@"name"];
+                }
+            }
+            [orderLines addObject:oLine];
         }
     }
     NSMutableDictionary *oLine = [NSMutableDictionary new];
@@ -4000,42 +4019,45 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 
     
     oLine = [NSMutableDictionary new];
-    if([cart getDiscount] && ![cart getDiscount].comesFromCoupon){
+    if(([cart getDiscount] && ![cart getDiscount].comesFromCoupon) || [[cart getDiscount].coupon isKindOfClass:[PNPCPStampCard class]]){
         [oLine setObject:@"discount" forKey:@"type"];
         [oLine setObject:[NSNumber numberWithDouble:[[[cart getDiscount] getPrice] doubleValue] * 100] forKey:@"amount"];
         [oLine setObject:[NSNumber numberWithDouble:[[[cart getDiscount] getDiscountPercentage] doubleValue] * 100] forKey:@"number"];
         [oLine setObject:NSLocalizedString(@"Descuento aplicado a la compra",nil) forKey:@"name"];
-        [orderLines addObject:oLine];
+        [orderLines addObject:oLine]; 
     }
     
     [self getProductCategoriesWithSuccessCallback:^(NSArray *data) {
         for (PNPCoupon *c in cart.coupons){
-            NSMutableDictionary *oLine = [NSMutableDictionary new];
-            [oLine setObject:@"coupon" forKey:@"type"];
-            [oLine setObject:c.ccode forKey:@"external_id"];
-            if(c.gift.length > 0){
-                [oLine setObject:@0 forKey:@"amount"];
-                [oLine setObject:@0 forKey:@"number"];
-                [oLine setObject:[NSString stringWithFormat:NSLocalizedString(@"%@ de regalo",nil),c.gift] forKey:@"name"];
-            }else if(c.percentageAmount.floatValue > 0 && c.productId){
-                NSPredicate *p = [NSPredicate predicateWithFormat:@"products.variants.identifier == %@",c.productId];
-                NSArray *sResult = [data filteredArrayUsingPredicate:p];
-                p = [NSPredicate predicateWithFormat:@"variants.identifier == %@",c.productId];
-                sResult = [(NSArray *)[sResult firstObject] filteredArrayUsingPredicate:p];
-                PNPCProduct *product = [sResult firstObject];
-                p = [NSPredicate predicateWithFormat:@"identifier == %@",c.productId];
-                sResult = [[sResult firstObject] filteredArrayUsingPredicate:p];
-                PNPCVariant *variant = [sResult firstObject];
-                NSNumber *priceWithDiscount = [NSNumber numberWithDouble:[variant.price doubleValue] - [variant.price doubleValue] * [c.percentageAmount doubleValue]/100];
-                [oLine setObject:priceWithDiscount forKey:@"amount"];
-                [oLine setObject:[NSNumber numberWithDouble:[c.percentageAmount doubleValue] * 100] forKey:@"number"];
-                [oLine setObject:[NSString stringWithFormat:NSLocalizedString(@"Descuento aplicado al producto %@",nil),product.name] forKey:@"name"];
-            }else if(c.percentageAmount.floatValue > 0){
-                [oLine setObject:[[cart getDiscount] getPrice] forKey:@"amount"];
-                [oLine setObject:[NSNumber numberWithDouble:[c.percentageAmount doubleValue] * 100] forKey:@"number"];
-                [oLine setObject:NSLocalizedString(@"Descuento aplicado a la compra",nil) forKey:@"name"];
+            if(![c isKindOfClass:[PNPCPStampCard class]]){
+                NSMutableDictionary *oLine = [NSMutableDictionary new];
+                [oLine setObject:@"coupon" forKey:@"type"];
+                [oLine setObject:c.ccode forKey:@"external_id"];
+                if(c.gift.length > 0){
+                    [oLine setObject:@0 forKey:@"amount"];
+                    [oLine setObject:@0 forKey:@"number"];
+                    [oLine setObject:[NSString stringWithFormat:NSLocalizedString(@"%@ de regalo",nil),c.gift] forKey:@"name"];
+                }else if(c.percentageAmount.floatValue > 0 && c.productId){
+                    NSPredicate *p = [NSPredicate predicateWithFormat:@"products.variants.identifier == %@",c.productId];
+                    NSArray *sResult = [data filteredArrayUsingPredicate:p];
+                    p = [NSPredicate predicateWithFormat:@"variants.identifier == %@",c.productId];
+                    sResult = [(NSArray *)[sResult firstObject] filteredArrayUsingPredicate:p];
+                    PNPCProduct *product = [sResult firstObject];
+                    p = [NSPredicate predicateWithFormat:@"identifier == %@",c.productId];
+                    sResult = [[sResult firstObject] filteredArrayUsingPredicate:p];
+                    PNPCVariant *variant = [sResult firstObject];
+                    NSNumber *priceWithDiscount = [NSNumber numberWithDouble:[variant.price doubleValue] - [variant.price doubleValue] * [c.percentageAmount doubleValue]/100];
+                    [oLine setObject:priceWithDiscount forKey:@"amount"];
+                    [oLine setObject:[NSNumber numberWithDouble:[c.percentageAmount doubleValue] * 100] forKey:@"number"];
+                    [oLine setObject:[NSString stringWithFormat:NSLocalizedString(@"Descuento aplicado al producto %@",nil),product.name] forKey:@"name"];
+                }else if(c.percentageAmount.floatValue > 0){
+                    [oLine setObject:[[cart getDiscount] getPrice] forKey:@"amount"];
+                    [oLine setObject:[NSNumber numberWithDouble:[c.percentageAmount doubleValue] * 100] forKey:@"number"];
+                    [oLine setObject:NSLocalizedString(@"Descuento aplicado a la compra",nil) forKey:@"name"];
+                }
+                [orderLines addObject:oLine];
             }
-            [orderLines addObject:oLine];
+
         }
         NSError *jerror;
         NSString *jOrderLines = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:orderLines
@@ -5299,7 +5321,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
         [NXOAuth2Request performMethod:@"POST"
                             onResource:[self generateUrl:@"coupons/commerce_call"]
                        usingParameters:@{
-                                         @"action":[NSString stringWithFormat:@"coupons/%@.json",couponCode],
+                                         @"action":[NSString stringWithFormat:@"coupons/%@/view.json",couponCode],
                                          @"method": @"get",
                                          @"fields": pparams,
                                          }

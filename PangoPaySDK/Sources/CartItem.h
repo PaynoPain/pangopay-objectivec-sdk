@@ -25,6 +25,7 @@
 -(Discount*)getDiscount;
 
 
+
 -(Product*)getProduct;
 
 -(void)increaseQuantityByOne;

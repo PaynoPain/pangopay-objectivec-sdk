@@ -603,7 +603,9 @@
 @interface PNPCPDaily : PNPCoupon
 @end
 
+@class CartItem;
 @interface PNPCPStampCard : PNPCoupon
+@property (strong,nonatomic) CartItem *cartItem;
 @end
 
 @interface PNPCPMultiUssage : PNPCoupon

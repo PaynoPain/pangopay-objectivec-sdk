@@ -22,7 +22,9 @@
               discount:(NSNumber*)discount
        comesFromCoupon:(BOOL) comesFromCoupon{
     self = [super init];
-    if (self == nil) { return nil; }
+    if (self == nil) {
+        return nil;
+    }
     
     _basePrice = price;
     _discount = discount;
@@ -67,7 +69,9 @@
 -(void)updateBasePrice:(NSNumber*)price {
     _basePrice = price;
 }
+
 -(NSNumber *) getDiscountPercentage{
     return _discount;
 }
+
 @end
