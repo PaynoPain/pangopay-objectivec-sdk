@@ -181,6 +181,10 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
     withSuccessCallback:(PnPSuccessHandler) successHandler
        andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
+-(void) getUserOrdersWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+                           errorCallback:(PnPGenericErrorHandler)errorHandler
+                         refreshCallback:(PnPGenericNSAarraySucceddHandler)refreshHandler;
+
 #pragma mark - Credit cards
 
 -(void) getCreditCardsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler

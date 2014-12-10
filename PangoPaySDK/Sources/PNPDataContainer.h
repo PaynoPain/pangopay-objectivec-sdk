@@ -529,8 +529,32 @@
                    phone:(NSString *) phone
                  created:(NSDate *) created
               orderLines:(NSArray *) orderLines;
+@end
 
+@interface PNPUserOrder : NSObject<NSCoding>
+@property (strong,nonatomic) NSString *commerceName;
+@property (strong,nonatomic) NSString *concept;
+@property (strong,nonatomic) NSDate *created;
+@property (strong,nonatomic) NSString *currencySymbol;
+@property (strong,nonatomic) NSNumber *identifier;
+@property (strong,nonatomic) NSNumber *amount;
+@property (strong,nonatomic) NSNumber *netAmount;
+@property (strong,nonatomic) NSString *mail;
+@property (strong,nonatomic) NSArray *orderLines;
+@property (strong,nonatomic) NSString *type;
+@property (strong,nonatomic) NSString *reference;
 
+-(id) initWithIdentifier:(NSNumber *) identifier
+            commerceName:(NSString *) commerceName
+                 concept:(NSString *) concept
+                 created:(NSDate *) created
+          currencySymbol:(NSString *) currencySymbol
+                  amount:(NSNumber *) amount
+               netAmount:(NSNumber *) netAmount
+                    mail:(NSString *) mail
+              orderLines:(NSArray *) orderLines
+                    type:(NSString *) type
+               reference:(NSString *) reference;
 
 @end
 

@@ -1287,6 +1287,76 @@
 
 @end
 
+@implementation PNPUserOrder
+
+-(id) initWithIdentifier:(NSNumber *) identifier
+            commerceName:(NSString *) commerceName
+                 concept:(NSString *) concept
+                 created:(NSDate *) created
+          currencySymbol:(NSString *) currencySymbol
+                  amount:(NSNumber *) amount
+               netAmount:(NSNumber *) netAmount
+                    mail:(NSString *) mail
+              orderLines:(NSArray *) orderLines
+                    type:(NSString *) type
+               reference:(NSString *)reference{
+    
+    self = [super  init];
+    if(!self) return nil;
+    
+    self.identifier = identifier;
+    self.commerceName = commerceName;
+    self.concept = concept;
+    self.created = created;
+    self.currencySymbol = currencySymbol;
+    self.amount = amount;
+    self.netAmount = netAmount;
+    self.mail = mail;
+    self.orderLines = orderLines;
+    self.type = type;
+    self.reference = reference;
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super  init];
+    if(!self) return nil;
+    
+    self.identifier = [aDecoder decodeObjectForKey:@"identifier"];
+    self.commerceName = [aDecoder decodeObjectForKey:@"commerceName"];
+    self.concept = [aDecoder decodeObjectForKey:@"concept"];
+    self.created = [aDecoder decodeObjectForKey:@"created"];
+    self.currencySymbol = [aDecoder decodeObjectForKey:@"currencySymbol"];
+    self.amount = [aDecoder decodeObjectForKey:@"amount"];
+    self.netAmount = [aDecoder decodeObjectForKey:@"netAmount"];
+    self.mail = [aDecoder decodeObjectForKey:@"mail"];
+    self.orderLines = [aDecoder decodeObjectForKey:@"orderLines"];
+    self.type = [aDecoder decodeObjectForKey:@"type"];
+    self.reference = [aDecoder decodeObjectForKey:@"reference"];
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:_identifier forKey:@"identifier"];
+    [aCoder encodeObject:_commerceName forKey:@"commerceName"];
+    [aCoder encodeObject:_concept forKey:@"concept"];
+    [aCoder encodeObject:_created forKey:@"created"];
+    [aCoder encodeObject:_currencySymbol forKey:@"currencySymbol"];
+    [aCoder encodeObject:_amount forKey:@"amount"];
+    [aCoder encodeObject:_netAmount forKey:@"netAmount"];
+    [aCoder encodeObject:_mail forKey:@"mail"];
+    [aCoder encodeObject:_orderLines forKey:@"orderLines"];
+    [aCoder encodeObject:_type forKey:@"type"];
+    [aCoder encodeObject:_reference forKey:@"reference"];
+}
+
+-(NSString *) description{
+    return [NSString stringWithFormat:@"\nID: %@ \n Commerce Name: %@ Mail: %@ \n Concept: %@ \n Currency Symbol: %@ \n Amount: %@ \n Net Amount: %@ \n Order Lines: %@ \n Created: %@ type: %@ reference: %@" ,_identifier,_commerceName,_mail,_concept,_currencySymbol,_amount,_netAmount,_orderLines,_created,_type,_reference];
+}
+
+
+
+@end
 
 @implementation PNPCoupon
 

@@ -1423,6 +1423,80 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
     
 }
 
+-(void) getUserOrdersWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
+                           errorCallback:(PnPGenericErrorHandler)errorHandler
+                         refreshCallback:(PnPGenericNSAarraySucceddHandler)refreshHandler{
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"orders/get_orders"]
+                   usingParameters: @{@"limit":@"50", @"page":@"1"}
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
+                       
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"get_orders"];
+                               
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   NSMutableArray *orders = [NSMutableArray new];
+                                   for (NSDictionary *d in [responseDictionary objectForKey:@"data"]) {
+                                       NSDictionary *orderDic = [d objectForKey:@"order"];
+                                       NSDictionary *payerDic = [orderDic objectForKey:@"payer"];
+                                       NSArray *orderLines = [d objectForKey:@"order_lines"];
+                                       NSDateFormatter *df = [[NSDateFormatter alloc] init];
+                                       [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+                                       [df setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
+                                       if([payerDic isKindOfClass:[NSArray class]]){
+                                           payerDic = [NSDictionary new];
+                                       }
+                                       NSLog(@"data: %@",d);
+                                       
+                                       PNPUserOrder *o = [[PNPUserOrder alloc] initWithIdentifier:[orderDic objectForKey:@"id"] commerceName:[orderDic objectForKey:@"commerce"] concept:[orderDic objectForKey:@"concept"] created:[df dateFromString:[orderDic objectForKey:@"created"]] currencySymbol:[[orderDic objectForKey:@"currency"] objectForKey:@"symbol"] amount:[orderDic objectForKey:@"amount"] netAmount:[orderDic objectForKey:@"net_amount"] mail:[orderDic objectForKey:@"mail_ticket"] orderLines:orderLines type:[orderDic objectForKey:@"type"] reference:[orderDic objectForKey:@"reference"]];
+                                       
+                                       
+                                       [orders addObject:o];
+                                       if(successHandler) successHandler(orders);
+                                   }
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                   }];
+    
+    
+    
+}
+
+
 
 #pragma mark - Credit cards
 
