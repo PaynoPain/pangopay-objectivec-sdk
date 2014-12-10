@@ -568,6 +568,7 @@
 
 @property (strong,nonatomic) NSNumber *identifier;
 @property (strong,nonatomic) NSNumber *loyaltyIdentifier;
+@property (strong,nonatomic) NSNumber * promoId;
 
 @property (strong,nonatomic) NSNumber *actualUses;
 @property (strong,nonatomic) NSNumber *limitUses;
@@ -589,6 +590,7 @@
 @property (strong,nonatomic) NSArray *timeRanges;
 
 @property (strong,nonatomic) NSNumber * fixedAmount;
+
 @property (strong,nonatomic) NSNumber * percentageAmount;
 @property (strong,nonatomic) NSString * gift;
 @property (strong,nonatomic) NSString * status;
@@ -596,8 +598,11 @@
 @property (strong,nonatomic) NSString * type;
 @property (strong,nonatomic) NSArray *giftProducts;
 
+
+
 -(id) initWithCode:(NSString *)code
         identifier:(NSNumber *)identifier
+        promoId:(NSNumber *)promoId
  loyaltyIdentifier:(NSNumber *)loyaltyIdentifier
         actualUses:(NSNumber *)actualUses
          limitUses:(NSNumber *)limitUses
@@ -663,10 +668,12 @@
 @property (strong,nonatomic) NSDate *startDate;
 @property (strong,nonatomic) NSDate *endDate;
 @property (strong,nonatomic) NSString * status;
+@property (strong,nonatomic) NSString * company;
 
 
 -(id) initWithIdentifier:(NSString *) identifier
                    title:(NSString *) title
+                 company:(NSString *) company
          longDescription:(NSString *) longDescription
         shortDescription:(NSString *) shortDescription
                     type:(NSString *) type

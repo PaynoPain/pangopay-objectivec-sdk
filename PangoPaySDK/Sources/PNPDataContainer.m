@@ -1362,6 +1362,7 @@
 
 -(id) initWithCode:(NSString *)code
         identifier:(NSNumber *)identifier
+           promoId:(NSNumber *) promoId
  loyaltyIdentifier:(NSNumber *)loyaltyIdentifier
         actualUses:(NSNumber *)actualUses
          limitUses:(NSNumber *)limitUses
@@ -1390,6 +1391,7 @@
     
     _ccode = code;
     _favorite = favorite;
+    _promoId = promoId;
     _identifier = identifier;
     _loyaltyIdentifier = loyaltyIdentifier;
     _actualUses = actualUses;
@@ -1412,7 +1414,6 @@
     _products = products;
     _giftProducts = giftProducts;
     _type = type;
-    _type = type;
     
     return self;
 }
@@ -1425,6 +1426,7 @@
     if(!self) return nil;
     _ccode = [aDecoder decodeObjectForKey:@"code"];
     _status = [aDecoder decodeObjectForKey:@"status"];
+    _promoId = [aDecoder decodeObjectForKey:@"promoId"];
     _identifier = [aDecoder decodeObjectForKey:@"identifier"];
     _loyaltyIdentifier = [aDecoder decodeObjectForKey:@"loyaltyIdentifier"];
     _actualUses = [aDecoder decodeObjectForKey:@"actualUses"];
@@ -1450,6 +1452,7 @@
 
 -(void) encodeWithCoder:(NSCoder *)aCoder{
     [aCoder encodeObject:_ccode forKey:@"code"];
+    [aCoder encodeObject:_promoId forKey:@"promoId"];
     [aCoder encodeObject:_identifier forKey:@"identifier"];
     [aCoder encodeObject:_loyaltyIdentifier forKey:@"loyaltyIdentifier"];
     [aCoder encodeObject:_actualUses forKey:@"actualUses"];
@@ -1475,7 +1478,7 @@
 
 
 -(NSString *) description{
-    return [NSString stringWithFormat:@"CODE: %@,FAVORITE: %hhd, Viewed: %hhd , Id:%@, promoId:%@, actualUses:%@, limitUses:%@, companyName:%@, Title:%@, longDescr:%@, shortDescr:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ products: %@  gift_products: %@ type:%@",_ccode,_favorite,_viewed,_identifier,_loyaltyIdentifier,_actualUses,_limitUses,_companyName,_title,_longDescription,_shortDescription,_logoUrl,_brandLogoUrl,_startDate,_endDate,_products,_giftProducts,_type];
+    return [NSString stringWithFormat:@"CODE: %@,FAVORITE: %hhd, Viewed: %hhd , Id:%@, promoId:%@, actualUses:%@, limitUses:%@, companyName:%@, Title:%@, longDescr:%@, shortDescr:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ products: %@  gift_products: %@ type:%@",_ccode,_favorite,_viewed,_identifier,_promoId,_actualUses,_limitUses,_companyName,_title,_longDescription,_shortDescription,_logoUrl,_brandLogoUrl,_startDate,_endDate,_products,_giftProducts,_type];
 }
 
 
@@ -1505,6 +1508,7 @@
 
 -(id) initWithIdentifier:(NSString *) identifier
                    title:(NSString *) title
+                 company:(NSString *) company
          longDescription:(NSString *) longDescription
         shortDescription:(NSString *) shortDescription
                     type:(NSString *) type
@@ -1539,6 +1543,7 @@
     _status = status;
     _startDate = startDate;
     _endDate = endDate;
+    _company = company;
     return self;
 }
 -(BOOL) isEqual:(id)object{
@@ -1550,6 +1555,7 @@
     if(!self) return nil;
     _identifier = [aDecoder decodeObjectForKey:@"identifier"];
     _title = [aDecoder decodeObjectForKey:@"title"];
+    _company = [aDecoder decodeObjectForKey:@"company"];
     _longDescription = [aDecoder decodeObjectForKey:@"longDescription"];
     _shortDescription = [aDecoder decodeObjectForKey:@"shortDescription"];
     _type = [aDecoder decodeObjectForKey:@"type"];
@@ -1571,6 +1577,7 @@
 -(void) encodeWithCoder:(NSCoder *)aCoder{
     [aCoder encodeObject:_identifier forKey:@"identifier"];
     [aCoder encodeObject:_title forKey:@"title"];
+    [aCoder encodeObject:_company forKey:@"company"];
     [aCoder encodeObject:_longDescription forKey:@"longDescription"];
     [aCoder encodeObject:_shortDescription forKey:@"shortDescription"];
     [aCoder encodeObject:_type forKey:@"type"];
@@ -1590,7 +1597,7 @@
 
 
 -(NSString *) description{
-    return [NSString stringWithFormat:@"Id: %@, title: %@, longDescription: %@ , shortDescription:%@,actualUses:%@, gift:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ products: %@ , gift_products: %@ ,type:%@ ,fixedAmount: %@, percentageAmount: %@, validDays: %@, status: %@",_identifier,_title,_longDescription,_shortDescription,_actualUses,_gift,_logoUrl,_brandLogoUrl,_startDate,_endDate,_products,_giftProducts,_type,_fixedAmount,_percentageAmount,_validDays, _status];
+    return [NSString stringWithFormat:@"Id: %@, Company:%@, title: %@, longDescription: %@ , shortDescription:%@,actualUses:%@, gift:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ products: %@ , gift_products: %@ ,type:%@ ,fixedAmount: %@, percentageAmount: %@, validDays: %@, status: %@",_identifier,_company,_title,_longDescription,_shortDescription,_actualUses,_gift,_logoUrl,_brandLogoUrl,_startDate,_endDate,_products,_giftProducts,_type,_fixedAmount,_percentageAmount,_validDays, _status];
 
 }
     @end
