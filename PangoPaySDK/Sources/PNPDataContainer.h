@@ -488,6 +488,29 @@
 
 @end
 
+@interface PNPOrderLine : NSObject
+@property (strong,nonatomic) NSNumber *identifier;
+@property (strong,nonatomic) NSString *name;
+@property (strong,nonatomic) NSNumber *amount;
+@property (strong,nonatomic) NSNumber *netAmount;
+@property (strong,nonatomic) NSNumber *orderId;
+@property (strong,nonatomic) NSNumber *number;
+@property (strong,nonatomic) NSNumber *refunded;
+@property (strong,nonatomic) NSString *type;
+@property (strong,nonatomic) NSNumber *externalId;
+
+-(id) initWithIdentifier:(NSNumber *) identifier
+                   name:(NSString *) name
+                  amount:(NSNumber *) amount
+               netAmount:(NSNumber *) netAmount
+                 orderId:(NSNumber *) orderId
+                  number:(NSNumber *) number
+                refunded:(NSNumber *) refunded
+                    type:(NSString *) type
+              externalId:(NSNumber *) externalId;
+
+@end
+
 #define PNPCommerceOrderStatusOk @"AC"
 #define PNPCommerceOrderStatusCancelled @"CA"
 

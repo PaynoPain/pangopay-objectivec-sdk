@@ -1196,6 +1196,36 @@
 }
 @end
 
+@implementation PNPOrderLine
+
+-(id) initWithIdentifier:(NSNumber *) identifier
+                   name:(NSString *) name
+                  amount:(NSNumber *) amount
+               netAmount:(NSNumber *) netAmount
+                 orderId:(NSNumber *) orderId
+                  number:(NSNumber *) number
+                refunded:(NSNumber *) refunded
+                    type:(NSString *)type
+              externalId:(NSNumber *)externalId{
+    self = [super init];
+    if(!self) return nil;
+    self.identifier = identifier;
+    self.name = name;
+    self.amount = amount;
+    self.netAmount = netAmount;
+    self.orderId = orderId;
+    self.number = number;
+    self.refunded = refunded;
+    self.type = type;
+    self.externalId = externalId;
+    return self;
+}
+-(NSString *) description{
+    return [NSString stringWithFormat:@"\n ID: %@ \n Name: %@ Amount: %@ \n NetAmount: %@ \n OrderId: %@ \n number: %@ refunded:%@ type:%@ externalId: %@\n ",_identifier,_name,_amount,_netAmount,_orderId,_number,_refunded,_type,_externalId];
+}
+
+@end
+
 @implementation PNPCommerceOrder
 
 -(id) initWithIdentifier:(NSNumber *) identifier
