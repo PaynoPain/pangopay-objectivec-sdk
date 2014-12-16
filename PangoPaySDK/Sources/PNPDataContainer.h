@@ -495,7 +495,7 @@
 @property (strong,nonatomic) NSNumber *netAmount;
 @property (strong,nonatomic) NSNumber *orderId;
 @property (strong,nonatomic) NSNumber *number;
-@property (strong,nonatomic) NSNumber *refunded;
+@property BOOL refunded;
 @property (strong,nonatomic) NSString *type;
 @property (strong,nonatomic) NSNumber *externalId;
 
@@ -505,7 +505,7 @@
                netAmount:(NSNumber *) netAmount
                  orderId:(NSNumber *) orderId
                   number:(NSNumber *) number
-                refunded:(NSNumber *) refunded
+                refunded:(BOOL) refunded
                     type:(NSString *) type
               externalId:(NSNumber *) externalId;
 
@@ -526,6 +526,7 @@
 
 @property (strong,nonatomic) NSNumber *amount;
 @property (strong,nonatomic) NSNumber *netAmount;
+@property (strong,nonatomic) NSNumber *refundAmount;
 @property (strong,nonatomic) NSString *currencySymbol;
 
 @property (strong,nonatomic) NSString *mail;
@@ -543,6 +544,7 @@
                   status:(NSString *) status
                   amount:(NSNumber *) amount
                netAmount:(NSNumber *) netAmount
+               refundAmount:(NSNumber *) refundAmount
           currencySymbol:(NSString *) currencySymbol
                     mail:(NSString *) mail
                   userId:(NSNumber *) userId
@@ -562,6 +564,7 @@
 @property (strong,nonatomic) NSNumber *identifier;
 @property (strong,nonatomic) NSNumber *amount;
 @property (strong,nonatomic) NSNumber *netAmount;
+@property (strong,nonatomic) NSNumber *refundAmount;
 @property (strong,nonatomic) NSString *mail;
 @property (strong,nonatomic) NSArray *orderLines;
 @property (strong,nonatomic) NSString *type;

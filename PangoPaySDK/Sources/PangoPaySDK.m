@@ -3727,12 +3727,23 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    return;
                                }
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   
+                                   NSLog(@"%@",responseDictionary);
+                                   
                                    NSMutableArray *orders = [NSMutableArray new];
                                    for (NSDictionary *d in [responseDictionary objectForKey:@"data"]) {
 
                                        NSDictionary *orderDic = [d objectForKey:@"order"];
                                        NSDictionary *payerDic = [orderDic objectForKey:@"payer"];
                                        NSArray *orderLines = [d objectForKey:@"order_lines"];
+                                       
+                                       NSMutableArray *parsedOrderLines = [NSMutableArray new];
+
+                                       for (NSDictionary *d in orderLines) {
+                                           PNPOrderLine *o = [[PNPOrderLine alloc] initWithIdentifier:[d objectForKey:@"id"] name:[d objectForKey:@"name"] amount:[self clearAmount:[d objectForKey:@"amount"]] netAmount:[self clearAmount:[d objectForKey:@"net_amount"]] orderId:[d objectForKey:@"order_id"] number:[d objectForKey:@"amount"] refunded:[[d objectForKey:@"refunded"] boolValue] type:[d objectForKey:@"type"] externalId:[d objectForKey:@"external_id"]];
+                                           [parsedOrderLines addObject:o];
+                                       }
+                                       
                                        NSDateFormatter *df = [[NSDateFormatter alloc] init];
                                        [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
                                        [df setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
@@ -3740,7 +3751,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                            payerDic = [NSDictionary new];
                                        }
                                        
-                                       PNPCommerceOrder *o = [[PNPCommerceOrder alloc] initWithIdentifier:[orderDic objectForKey:@"id"] reference:[orderDic objectForKey:@"reference"] type:[orderDic objectForKey:@"type"] concept:[orderDic objectForKey:@"concept"] status:[orderDic objectForKey:@"status"] amount:[self clearAmount:[orderDic objectForKey:@"amount"]] netAmount:[self clearAmount:[orderDic objectForKey:@"net_amount"]] currencySymbol:[[orderDic objectForKey:@"currency"] objectForKey:@"symbol"] mail:[payerDic objectForKey:@"mail"] userId:[payerDic objectForKey:@"user_id"] name:[payerDic objectForKey:@"name"] surname:[payerDic objectForKey:@"surname"] prefix:[payerDic objectForKey:@"prefix"] phone:[payerDic objectForKey:@"phone"] created:[df dateFromString:[orderDic objectForKey:@"created"]] orderLines:orderLines];
+                                       PNPCommerceOrder *o = [[PNPCommerceOrder alloc] initWithIdentifier:[orderDic objectForKey:@"id"] reference:[orderDic objectForKey:@"reference"] type:[orderDic objectForKey:@"type"] concept:[orderDic objectForKey:@"concept"] status:[orderDic objectForKey:@"status"] amount:[self clearAmount:[orderDic objectForKey:@"amount"]] netAmount:[self clearAmount:[orderDic objectForKey:@"net_amount"]] refundAmount:[self clearAmount:[orderDic objectForKey:@"refund_amount"]] currencySymbol:[[orderDic objectForKey:@"currency"] objectForKey:@"symbol"] mail:[payerDic objectForKey:@"mail"] userId:[payerDic objectForKey:@"user_id"] name:[payerDic objectForKey:@"name"] surname:[payerDic objectForKey:@"surname"] prefix:[payerDic objectForKey:@"prefix"] phone:[payerDic objectForKey:@"phone"] created:[df dateFromString:[orderDic objectForKey:@"created"]] orderLines:parsedOrderLines];
                                        [orders addObject:o];
                                        if(successHandler) successHandler(orders);
                                    }
@@ -4239,7 +4250,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    [df setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
                                    NSDictionary *payerDic = [orderDic objectForKey:@"payer"];
                                    NSLog(@"%@",payerDic);
-                                   PNPCommerceOrder *o = [[PNPCommerceOrder alloc] initWithIdentifier:[orderDic objectForKey:@"id"] reference:[orderDic objectForKey:@"reference"] type:[orderDic objectForKey:@"type"] concept:[orderDic objectForKey:@"concept"] status:[orderDic objectForKey:@"status"] amount:[self clearAmount:[orderDic objectForKey:@"amount"]] netAmount:[self clearAmount:[orderDic objectForKey:@"net_amount"]] currencySymbol:[[orderDic objectForKey:@"currency"] objectForKey:@"symbol"] mail:[payerDic objectForKey:@"mail"] userId:[payerDic objectForKey:@"user_id"] name:[payerDic objectForKey:@"name"] surname:[payerDic objectForKey:@"surname"] prefix:[payerDic objectForKey:@"prefix"] phone:[payerDic objectForKey:@"phone"] created:[df dateFromString:[orderDic objectForKey:@"created"]] orderLines:[[[responseDictionary objectForKey:@"data"] objectAtIndex:0] objectForKey:@"order_lines"]];
+                                   PNPCommerceOrder *o = [[PNPCommerceOrder alloc] initWithIdentifier:[orderDic objectForKey:@"id"] reference:[orderDic objectForKey:@"reference"] type:[orderDic objectForKey:@"type"] concept:[orderDic objectForKey:@"concept"] status:[orderDic objectForKey:@"status"] amount:[self clearAmount:[orderDic objectForKey:@"amount"]] netAmount:[self clearAmount:[orderDic objectForKey:@"net_amount"]] refundAmount:[self clearAmount:[orderDic objectForKey:@"refund_amount"]] currencySymbol:[[orderDic objectForKey:@"currency"] objectForKey:@"symbol"] mail:[payerDic objectForKey:@"mail"] userId:[payerDic objectForKey:@"user_id"] name:[payerDic objectForKey:@"name"] surname:[payerDic objectForKey:@"surname"] prefix:[payerDic objectForKey:@"prefix"] phone:[payerDic objectForKey:@"phone"] created:[df dateFromString:[orderDic objectForKey:@"created"]] orderLines:[[[responseDictionary objectForKey:@"data"] objectAtIndex:0] objectForKey:@"order_lines"]];
                                    if(successHandler) successHandler(o);
                                }else{
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]

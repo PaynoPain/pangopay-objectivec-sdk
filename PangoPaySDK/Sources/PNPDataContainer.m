@@ -1204,7 +1204,7 @@
                netAmount:(NSNumber *) netAmount
                  orderId:(NSNumber *) orderId
                   number:(NSNumber *) number
-                refunded:(NSNumber *) refunded
+                refunded:(BOOL) refunded
                     type:(NSString *)type
               externalId:(NSNumber *)externalId{
     self = [super init];
@@ -1235,6 +1235,7 @@
                   status:(NSString *) status
                   amount:(NSNumber *) amount
                netAmount:(NSNumber *) netAmount
+               refundAmount:(NSNumber *) refundAmount
           currencySymbol:(NSString *) currencySymbol
                     mail:(NSString *) mail
                   userId:(NSNumber *) userId
@@ -1253,6 +1254,7 @@
     self.status = status;
     self.amount = amount;
     self.netAmount = netAmount;
+    self.refundAmount = refundAmount;
     self.currencySymbol = currencySymbol;
     self.mail = mail;
     self.userId = userId;
