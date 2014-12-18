@@ -3740,7 +3740,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                        NSMutableArray *parsedOrderLines = [NSMutableArray new];
 
                                        for (NSDictionary *d in orderLines) {
-                                           PNPOrderLine *o = [[PNPOrderLine alloc] initWithIdentifier:[d objectForKey:@"id"] name:[d objectForKey:@"name"] amount:[self clearAmount:[d objectForKey:@"amount"]] netAmount:[self clearAmount:[d objectForKey:@"net_amount"]] orderId:[d objectForKey:@"order_id"] number:[d objectForKey:@"amount"] refunded:[[d objectForKey:@"refunded"] boolValue] type:[d objectForKey:@"type"] externalId:[d objectForKey:@"external_id"]];
+                                           PNPOrderLine *o = [[PNPOrderLine alloc] initWithIdentifier:[d objectForKey:@"id"] name:[d objectForKey:@"name"] amount:[self clearAmount:[d objectForKey:@"amount"]] netAmount:[self clearAmount:[d objectForKey:@"net_amount"]] orderId:[d objectForKey:@"order_id"] number:[d objectForKey:@"number"] refunded:[[d objectForKey:@"refunded"] boolValue] type:[d objectForKey:@"type"] externalId:[d objectForKey:@"external_id"]];
                                            [parsedOrderLines addObject:o];
                                        }
                                        
@@ -4033,7 +4033,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                           type:(NSString *) type
            withSuccessCallback:(PnPSuccessStringHandler) successHandler
               andErrorCallback:(PnPGenericErrorHandler) errorHandler{
-    
+
     if(![self userIsLoggedIn]){
         NSLog(@"No user logged in.");
         return;
@@ -4049,6 +4049,11 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
         if([c.product.getPrice floatValue] > 0){
             NSMutableDictionary *oLine = [NSMutableDictionary new];
             [oLine setObject:[NSNumber numberWithDouble:[[c.product getPrice] doubleValue] * 100] forKey:@"amount"];
+            double discount = [[[c getDiscount] getPrice] doubleValue];
+            double netAmount = [[c.product getPrice] doubleValue] - discount;
+            double totalDiscount = netAmount * [[[cart getDiscount] getDiscountPercentage] doubleValue]/100;
+            netAmount -=totalDiscount ;
+            [oLine setObject:[NSString stringWithFormat:@"%.0f",netAmount*100] forKey:@"net_amount"];
             [oLine setObject:@"product" forKey:@"type"];
             [oLine setObject:c.product.descr forKey:@"name"];
             if(c.product.externalId){

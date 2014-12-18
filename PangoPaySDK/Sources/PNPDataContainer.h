@@ -488,7 +488,7 @@
 
 @end
 
-@interface PNPOrderLine : NSObject
+@interface PNPOrderLine : NSObject <NSCopying>
 @property (strong,nonatomic) NSNumber *identifier;
 @property (strong,nonatomic) NSString *name;
 @property (strong,nonatomic) NSNumber *amount;
