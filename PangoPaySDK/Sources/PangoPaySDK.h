@@ -414,6 +414,12 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 withSuccessCallback:(PnPSuccessHandler) successHandler
    andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
+
+-(void) refundOrderLines:(NSNumber *) orderId
+              orderLines:(NSArray *) orderLines
+                  amount:(NSNumber *) amount
+     withSuccessCallback:(PnPSuccessHandler) successHandler
+        andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 #pragma mark - Wallet
 -(void) rechargeWalletWithAmount:(NSNumber *) amount
 							 pin:(NSString*) pin
