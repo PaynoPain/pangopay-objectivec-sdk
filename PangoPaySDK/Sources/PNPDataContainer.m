@@ -1223,7 +1223,7 @@
 
 
 -(NSString *) description{
-    return [NSString stringWithFormat:@"\n ID: %@ \n Name: %@ Amount: %@ \n NetAmount: %@ \n OrderId: %@ \n number: %@ refunded:%@ type:%@ externalId: %@\n ",_identifier,_name,_amount,_netAmount,_orderId,_number,_refunded,_type,_externalId];
+    return [NSString stringWithFormat:@"\n ID: %@ \n Name: %@ Amount: %@ \n NetAmount: %@ \n OrderId: %@ \n number: %@ refunded:%hhd type:%@ externalId: %@\n ",_identifier,_name,_amount,_netAmount,_orderId,_number,_refunded,_type,_externalId];
 }
 
 @end
