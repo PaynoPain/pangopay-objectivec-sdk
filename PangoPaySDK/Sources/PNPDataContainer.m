@@ -1220,6 +1220,8 @@
     self.externalId = externalId;
     return self;
 }
+
+
 -(NSString *) description{
     return [NSString stringWithFormat:@"\n ID: %@ \n Name: %@ Amount: %@ \n NetAmount: %@ \n OrderId: %@ \n number: %@ refunded:%@ type:%@ externalId: %@\n ",_identifier,_name,_amount,_netAmount,_orderId,_number,_refunded,_type,_externalId];
 }
@@ -1313,7 +1315,7 @@
 }
 
 -(NSString *) description{
-    return [NSString stringWithFormat:@"\nID: %@ \n Reference: %@ mail: %@ \n userId: %@ \n name: %@ \n surname: %@ \n Prefix: %@ \n Phone: %@ \n Created: %@",_identifier,_reference,_mail,_userId,_name,_surname,_prefix,_phone,_created];
+    return [NSString stringWithFormat:@"\n ID: %@ \n Reference: %@ \n Mail: %@ \n UserId: %@ \n name: %@ \n surname: %@ \n Prefix: %@ \n Phone: %@ \n Status: %@ \n Created: %@",_identifier,_reference,_mail,_userId,_name,_surname,_prefix,_phone,_status,_created];
 }
 
 
@@ -1353,7 +1355,6 @@
 -(id) initWithCoder:(NSCoder *)aDecoder{
     self = [super  init];
     if(!self) return nil;
-    
     self.identifier = [aDecoder decodeObjectForKey:@"identifier"];
     self.commerceName = [aDecoder decodeObjectForKey:@"commerceName"];
     self.concept = [aDecoder decodeObjectForKey:@"concept"];
