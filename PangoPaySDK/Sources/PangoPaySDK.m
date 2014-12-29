@@ -3708,7 +3708,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     }
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"orders/get_orders"]
-                   usingParameters: nil
+                   usingParameters: @{@"limit":[NSNumber numberWithInt:limit],@"page":[NSNumber numberWithInt:page]}
                        withAccount:self.userAccount
                            timeout:PNP_REQUEST_TIMEOUT
                sendProgressHandler:nil
@@ -3752,8 +3752,9 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                        
                                        PNPCommerceOrder *o = [[PNPCommerceOrder alloc] initWithIdentifier:[orderDic objectForKey:@"id"] reference:[orderDic objectForKey:@"reference"] type:[orderDic objectForKey:@"type"] concept:[orderDic objectForKey:@"concept"] status:[orderDic objectForKey:@"status"] amount:[self clearAmount:[orderDic objectForKey:@"amount"]] netAmount:[self clearAmount:[orderDic objectForKey:@"net_amount"]] refundAmount:[self clearAmount:[orderDic objectForKey:@"refund_amount"]] currencySymbol:[[orderDic objectForKey:@"currency"] objectForKey:@"symbol"] mail:[payerDic objectForKey:@"mail"] userId:[payerDic objectForKey:@"user_id"] name:[payerDic objectForKey:@"name"] surname:[payerDic objectForKey:@"surname"] prefix:[payerDic objectForKey:@"prefix"] phone:[payerDic objectForKey:@"phone"] created:[df dateFromString:[orderDic objectForKey:@"created"]] orderLines:parsedOrderLines];
                                        [orders addObject:o];
-                                       if(successHandler) successHandler(orders);
                                    }
+                                   if(successHandler) successHandler(orders);
+
                                }else{
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
