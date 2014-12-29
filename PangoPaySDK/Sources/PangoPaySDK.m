@@ -4482,6 +4482,87 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 }
 
+-(void) refundOrderLines:(NSNumber *) orderId
+              orderLines:(NSArray *) orderLines
+                  amount:(NSNumber *) amount
+withSuccessCallback:(PnPSuccessHandler) successHandler
+   andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+    amount = [NSNumber numberWithDouble:[amount doubleValue]*100];
+    NSMutableArray *ol = [NSMutableArray new];
+   
+    
+    for (PNPOrderLine * o in orderLines) {
+        NSMutableDictionary *oLine = [NSMutableDictionary new];
+        [oLine setObject:[NSNumber numberWithInt:o.externalId.intValue] forKey:@"external_id"];
+        [oLine setObject:o.type forKey:@"type"];
+        [oLine setObject:o.name forKey:@"name"];
+        [oLine setObject:[NSNumber numberWithDouble:[o.amount doubleValue]*100]  forKey:@"amount"];
+        [oLine setObject:[NSNumber numberWithDouble:[o.netAmount doubleValue]*100]  forKey:@"net_amount"];
+        [oLine setObject:[NSNumber numberWithInt:o.orderId.intValue]  forKey:@"order_id"];
+        [oLine setObject:[NSNumber numberWithInt:o.number.intValue]  forKey:@"number"];
+        [oLine setObject:[NSString stringWithFormat:@"%hhd",o.refunded] forKey:@"refunded"];
+        [ol addObject:oLine];
+    }
+    NSError *jerror;
+    NSString *jOrderLines = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:ol
+                                                                                           options:0
+                                                                                             error:&jerror]
+                                                  encoding:NSUTF8StringEncoding];
+
+        [NXOAuth2Request performMethod:@"POST"
+                            onResource:[self generateUrl:@"orders/cancel"]
+                       usingParameters: @{@"order_id":orderId,@"amount":amount,@"lines":jOrderLines}
+                           withAccount:self.userAccount
+                               timeout:PNP_REQUEST_TIMEOUT
+                   sendProgressHandler:nil
+                       responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
+                           
+                           if(!error){
+                               @try {
+                                   NSError *parseError;
+                                   NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                       options:0
+                                                                                                         error:&parseError]
+                                                                       objectForKey:@"cancel"];
+                                   if(parseError){
+                                       if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                          code:[parseError code]
+                                                                                                      userInfo:parseError.userInfo]);
+                                       return;
+                                   }
+                                   
+                                   if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                       
+                                       if(successHandler) successHandler();
+                                       
+                                   }else{
+                                       if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                     initWithDomain:@"PNPGenericWebserviceError"
+                                                                     code:-6060
+                                                                     userInfo:responseDictionary]);
+                                   }
+                               }
+                               @catch (NSException *exception) {
+                                   NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                                   if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                                  initWithDomain:@"PNPMalformedJson"
+                                                                  code:-2020
+                                                                  userInfo:nil]);
+                               }
+                           }else{
+                               if(errorHandler)errorHandler([self handleErrors:error]);
+                           }
+                       }];
+        
+    }
+
 #pragma mark - Wallet
 -(void) rechargeWalletWithAmount:(NSNumber *) amount
 							 pin:(NSString*) pin
