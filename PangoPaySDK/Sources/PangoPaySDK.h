@@ -224,7 +224,9 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
    errorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) getCommerceOrdersWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
-                               errorCallback:(PnPGenericErrorHandler) errorHandler;
+                               errorCallback:(PnPGenericErrorHandler) errorHandler
+                                       limit:(int) limit
+                                        page:(int) page;
 
 
 #pragma mark - Notification Methods
@@ -401,6 +403,10 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 -(void) checkIfOrderIsPaid:(NSString *) orderReference
        withSuccessCallback:(PnPCommerceOrderSuccessHandler) successHandler
           andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) getCommerceOrderWithReference:(NSString *) identifier
+                  withSuccessCallback:(PnPCommerceOrderSuccessHandler)successHandler
+                        errorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) sendMailForOrder:(NSString *) orderReference
                   toMail:(NSString *) mail
