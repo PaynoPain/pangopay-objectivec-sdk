@@ -224,7 +224,9 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
    errorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) getCommerceOrdersWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
-                               errorCallback:(PnPGenericErrorHandler) errorHandler;
+                               errorCallback:(PnPGenericErrorHandler) errorHandler
+                                       limit:(int) limit
+                                        page:(int) page;
 
 
 #pragma mark - Notification Methods
