@@ -606,6 +606,10 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 @end
 
+@interface PNPTestEnvironment : PNPEnvironment
+
+@end
+
 
 
 

@@ -7029,4 +7029,13 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 @end
 
+@implementation PNPTestEnvironment
+
+-(id) init{
+    self=[super initWithUrl:[NSURL URLWithString:@"https://test-core.paynopain.com"]];
+    return self;
+}
+
+@end
+
 
