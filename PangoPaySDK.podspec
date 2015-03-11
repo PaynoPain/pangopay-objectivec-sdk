@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name              = 'PangoPaySDK'
-    s.version           = '0.7.7'
+    s.version           = '0.7.8'
     s.summary           = 'PangoPay connection and caching interface.'
     s.homepage          = 'https://github.com/PaynoPain/pangopay-objectivec-sdk'
     s.license           = {
