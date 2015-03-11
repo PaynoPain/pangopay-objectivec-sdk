@@ -7005,7 +7005,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 @implementation PNPSandboxEnvironment
 
 -(id) init{
-    self = [super initWithUrl:[NSURL URLWithString:@"https://demo-core.paynopain.com"]];
+    self = [super initWithUrl:[NSURL URLWithString:@"https://demo-aywant-core.paynopain.com"]];
     return self;
 }
 
