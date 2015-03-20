@@ -404,7 +404,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
        withSuccessCallback:(PnPCommerceOrderSuccessHandler) successHandler
           andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
--(void) getCommerceOrderWithReference:(NSString *) identifier
+-(void) getCommerceOrderWithIdentifier:(NSNumber *) identifier
                   withSuccessCallback:(PnPCommerceOrderSuccessHandler)successHandler
                         errorCallback:(PnPGenericErrorHandler) errorHandler;
 
@@ -421,9 +421,8 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
    andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 
--(void) refundOrderLines:(NSNumber *) orderId
-              orderLines:(NSArray *) orderLines
-                  amount:(NSNumber *) amount
+-(void) refundOrderLines:(PNPCommerceOrder *) order
+       andRefundedAmount:(NSNumber *) refundedAmount
      withSuccessCallback:(PnPSuccessHandler) successHandler
         andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 #pragma mark - Wallet

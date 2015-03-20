@@ -4064,7 +4064,8 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
             oLine = [NSMutableDictionary new];
             if([c getDiscount]){
                 [oLine setObject:@"discount" forKey:@"type"];
-                [oLine setObject:[NSNumber numberWithDouble:[[[c getDiscount] getPrice] doubleValue] * 100] forKey:@"amount"];
+                [oLine setObject:[NSNumber numberWithDouble:[[[c getDiscount] getPrice] doubleValue] * 100] forKey:@"net_amount"];
+                [oLine setObject:[NSNumber numberWithDouble:[[c.product getPrice] doubleValue] * 100] forKey:@"amount"];
                 [oLine setObject:[NSNumber numberWithDouble:[[[c getDiscount] getDiscountPercentage] doubleValue] * 100] forKey:@"number"];
                 [oLine setObject:[NSString stringWithFormat:NSLocalizedString(@"Descuento aplicado al producto %@",nil),c.product.name] forKey:@"name"];
                 [orderLines addObject:oLine];
@@ -4109,7 +4110,8 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
     oLine = [NSMutableDictionary new];
     if([cart getDiscount]){
         [oLine setObject:@"discount" forKey:@"type"];
-        [oLine setObject:[NSNumber numberWithDouble:[[[cart getDiscount] getPrice] doubleValue] * 100] forKey:@"amount"];
+        [oLine setObject:[NSNumber numberWithDouble:[[[cart getDiscount] getPrice] doubleValue] * 100] forKey:@"net_amount"];
+        [oLine setObject:[NSNumber numberWithDouble:[[cart getPrice] doubleValue] * 100] forKey:@"amount"];
         [oLine setObject:[NSNumber numberWithDouble:[[[cart getDiscount] getDiscountPercentage] doubleValue] * 100] forKey:@"number"];
         [oLine setObject:NSLocalizedString(@"Descuento aplicado a la compra",nil) forKey:@"name"];
         [orderLines addObject:oLine]; 
@@ -4262,7 +4264,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 }
 
     
--(void) getCommerceOrderWithReference:(NSNumber *) identifier
+-(void) getCommerceOrderWithIdentifier:(NSNumber *) identifier
           withSuccessCallback:(PnPCommerceOrderSuccessHandler)successHandler
                 errorCallback:(PnPGenericErrorHandler) errorHandler{
     
@@ -4270,7 +4272,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
         NSLog(@"No user logged in.");
         return;
     }
-    
+   
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"orders/get_orders"]
                    usingParameters:@{@"id":identifier}
@@ -4278,7 +4280,6 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                            timeout:PNP_REQUEST_TIMEOUT
                sendProgressHandler:nil
                    responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
-                       NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
                        if(!error){
                            @try {
                                NSError *parseError;
@@ -4293,27 +4294,25 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                    return;
                                }
                                if([[responseDictionary objectForKey:@"success"] boolValue]){
-                                   NSMutableArray *orders = [NSMutableArray new];
-                                   NSDictionary *d = [responseDictionary objectForKey:@"data"];
-                                   NSDictionary *orderDic = [d objectForKey:@"order"];
-                                   NSDictionary *payerDic = [orderDic objectForKey:@"payer"];
-                                   NSArray *orderLines = [d objectForKey:@"order_lines"];
-                                   NSMutableArray *parsedOrderLines = [NSMutableArray new];
-                                   for (NSDictionary *d in orderLines) {
-                                           PNPOrderLine *o = [[PNPOrderLine alloc] initWithIdentifier:[d objectForKey:@"id"] name:[d objectForKey:@"name"] amount:[self clearAmount:[d objectForKey:@"amount"]] netAmount:[self clearAmount:[d objectForKey:@"net_amount"]] orderId:[d objectForKey:@"order_id"] number:[d objectForKey:@"number"] refunded:[[d objectForKey:@"refunded"] boolValue] type:[d objectForKey:@"type"] externalId:[d objectForKey:@"external_id"]];
-                                           [parsedOrderLines addObject:o];
-                                    }
-                                    NSDateFormatter *df = [[NSDateFormatter alloc] init];
-                                    [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-                                    [df setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
-                                    if([payerDic isKindOfClass:[NSArray class]]){
-                                        payerDic = [NSDictionary new];
-                                    }
+                                   for(NSDictionary *d in [responseDictionary objectForKey:@"data"]){
+                                       NSDictionary *orderDic = [d objectForKey:@"order"];
+                                       NSDictionary *payerDic = [orderDic objectForKey:@"payer"];
+                                       NSArray *orderLines = [d objectForKey:@"order_lines"];
+                                       NSMutableArray *parsedOrderLines = [NSMutableArray new];
+                                       for (NSDictionary *d in orderLines) {
+                                            PNPOrderLine *o = [[PNPOrderLine alloc] initWithIdentifier:[d objectForKey:@"id"] name:[d objectForKey:@"name"] amount:[self clearAmount:[d objectForKey:@"amount"]] netAmount:[self clearAmount:[d objectForKey:@"net_amount"]] orderId:[d objectForKey:@"order_id"] number:[d objectForKey:@"number"] refunded:[[d objectForKey:@"refunded"] boolValue] type:[d objectForKey:@"type"] externalId:[d objectForKey:@"external_id"]];
+                                            [parsedOrderLines addObject:o];
+                                       }
+                                       NSDateFormatter *df = [[NSDateFormatter alloc] init];
+                                       [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+                                       [df setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
+                                       if([payerDic isKindOfClass:[NSArray class]]){
+                                           payerDic = [NSDictionary new];
+                                       }
                                    
-                                    PNPCommerceOrder *o = [[PNPCommerceOrder alloc] initWithIdentifier:[orderDic objectForKey:@"id"] reference:[orderDic objectForKey:@"reference"] type:[orderDic objectForKey:@"type"] concept:[orderDic objectForKey:@"concept"] status:[orderDic objectForKey:@"status"] amount:[self clearAmount:[orderDic objectForKey:@"amount"]] netAmount:[self clearAmount:[orderDic objectForKey:@"net_amount"]] refundAmount:[self clearAmount:[orderDic objectForKey:@"refund_amount"]] currencySymbol:[[orderDic objectForKey:@"currency"] objectForKey:@"symbol"] mail:[payerDic objectForKey:@"mail"] userId:[payerDic objectForKey:@"user_id"] name:[payerDic objectForKey:@"name"] surname:[payerDic objectForKey:@"surname"] prefix:[payerDic objectForKey:@"prefix"] phone:[payerDic objectForKey:@"phone"] created:[df dateFromString:[orderDic objectForKey:@"created"]] orderLines:parsedOrderLines];
-                                       [orders addObject:o];
-                                    if(successHandler) successHandler(o);
-                                   
+                                       PNPCommerceOrder *o = [[PNPCommerceOrder alloc] initWithIdentifier:[orderDic objectForKey:@"id"] reference:[orderDic objectForKey:@"reference"] type:[orderDic objectForKey:@"type"] concept:[orderDic objectForKey:@"concept"] status:[orderDic objectForKey:@"status"] amount:[self clearAmount:[orderDic objectForKey:@"amount"]] netAmount:[self clearAmount:[orderDic objectForKey:@"net_amount"]] refundAmount:[self clearAmount:[orderDic objectForKey:@"refund_amount"]] currencySymbol:[[orderDic objectForKey:@"currency"] objectForKey:@"symbol"] mail:[payerDic objectForKey:@"mail"] userId:[payerDic objectForKey:@"user_id"] name:[payerDic objectForKey:@"name"] surname:[payerDic objectForKey:@"surname"] prefix:[payerDic objectForKey:@"prefix"] phone:[payerDic objectForKey:@"phone"] created:[df dateFromString:[orderDic objectForKey:@"created"]] orderLines:parsedOrderLines];
+                                       if(successHandler) successHandler(o);
+                                   }
                                }else{
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
@@ -4556,9 +4555,8 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 }
 
--(void) refundOrderLines:(NSNumber *) orderId
-              orderLines:(NSArray *) orderLines
-                  amount:(NSNumber *) amount
+-(void) refundOrderLines:(PNPCommerceOrder *) order
+       andRefundedAmount:(NSNumber *) refundedAmount
 withSuccessCallback:(PnPSuccessHandler) successHandler
    andErrorCallback:(PnPGenericErrorHandler) errorHandler{
     
@@ -4568,11 +4566,13 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
         return;
     }
     
-    amount = [NSNumber numberWithDouble:[amount doubleValue]*100];
-    NSMutableArray *ol = [NSMutableArray new];
-   
+    refundedAmount = [NSNumber numberWithDouble:[refundedAmount doubleValue]*100];
+
     
-    for (PNPOrderLine * o in orderLines) {
+    
+    NSMutableArray *orderLines = [NSMutableArray new];
+
+    for (PNPOrderLine * o in order.orderLines) {
         NSMutableDictionary *oLine = [NSMutableDictionary new];
         [oLine setObject:[NSNumber numberWithInt:o.externalId.intValue] forKey:@"external_id"];
         [oLine setObject:o.type forKey:@"type"];
@@ -4582,57 +4582,57 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
         [oLine setObject:[NSNumber numberWithInt:o.orderId.intValue]  forKey:@"order_id"];
         [oLine setObject:[NSNumber numberWithInt:o.number.intValue]  forKey:@"number"];
         [oLine setObject:[NSString stringWithFormat:@"%hhd",o.refunded] forKey:@"refunded"];
-        [ol addObject:oLine];
+        [orderLines addObject:oLine];
     }
     NSError *jerror;
-    NSString *jOrderLines = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:ol
+    NSString *jOrderLines = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:orderLines
                                                                                            options:0
                                                                                              error:&jerror]
                                                   encoding:NSUTF8StringEncoding];
-
-        [NXOAuth2Request performMethod:@"POST"
-                            onResource:[self generateUrl:@"orders/cancel"]
-                       usingParameters: @{@"order_id":orderId,@"amount":amount,@"lines":jOrderLines}
-                           withAccount:self.userAccount
-                               timeout:PNP_REQUEST_TIMEOUT
-                   sendProgressHandler:nil
-                       responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"orders/cancel"]
+                    usingParameters: @{@"order_id":order.identifier,@"amount":refundedAmount,@"lines":jOrderLines}
+                        withAccount:self.userAccount
+                            timeout:PNP_REQUEST_TIMEOUT
+                sendProgressHandler:nil
+                    responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
                            
-                           if(!error){
-                               @try {
-                                   NSError *parseError;
-                                   NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
-                                                                                                       options:0
-                                                                                                         error:&parseError]
-                                                                       objectForKey:@"cancel"];
-                                   if(parseError){
-                                       if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                        if(!error){
+                            @try {
+                                NSError *parseError;
+                                NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                    options:0
+                                                                                                      error:&parseError]
+                                                                                               objectForKey:@"cancel"];
+                                if(parseError){
+                                    if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
                                                                                                           code:[parseError code]
                                                                                                       userInfo:parseError.userInfo]);
-                                       return;
-                                   }
+                                    return;
+                                }
                                    
-                                   if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                if([[responseDictionary objectForKey:@"success"] boolValue]){
                                        
-                                       if(successHandler) successHandler();
+                                    if(successHandler) successHandler();
                                        
-                                   }else{
-                                       if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                }else{
+                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                      initWithDomain:@"PNPGenericWebserviceError"
                                                                      code:-6060
                                                                      userInfo:responseDictionary]);
                                    }
                                }
-                               @catch (NSException *exception) {
+                            @catch (NSException *exception) {
                                    NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
                                    if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
                                                                   initWithDomain:@"PNPMalformedJson"
                                                                   code:-2020
                                                                   userInfo:nil]);
                                }
-                           }else{
-                               if(errorHandler)errorHandler([self handleErrors:error]);
-                           }
+                        }else{
+                            if(errorHandler)errorHandler([self handleErrors:error]);
+                        }
                        }];
         
     }

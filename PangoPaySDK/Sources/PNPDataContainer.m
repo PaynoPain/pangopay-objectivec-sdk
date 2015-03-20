@@ -1223,7 +1223,22 @@
 
 
 -(NSString *) description{
-    return [NSString stringWithFormat:@"\n ID: %@ \n Name: %@ Amount: %@ \n NetAmount: %@ \n OrderId: %@ \n number: %@ refunded:%hhd type:%@ externalId: %@\n ",_identifier,_name,_amount,_netAmount,_orderId,_number,_refunded,_type,_externalId];
+    return [NSString stringWithFormat:@"\n ID: %@ \n Name: %@ Amount: %@ \n NetAmount: %@ \n OrderId: %@ \n number: %@ refunded:%d type:%@ externalId: %@\n ",_identifier,_name,_amount,_netAmount,_orderId,_number,_refunded,_type,_externalId];
+}
+
+-(id)copyWithZone:(NSZone *)zone
+{
+    PNPOrderLine *newOrderLine = [[PNPOrderLine allocWithZone:zone] init];
+    newOrderLine.identifier = _identifier;
+    newOrderLine.name = _name ;
+    newOrderLine.amount = _amount ;
+    newOrderLine.netAmount = _netAmount ;
+    newOrderLine.orderId = _orderId ;
+    newOrderLine.number = _number ;
+    newOrderLine.type = _type ;
+    newOrderLine.externalId = _externalId ;
+    newOrderLine.refunded = self.refunded;
+    return newOrderLine;
 }
 
 @end
