@@ -4574,7 +4574,11 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
     for (PNPOrderLine * o in order.orderLines) {
         NSMutableDictionary *oLine = [NSMutableDictionary new];
-        [oLine setObject:[NSNumber numberWithInt:o.externalId.intValue] forKey:@"external_id"];
+        if(![o.externalId  isEqual: @""]){
+            [oLine setObject:[NSNumber numberWithInt:o.externalId.intValue] forKey:@"external_id"];
+        }else{
+            [oLine setObject:@"" forKey:@"external_id"];
+        }
         [oLine setObject:o.type forKey:@"type"];
         [oLine setObject:o.name forKey:@"name"];
         [oLine setObject:[NSNumber numberWithDouble:[o.amount doubleValue]*100]  forKey:@"amount"];
