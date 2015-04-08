@@ -315,6 +315,8 @@
 -(void) validatePinWithSuccessCallback:(NSString *)pin
                    withSuccessCallback:(PnPSuccessHandler)successHandler
                       andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+    NSLog(@"url: %@",[self generateUrl:@"users/validate_pin"]);
+    NSLog(@"user Account: %@",self.userAccount);
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"users/validate_pin"]
                    usingParameters:@{@"pin":pin}
@@ -324,6 +326,8 @@
                    responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
                        if(!error){
                            @try {
+                               NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                               
                                NSError *parseError;
                                NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
                                                                                                    options:0
@@ -345,7 +349,7 @@
                                }
                            }
                            @catch (NSException *exception) {
-                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               NSLog(@"func %s --> %@",__PRETTY_FUNCTION__,exception);
                                if(errorHandler) errorHandler([[PNPMalformedJsonError alloc] initWithDomain:@"PNPMalformedJson"
                                                                                                       code:-2020
                                                                                                   userInfo:nil]);
@@ -357,6 +361,8 @@
                        }
 
                    }];
+    
+    
 
 }
 
@@ -4090,7 +4096,9 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
             [oLine setObject:[NSString stringWithFormat:@"%@ %@",c.product.descr,NSLocalizedString(@"de regalo", nil)] forKey:@"name"];
             [oLine setObject:[c getQuantity] forKey:@"number"];
             [oLine setObject:@0 forKey:@"amount"];
-            [oLine setObject:c.product.externalId forKey:@"external_id"];
+            if(c.product.externalId){
+                [oLine setObject:c.product.externalId forKey:@"external_id"];
+            }
             [orderLines addObject:oLine];
         }
     }
@@ -4565,8 +4573,15 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
         NSLog(@"No user logged in.");
         return;
     }
-    
+    NSNumberFormatter *nf = [[NSNumberFormatter alloc] init];
+    nf.numberStyle = NSNumberFormatterCurrencyStyle;
+    [nf setCurrencySymbol:@""];
+    [nf setDecimalSeparator:@","];
+    [nf setGroupingSeparator:@"."];
+    [nf setLocale:[NSLocale localeWithLocaleIdentifier:@"es"]];
+    [nf setMaximumFractionDigits:2];
     refundedAmount = [NSNumber numberWithDouble:[refundedAmount doubleValue]*100];
+    refundedAmount = [nf numberFromString:[nf stringFromNumber:refundedAmount]];
 
     
     
@@ -4593,7 +4608,6 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                                                            options:0
                                                                                              error:&jerror]
                                                   encoding:NSUTF8StringEncoding];
-    
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"orders/cancel"]
                     usingParameters: @{@"order_id":order.identifier,@"amount":refundedAmount,@"lines":jOrderLines}

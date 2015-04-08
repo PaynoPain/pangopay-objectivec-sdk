@@ -57,10 +57,15 @@
     if(_discount == nil){
         return nil;
     }
-    _discount = [[Discount alloc] initWithBasePrice:[self getPriceWithoutGlobalDiscount] discount:[_discount getDiscountPercentage] comesFromCoupon:NO];
+   
+    _discount = [[Discount alloc] initWithBasePrice:[self getPriceWithoutGlobalDiscount] discount:[_discount getDiscountPercentage] coupon:_discount.coupon];
+    
     return _discount;
 }
 -(void)removeDiscount{
+    if(_discount.comesFromCoupon){
+        [_coupons removeObject:_discount.coupon];
+    }
     _discount = nil;
 }
 

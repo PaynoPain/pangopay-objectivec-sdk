@@ -498,6 +498,7 @@
 @property BOOL refunded;
 @property (strong,nonatomic) NSString *type;
 @property (strong,nonatomic) NSNumber *externalId;
+@property (strong,nonatomic) NSString *desc;
 
 -(id) initWithIdentifier:(NSNumber *) identifier
                    name:(NSString *) name
