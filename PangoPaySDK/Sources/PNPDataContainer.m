@@ -1571,7 +1571,9 @@
               actualUses:(NSNumber *) actualUses
                startDate:(NSDate *)startDate
                  endDate:(NSDate *)endDate
-                  status:(NSString *) status{
+                 created:(NSDate *)created
+                  status:(NSString *) status
+                    user:(NSString *) user{
     self= [super init];
     if(!self) return nil;
     _identifier = identifier;
@@ -1592,6 +1594,8 @@
     _startDate = startDate;
     _endDate = endDate;
     _company = company;
+    _user = user;
+    _created = created;
     return self;
 }
 -(BOOL) isEqual:(id)object{
@@ -1619,6 +1623,8 @@
     _status = [aDecoder decodeObjectForKey:@"status"];
     _startDate = [aDecoder decodeObjectForKey:@"startDate"];
     _endDate = [aDecoder decodeObjectForKey:@"endDate"];
+    _created = [aDecoder decodeObjectForKey:@"created"];
+    _user = [aDecoder decodeObjectForKey:@"user"];
     return self;
 }
 
@@ -1641,11 +1647,14 @@
     [aCoder encodeObject:_status forKey:@"status"];
     [aCoder encodeObject:_startDate forKey:@"startDate"];
     [aCoder encodeObject:_endDate forKey:@"endDate"];
+    [aCoder encodeObject:_created forKey:@"created"];
+    [aCoder encodeObject:_user forKey:@"user"];
+
 }
 
 
 -(NSString *) description{
-    return [NSString stringWithFormat:@"Id: %@, Company:%@, title: %@, longDescription: %@ , shortDescription:%@,actualUses:%@, gift:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ products: %@ , gift_products: %@ ,type:%@ ,fixedAmount: %@, percentageAmount: %@, validDays: %@, status: %@",_identifier,_company,_title,_longDescription,_shortDescription,_actualUses,_gift,_logoUrl,_brandLogoUrl,_startDate,_endDate,_products,_giftProducts,_type,_fixedAmount,_percentageAmount,_validDays, _status];
+    return [NSString stringWithFormat:@"Id: %@, Company:%@, title: %@, longDescription: %@ , shortDescription:%@,actualUses:%@, gift:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ products: %@ , gift_products: %@ ,type:%@ ,fixedAmount: %@, percentageAmount: %@, validDays: %@, status: %@, user: %@, created: %@",_identifier,_company,_title,_longDescription,_shortDescription,_actualUses,_gift,_logoUrl,_brandLogoUrl,_startDate,_endDate,_products,_giftProducts,_type,_fixedAmount,_percentageAmount,_validDays, _status, _user, _created];
 
 }
     @end

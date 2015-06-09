@@ -66,7 +66,8 @@
                            @"requestedRequests"         : @"pnprequestedrequests",
                            @"catalogue"                 : @"pnpcatalogue",
                            @"commerceOrders"            : @"pnpcommerceorders",
-                           @"userPromotions"            : @"pnpuserpromotions"
+                           @"userPromotions"            : @"pnpuserpromotions",
+                           @"couponsExchanged"          : @"pnpcouponsexchanged"
                            };
     return self;
 }
@@ -1522,7 +1523,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                     data = [data filteredArrayUsingPredicate:p];
                     [self storeCouponPromotions:data];
                     refreshHandler(data);
-                } andErrorCallback:errorHandler];
+                } andErrorCallback:errorHandler limit:10 page:1];
             }
         }else{
             [super getCouponPromotionsWithSuccessCallback:^(NSArray *data){
@@ -1530,11 +1531,48 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                 data = [data filteredArrayUsingPredicate:p];
                 [self storeCouponPromotions:data];
                 if(successHandler) successHandler(data);
-            } andErrorCallback:errorHandler];
+            } andErrorCallback:errorHandler limit:10 page:1];
         }
     }];
     
 }
+
+-(void) getCouponsExchangedWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                              andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    [self getCouponPromotionsWithSuccessCallback:successHandler
+                                andErrorCallback:errorHandler
+                              andRefreshCallback:nil];
+    
+}
+
+-(void) getCouponsExchangedWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                              andErrorCallback:(PnPGenericErrorHandler) errorHandler
+                            andRefreshCallback:(PnPGenericNSAarraySucceddHandler) refreshHandler{
+    
+    [self getCouponsExchanged:^(NSArray *data) {
+        if(data != nil){
+            if(successHandler) successHandler(data);
+            if(refreshHandler){
+                [super getCouponsExchangedWithSuccessCallback:^(NSArray *data) {
+                    NSPredicate *p = [NSPredicate predicateWithFormat:@"endDate > %@",[NSDate date]];
+                    data = [data filteredArrayUsingPredicate:p];
+                    [self storeCouponsExchanged:data];
+                    refreshHandler(data);
+                } andErrorCallback:errorHandler limit:10 page:1];
+            }
+        }else{
+            [super getCouponsExchangedWithSuccessCallback:^(NSArray *data){
+                NSPredicate *p = [NSPredicate predicateWithFormat:@"endDate > %@",[NSDate date]];
+                data = [data filteredArrayUsingPredicate:p];
+                [self storeCouponsExchanged:data];
+                if(successHandler) successHandler(data);
+            } andErrorCallback:errorHandler limit:10 page:1];
+        }
+    }];
+    
+}
+
 
 
 
@@ -1797,6 +1835,20 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
         if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(promotions);} );
     });
 }
+
+-(void) getCouponsExchanged:(PnPGenericNSAarraySucceddHandler) successHandler{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        NSArray *promotions = [NSKeyedUnarchiver unarchiveObjectWithFile:
+                               [[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"couponsExchanged"]]];
+        
+        if(successHandler) dispatch_sync(dispatch_get_main_queue(), ^{ successHandler(promotions);} );
+    });
+}
+-(void) storeCouponsExchanged:(NSArray *) promotions{
+    [NSKeyedArchiver archiveRootObject:promotions
+                                toFile:[[self pnpDataDirectoryPath] stringByAppendingPathComponent:[self.dataFileNames objectForKey:@"couponsExchanged"]]];
+}
+
 
 -(void) storeCouponPromotions:(NSArray *) promotions{
     [NSKeyedArchiver archiveRootObject:promotions

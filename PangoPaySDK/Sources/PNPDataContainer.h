@@ -694,8 +694,11 @@
 @property (strong,nonatomic) NSNumber *actualUses;
 @property (strong,nonatomic) NSDate *startDate;
 @property (strong,nonatomic) NSDate *endDate;
+@property (strong,nonatomic) NSDate *created;
 @property (strong,nonatomic) NSString * status;
 @property (strong,nonatomic) NSString * company;
+@property (strong,nonatomic) NSString * user;
+
 
 
 -(id) initWithIdentifier:(NSString *) identifier
@@ -715,7 +718,9 @@
               actualUses:(NSNumber *) actualUses
                startDate:(NSDate *)startDate
                  endDate:(NSDate *)endDate
-                  status:(NSString *) status;
+                 created:(NSDate *)created
+                  status:(NSString *) status
+                    user:(NSString *) user;
 @end
 
 
