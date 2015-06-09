@@ -4955,20 +4955,34 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 
 -(void) getCouponPromotionsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
-                     andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+                     andErrorCallback:(PnPGenericErrorHandler) errorHandler
+                                         limit:(int)limit
+                                          page:(int)page{
     
     if(![self userIsLoggedIn]){
         NSLog(@"No user logged in.");
         return;
     }
     
+    NSMutableDictionary *filter = [NSMutableDictionary dictionaryWithDictionary:@{@"last":[NSNumber numberWithInt:limit*(page+1)],
+                                                                                  @"offset":[NSNumber numberWithInt:page*limit]}];
+    
+    NSMutableDictionary *fields = [NSMutableDictionary dictionaryWithDictionary:@{@"filter":filter}];
+    
+    NSError *error;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:fields
+                                                       options:NSJSONWritingPrettyPrinted
+                                                         error:&error];
+    NSLog(@"%@",[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]);
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithDictionary:@{ @"action": @"promos.json",
+                                                                                   @"method": @"get",
+                                                                                   @"fields": [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]}];
+    
+    
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"coupons/user_call"]
-                   usingParameters:@{
-                                     @"action":@"promos.json",
-                                     @"method": @"get",
-                                     @"fields": @"{}",
-                                     }
+                   usingParameters:params
                        withAccount:self.userAccount
                            timeout:PNP_REQUEST_TIMEOUT
                sendProgressHandler:nil
@@ -4993,11 +5007,15 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                    NSDateFormatter *df = [[NSDateFormatter alloc] init];
                                    [df setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
                                    [df setDateFormat:@"yyyy-MM-dd"];
+                                   
+                                   NSDateFormatter *date = [[NSDateFormatter alloc] init];
+                                   [date setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
+                                   [date setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
                                    for (NSDictionary *d in dataDic) {
                                        @try {
                                            NSLog(@"%@",d);
                                            NSDictionary *promo = [d objectForKey:@"Promo"];
-                                           PNPCouponPromotion *p = [[PNPCouponPromotion alloc] initWithIdentifier:NULL_TO_NIL([promo objectForKey:@"id"])  title:NULL_TO_NIL([promo objectForKey:@"title"]) company:NULL_TO_NIL([[d objectForKey:@"Company"] objectForKey:@"name"]) longDescription: NULL_TO_NIL([promo objectForKey:@"description"]) shortDescription:NULL_TO_NIL([promo objectForKey:@"description_short"]) type:NULL_TO_NIL([promo objectForKey:@"type"]) validDays:NULL_TO_NIL([promo objectForKey:@"valid_days"]) products:NULL_TO_NIL([promo objectForKey:@"products"]) logoUrl:NULL_TO_NIL([promo objectForKey:@"logo"]) brandLogoUrl:NULL_TO_NIL([promo objectForKey:@"logo_brand"]) fixedAmount:NULL_TO_NIL([promo objectForKey:@"fixed_amount"]) percentageAmount:NULL_TO_NIL([promo objectForKey:@"percentage_amount"]) gift:NULL_TO_NIL([promo objectForKey:@"gift"]) giftProducts:NULL_TO_NIL([promo objectForKey:@"gift_products"]) actualUses:NULL_TO_NIL([promo objectForKey:@"actual_uses"]) startDate:[df dateFromString:NULL_TO_NIL([promo objectForKey:@"start_date"])] endDate:[df dateFromString:NULL_TO_NIL([promo objectForKey:@"end_date"])] status:NULL_TO_NIL([promo objectForKey:@"status"])];
+                                           PNPCouponPromotion *p = [[PNPCouponPromotion alloc] initWithIdentifier:NULL_TO_NIL([promo objectForKey:@"id"])  title:NULL_TO_NIL([promo objectForKey:@"title"]) company:NULL_TO_NIL([[d objectForKey:@"Company"] objectForKey:@"name"]) longDescription: NULL_TO_NIL([promo objectForKey:@"description"]) shortDescription:NULL_TO_NIL([promo objectForKey:@"description_short"]) type:NULL_TO_NIL([promo objectForKey:@"type"]) validDays:NULL_TO_NIL([promo objectForKey:@"valid_days"]) products:NULL_TO_NIL([promo objectForKey:@"products"]) logoUrl:NULL_TO_NIL([promo objectForKey:@"logo"]) brandLogoUrl:NULL_TO_NIL([promo objectForKey:@"logo_brand"]) fixedAmount:NULL_TO_NIL([promo objectForKey:@"fixed_amount"]) percentageAmount:NULL_TO_NIL([promo objectForKey:@"percentage_amount"]) gift:NULL_TO_NIL([promo objectForKey:@"gift"]) giftProducts:NULL_TO_NIL([promo objectForKey:@"gift_products"]) actualUses:NULL_TO_NIL([promo objectForKey:@"actual_uses"]) startDate:[df dateFromString:NULL_TO_NIL([promo objectForKey:@"start_date"])] endDate:[df dateFromString:NULL_TO_NIL([promo objectForKey:@"end_date"])]created:[date dateFromString:NULL_TO_NIL([promo objectForKey:@"created"])] status:NULL_TO_NIL([promo objectForKey:@"status"]) user:NULL_TO_NIL([promo objectForKey:@"user_name"])];
                                            [promos addObject:p];
                                        }
                                        @catch (NSException *exception) {
@@ -5025,6 +5043,104 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                        //NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
                    }];
 }
+
+-(void) getCouponsExchangedWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                              andErrorCallback:(PnPGenericErrorHandler) errorHandler
+                                         limit:(int)limit
+                                          page:(int)page{
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+     [self getCommerceDataWithSuccessCallback:^(PNPCommerce *commerce) {
+         
+     
+         NSMutableDictionary *filter = [NSMutableDictionary dictionaryWithDictionary:@{@"limit":[NSNumber numberWithInt:limit],
+                                                                                       @"page":[NSNumber numberWithInt:page]}];
+         
+         NSError *error;
+         NSData *jsonData = [NSJSONSerialization dataWithJSONObject:filter
+                                                            options:NSJSONWritingPrettyPrinted
+                                                              error:&error];
+         NSLog(@"%@",[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]);
+         
+         NSMutableDictionary *params = [NSMutableDictionary dictionaryWithDictionary:@{ @"action": [NSString stringWithFormat:@"exchanges/%ld.json",(long)[commerce.commerceId integerValue]],
+                                                                                        @"method": @"get",
+                                                                                        @"fields": [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]}];
+         
+         NSLog(@"%@ %d %d",params,limit,page);
+         [NXOAuth2Request performMethod:@"POST"
+                             onResource:[self generateUrl:@"coupons/user_call"]
+                        usingParameters:params
+                            withAccount:self.userAccount
+                                timeout:PNP_REQUEST_TIMEOUT
+                    sendProgressHandler:nil
+                        responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                            if(!error){
+                                @try {
+                                    NSError *parseError;
+                                    NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                        options:0
+                                                                                                          error:&parseError]
+                                                                        objectForKey:@"user_call"];
+                                    
+                                    if(parseError){
+                                        if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                           code:[parseError code]
+                                                                                                       userInfo:parseError.userInfo]);
+                                        return;
+                                    }
+                                    if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                        NSArray *dataDic = [responseDictionary objectForKey:@"data"];
+                                        NSMutableArray *promos = [NSMutableArray new];
+                                        NSDateFormatter *df = [[NSDateFormatter alloc] init];
+                                        [df setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
+                                        [df setDateFormat:@"yyyy-mm-dd hh:mm:ss"];
+                                        
+                                        
+                                        NSDateFormatter *date = [[NSDateFormatter alloc] init];
+                                        [date setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
+                                        [date setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+                                        for (NSDictionary *promo in dataDic) {
+                                            NSLog(@"%@",promo);
+                                            @try {
+                                                PNPCouponPromotion *p = [[PNPCouponPromotion alloc] initWithIdentifier:NULL_TO_NIL([promo objectForKey:@"id"])  title:NULL_TO_NIL([promo objectForKey:@"title"]) company:NULL_TO_NIL([promo objectForKey:@"commerce_name"]) longDescription: NULL_TO_NIL([promo objectForKey:@"description"]) shortDescription:NULL_TO_NIL([promo objectForKey:@"description_short"]) type:NULL_TO_NIL([promo objectForKey:@"type"]) validDays:NULL_TO_NIL([promo objectForKey:@"valid_days"]) products:nil logoUrl:NULL_TO_NIL([promo objectForKey:@"logo"]) brandLogoUrl:NULL_TO_NIL([promo objectForKey:@"logo2"]) fixedAmount:NULL_TO_NIL([promo objectForKey:@"fixed_amount"]) percentageAmount:NULL_TO_NIL([promo objectForKey:@"percentage_amount"]) gift:NULL_TO_NIL([promo objectForKey:@"gift"]) giftProducts:NULL_TO_NIL([promo objectForKey:@"gift_products"]) actualUses:NULL_TO_NIL([promo objectForKey:@"actual_uses"]) startDate:[df dateFromString:NULL_TO_NIL([promo objectForKey:@"start_date"])] endDate:[df dateFromString:NULL_TO_NIL([promo objectForKey:@"end_date"])] created:[date dateFromString:NULL_TO_NIL([promo objectForKey:@"created"])] status:NULL_TO_NIL([promo objectForKey:@"status"]) user:NULL_TO_NIL([promo objectForKey:@"user_name"])];
+                                                [promos addObject:p];
+                                            }
+                                            @catch (NSException *exception) {
+                                                NSLog(@"no se ha podido parsear el coupon %@ por el error %@",promo,exception);
+                                            }
+                                        }
+                                        if(successHandler) successHandler(promos);
+                                    }else{
+                                        if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                      initWithDomain:@"PNPGenericWebserviceError"
+                                                                      code:-6060
+                                                                      userInfo:responseDictionary]);
+                                    }
+                                }
+                                @catch (NSException *exception) {
+                                    NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                                    if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                                   initWithDomain:@"PNPMalformedJson"
+                                                                   code:-2020
+                                                                   userInfo:nil]);
+                                }
+                            }else{
+                                if(errorHandler)errorHandler([self handleErrors:error]);
+                            }
+                            //NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                        }];
+
+     
+     
+     } andErrorCallback:^(NSError *error) {
+         nil;
+     }];
+    
+    }
+
 -(void) createCouponFromPromotion:(PNPCouponPromotion *) promo
               withSuccessCallback:(PnPSuccessHandler) successHandler
                  andErrorCallback:(PnPGenericErrorHandler) errorHandler{
@@ -5361,11 +5477,14 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
                                            
                                            NSMutableArray *benefits = [NSMutableArray new];
+                                           NSLog(@"loyalty benefits: %@",[d objectForKey:@"loyalty_benefits"]);
+                                           NSLog(@"diccionario: %@",d );
+
                                            for (NSDictionary *be in [d objectForKey:@"loyalty_benefits"]) {
-                                               [benefits addObject:[[PNPLoyaltyBenefits alloc] initWithIdentifier:[be objectForKey:@"id"] percentageAmount:[be objectForKey:@"percentage_amount"] startDate:[df dateFromString:[be objectForKey:@"start_date"]] endDate:[df dateFromString:[be objectForKey:@"end_date"]]]];
+                                               [benefits addObject:[[PNPLoyaltyBenefits alloc] initWithIdentifier:NULL_TO_NIL([be objectForKey:@"id"]) percentageAmount:NULL_TO_NIL([be objectForKey:@"percentage_amount"]) startDate:[df dateFromString:NULL_TO_NIL([be objectForKey:@"start_date"])] endDate:[df dateFromString:NULL_TO_NIL([be objectForKey:@"end_date"])]]];
                                            }
                                            
-                                           PNPLoyalty *l = [[PNPLoyalty alloc] initWithIdentifier:[[d objectForKey:@"loyalty"] objectForKey:@"id"] userId:[[d objectForKey:@"loyalty"] objectForKey:@"user_id"] title:[[d objectForKey:@"loyalty"] objectForKey:@"title"] description:[[d objectForKey:@"loyalty"] objectForKey:@"description"] shortDescription:[[d objectForKey:@"loyalty"] objectForKey:@"description_short"] logoUrl:[[d objectForKey:@"loyalty"] objectForKey:@"logo"] status:[[d objectForKey:@"loyalty"] objectForKey:@"status"] startDate:[df dateFromString:[[d objectForKey:@"loyalty"] objectForKey:@"start_date"]] endDate:[df dateFromString:[[d objectForKey:@"loyalty"] objectForKey:@"end_data"]] amount:[[d objectForKey:@"loyalty"] objectForKey:@"amount"] points:[[d objectForKey:@"loyalty"] objectForKey:@"points"] suscriptionFields:memberFields exchangableCoupons:exchangeableCoupons commerces:commerces company:company benefits:benefits registered:[[d objectForKey:@"registered"] boolValue]];
+                                           PNPLoyalty *l = [[PNPLoyalty alloc] initWithIdentifier:[[d objectForKey:@"loyalty"] objectForKey:@"id"] userId:[[d objectForKey:@"loyalty"] objectForKey:@"user_id"] title:[[d objectForKey:@"loyalty"] objectForKey:@"title"] description:[[d objectForKey:@"loyalty"] objectForKey:@"description"] shortDescription:[[d objectForKey:@"loyalty"] objectForKey:@"description_short"] logoUrl:NULL_TO_NIL([[d objectForKey:@"loyalty"] objectForKey:@"logo"] )status:[[d objectForKey:@"loyalty"] objectForKey:@"status"] startDate:[df dateFromString:[[d objectForKey:@"loyalty"] objectForKey:@"start_date"]] endDate:[df dateFromString:[[d objectForKey:@"loyalty"] objectForKey:@"end_data"]] amount:[[d objectForKey:@"loyalty"] objectForKey:@"amount"] points:[[d objectForKey:@"loyalty"] objectForKey:@"points"] suscriptionFields:memberFields exchangableCoupons:exchangeableCoupons commerces:commerces company:company benefits:benefits registered:[[d objectForKey:@"registered"] boolValue]];
                                            [loyalties addObject:l];
                                            if(successHandler) successHandler(loyalties);
                                        }

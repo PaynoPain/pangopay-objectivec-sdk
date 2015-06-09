@@ -443,7 +443,14 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                          andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) getCouponPromotionsWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
-                     andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+                              andErrorCallback:(PnPGenericErrorHandler) errorHandler
+                                         limit:(int)limit
+                                          page:(int)page;
+
+-(void) getCouponsExchangedWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                              andErrorCallback:(PnPGenericErrorHandler) errorHandler
+                                         limit:(int)limit
+                                          page:(int)page;
 
 -(void) createCouponFromPromotion:(PNPCouponPromotion *) promo
               withSuccessCallback:(PnPSuccessHandler) successHandler
