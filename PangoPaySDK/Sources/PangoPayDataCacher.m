@@ -1523,7 +1523,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                     data = [data filteredArrayUsingPredicate:p];
                     [self storeCouponPromotions:data];
                     refreshHandler(data);
-                } andErrorCallback:errorHandler limit:10 page:1];
+                } andErrorCallback:errorHandler limit:100 page:0];
             }
         }else{
             [super getCouponPromotionsWithSuccessCallback:^(NSArray *data){
@@ -1531,7 +1531,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                 data = [data filteredArrayUsingPredicate:p];
                 [self storeCouponPromotions:data];
                 if(successHandler) successHandler(data);
-            } andErrorCallback:errorHandler limit:10 page:1];
+            } andErrorCallback:errorHandler limit:100 page:0];
         }
     }];
     
