@@ -452,6 +452,9 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                          limit:(int)limit
                                           page:(int)page;
 
+-(void) getUserCouponsExchangedWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                                  andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 -(void) createCouponFromPromotion:(PNPCouponPromotion *) promo
               withSuccessCallback:(PnPSuccessHandler) successHandler
                  andErrorCallback:(PnPGenericErrorHandler) errorHandler;

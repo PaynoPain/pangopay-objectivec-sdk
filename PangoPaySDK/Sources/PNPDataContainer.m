@@ -1569,11 +1569,13 @@
                     gift:(NSString *) gift
             giftProducts:(NSArray *) giftProducts
               actualUses:(NSNumber *) actualUses
+               limitUses:(NSNumber *) limitUses
                startDate:(NSDate *)startDate
                  endDate:(NSDate *)endDate
                  created:(NSDate *)created
                   status:(NSString *) status
-                    user:(NSString *) user{
+                    user:(NSString *) user
+              timeRanges:(NSArray *) timeRanges{
     self= [super init];
     if(!self) return nil;
     _identifier = identifier;
@@ -1590,12 +1592,14 @@
     _gift = gift;
     _giftProducts =giftProducts;
     _actualUses = actualUses;
+    _limitUses = limitUses;
     _status = status;
     _startDate = startDate;
     _endDate = endDate;
     _company = company;
     _user = user;
     _created = created;
+    _timeRanges = timeRanges;
     return self;
 }
 -(BOOL) isEqual:(id)object{
@@ -1620,11 +1624,13 @@
     _gift = [aDecoder decodeObjectForKey:@"gift"];
     _giftProducts = [aDecoder decodeObjectForKey:@"giftProducts"];
     _actualUses = [aDecoder decodeObjectForKey:@"actualUses"];
+    _limitUses = [aDecoder decodeObjectForKey:@"limitUses"];
     _status = [aDecoder decodeObjectForKey:@"status"];
     _startDate = [aDecoder decodeObjectForKey:@"startDate"];
     _endDate = [aDecoder decodeObjectForKey:@"endDate"];
     _created = [aDecoder decodeObjectForKey:@"created"];
     _user = [aDecoder decodeObjectForKey:@"user"];
+    _timeRanges = [aDecoder decodeObjectForKey:@"timeRanges"];
     return self;
 }
 
@@ -1643,18 +1649,20 @@
     [aCoder encodeObject:_gift forKey:@"gift"];
     [aCoder encodeObject:_giftProducts forKey:@"giftProducts"];
     [aCoder encodeObject:_actualUses forKey:@"actualUses"];
+    [aCoder encodeObject:_limitUses forKey:@"limitUses"];
     [aCoder encodeObject:_validDays forKey:@"validDays"];
     [aCoder encodeObject:_status forKey:@"status"];
     [aCoder encodeObject:_startDate forKey:@"startDate"];
     [aCoder encodeObject:_endDate forKey:@"endDate"];
     [aCoder encodeObject:_created forKey:@"created"];
     [aCoder encodeObject:_user forKey:@"user"];
+    [aCoder encodeObject:_timeRanges forKey:@"timeRanges"];
 
 }
 
 
 -(NSString *) description{
-    return [NSString stringWithFormat:@"Id: %@, Company:%@, title: %@, longDescription: %@ , shortDescription:%@,actualUses:%@, gift:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ products: %@ , gift_products: %@ ,type:%@ ,fixedAmount: %@, percentageAmount: %@, validDays: %@, status: %@, user: %@, created: %@",_identifier,_company,_title,_longDescription,_shortDescription,_actualUses,_gift,_logoUrl,_brandLogoUrl,_startDate,_endDate,_products,_giftProducts,_type,_fixedAmount,_percentageAmount,_validDays, _status, _user, _created];
+    return [NSString stringWithFormat:@"Id: %@, Company:%@, title: %@, longDescription: %@ , shortDescription:%@,actualUses:%@, limitUses:%@, gift:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ products: %@ , gift_products: %@ ,type:%@ ,fixedAmount: %@, percentageAmount: %@, validDays: %@, status: %@, user: %@, created: %@, timeRanges: %@",_identifier,_company,_title,_longDescription,_shortDescription,_actualUses, _limitUses, _gift,_logoUrl,_brandLogoUrl,_startDate,_endDate,_products,_giftProducts,_type,_fixedAmount,_percentageAmount,_validDays, _status, _user, _created, _timeRanges];
 
 }
     @end

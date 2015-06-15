@@ -692,12 +692,14 @@
 @property (strong,nonatomic) NSString * gift;
 @property (strong,nonatomic) NSArray *giftProducts;
 @property (strong,nonatomic) NSNumber *actualUses;
+@property (strong,nonatomic) NSNumber *limitUses;
 @property (strong,nonatomic) NSDate *startDate;
 @property (strong,nonatomic) NSDate *endDate;
 @property (strong,nonatomic) NSDate *created;
 @property (strong,nonatomic) NSString * status;
 @property (strong,nonatomic) NSString * company;
 @property (strong,nonatomic) NSString * user;
+@property (strong,nonatomic) NSArray * timeRanges;
 
 
 
@@ -716,11 +718,13 @@
                     gift:(NSString *) gift
             giftProducts:(NSArray *) giftProducts
               actualUses:(NSNumber *) actualUses
+               limitUses:(NSNumber *) limitUses
                startDate:(NSDate *)startDate
                  endDate:(NSDate *)endDate
                  created:(NSDate *)created
                   status:(NSString *) status
-                    user:(NSString *) user;
+                    user:(NSString *) user
+              timeRanges:(NSArray *) timeRanges;
 @end
 
 
