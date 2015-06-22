@@ -624,6 +624,8 @@
 @property (strong,nonatomic) NSArray * products;
 @property (strong,nonatomic) NSString * type;
 @property (strong,nonatomic) NSArray *giftProducts;
+@property (strong,nonatomic) NSString  *web;
+
 
 
 
@@ -700,6 +702,7 @@
 @property (strong,nonatomic) NSString * company;
 @property (strong,nonatomic) NSString * user;
 @property (strong,nonatomic) NSArray * timeRanges;
+@property (strong,nonatomic) NSString  *web;
 
 
 
@@ -725,6 +728,19 @@
                   status:(NSString *) status
                     user:(NSString *) user
               timeRanges:(NSArray *) timeRanges;
+@end
+
+
+@interface PNPPromotionStatistic : NSObject <NSCoding>
+
+@property(strong, nonatomic) NSDictionary *exchanges;
+@property(strong, nonatomic) NSNumber *notificationsOpened;
+@property(strong, nonatomic) NSNumber *notificationsSended;
+
+-(id) initWithExchanges:(NSDictionary *) exchanges
+    notificationsOpened:(NSNumber *) notificationsOpened
+    notificationsSended:(NSNumber *) notificationsSended;
+
 @end
 
 

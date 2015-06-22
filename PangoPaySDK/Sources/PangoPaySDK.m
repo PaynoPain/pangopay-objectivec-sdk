@@ -5140,9 +5140,10 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
      }];
     
     }
-/*
--(void) getUserCouponsExchangedWithSuccessCallback:(PnPGenericNSAarraySucceddHandler)successHandler
-                                  andErrorCallback:(PnPGenericErrorHandler)errorHandler{
+
+-(void) getPromoStatisticWithPromo:(NSString *) identifier
+           WithSuccessCallback:(PnPPromoStatisticSuccessHandler)successHandler
+              andErrorCallback:(PnPGenericErrorHandler)errorHandler{
     if(![self userIsLoggedIn]){
         NSLog(@"No user logged in");
         return;
@@ -5150,8 +5151,15 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
     
     NSError *error;
     
-    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithDictionary:@{ @"action": @"exchanges.json",
-                                                                                   @"method": @"get"}];
+    NSMutableDictionary *dic = [NSMutableDictionary dictionaryWithDictionary:@{@"promo_id":identifier}];
+    
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dic
+                                                       options:NSJSONWritingPrettyPrinted
+                                                         error:&error];
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithDictionary:@{ @"action": @"stats/coupons.json",
+                                                                                   @"method": @"get",
+                                                                                   @"fields": [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]}];
     NSLog(@"URL: %@", [self generateUrl:@"coupons/user_call"]);
     [NXOAuth2Request performMethod:@"POST"
                         onResource:[self generateUrl:@"coupons/user_call"]
@@ -5160,13 +5168,54 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                            timeout:PNP_REQUEST_TIMEOUT
                sendProgressHandler:nil
                    responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
-                       NSLog(@"SOY LA LLAMADA Y AHORA HE IDO DE RECHUPETE");
-                       NSLog(@"URL: %@", [self generateUrl:@"coupons/user_call"]);
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                                              objectForKey:@"user_call"];
+                               
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   NSDictionary *dataDic = [responseDictionary objectForKey:@"data"];
+                                   
+                                   NSNumber *send = [[dataDic objectForKey:@"email"] objectForKey:@"sended"];
+                                   NSNumber *open = [[dataDic objectForKey:@"email"] objectForKey:@"opened"];
+                                   
+                                   PNPPromotionStatistic *ps = [[PNPPromotionStatistic alloc]initWithExchanges:[dataDic objectForKey:@"exchanges"]
+                                                                                            notificationsOpened:open
+                                                                                           notificationsSended:send];
+                                   
+                                   if(successHandler) successHandler(ps);
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                           NSLog(@"Error: %@", error);
+                       }
+                       NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
                    }];
     
-    
 }
-*/
+
 
 -(void) getUserCouponsExchangedWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                               andErrorCallback:(PnPGenericErrorHandler) errorHandler{
@@ -5252,6 +5301,130 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 }
 
 
+
+
+-(void) createPromotion:(PNPCoupon *) promo
+          withLogoImage:(UIImage *) logoImage
+         withPromoImage:(UIImage *) promoImage
+              withSuccessCallback:(PnPSuccessHandler) successHandler
+                 andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    [self getCommerceDataWithSuccessCallback:^(PNPCommerce *commerce) {
+
+        NSMutableDictionary *dic = [NSMutableDictionary new];
+        
+        NSArray *array = [NSArray arrayWithObject:commerce.commerceId];
+        [dic setObject:array forKey:@"commerces"];
+        [dic setObject:promo.longDescription forKey:@"description"];
+        [dic setObject:promo.title forKey:@"title"];
+        [dic setObject:promo.type forKey:@"type"];
+        [dic setObject:promo.limitUses forKey:@"uses"];
+        
+        if(promo.percentageAmount){
+            [dic setObject:promo.percentageAmount forKey:@"percentage_amount"];
+        }else if (![promo.gift isEqual:@""]){
+            [dic setObject:promo.gift forKey:@"gift"];
+        }else{
+            [dic setObject:promo.fixedAmount forKey:@"fixed_amount"];
+        }
+        
+        
+        if(promo.shortDescription != nil){
+            [dic setObject:promo.shortDescription forKey:@"description_short"];
+        }
+        if(promo.web != nil){
+            [dic setObject:promo.web forKey:@"web"];
+        }
+
+        if(logoImage != nil){
+        
+            NSData *imageData = UIImageJPEGRepresentation(logoImage, 0.5);
+            NSString *base64encodedImage = [imageData base64EncodedString];
+            base64encodedImage = [NSString stringWithFormat:@"data:image/jpg;base64,%@",base64encodedImage];
+            [dic setObject:base64encodedImage forKey:@"logo"];
+
+        }
+        if(promoImage != nil){
+            
+            NSData *imageData = UIImageJPEGRepresentation(promoImage, 0.5);
+            NSString *base64encodedImage = [imageData base64EncodedString];
+            base64encodedImage = [NSString stringWithFormat:@"data:image/jpg;base64,%@",base64encodedImage];
+            [dic setObject:base64encodedImage forKey:@"logo2"];
+            }
+        
+        NSDateFormatter *df = [[NSDateFormatter alloc]init];
+        [df setDateFormat:@"yyyy-MM-dd"];
+        [dic setObject:[df stringFromDate:promo.startDate] forKey:@"start_date"];
+        [dic setObject:[df stringFromDate:promo.endDate] forKey:@"end_date"];
+        
+        
+        [dic setObject:promo.validDays forKey:@"valid_days"];
+        [dic setObject:promo.timeRanges forKey:@"time_range"];
+     
+        NSError *error;
+        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dic
+                                                           options:NSJSONWritingPrettyPrinted
+                                                             error:&error];
+        NSLog(@"%@",[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]);
+        
+        NSMutableDictionary *params = [NSMutableDictionary dictionaryWithDictionary:@{ @"action": @"promos.json",
+                                                                                       @"method": @"post",
+                                                                                       @"fields": [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]}];
+        
+
+        [NXOAuth2Request performMethod:@"POST"
+                            onResource:[self generateUrl:@"coupons/user_call"]
+                       usingParameters:params
+                           withAccount:self.userAccount
+                               timeout:PNP_REQUEST_TIMEOUT
+                   sendProgressHandler:nil
+                       responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                           if(!error){
+                               @try {
+                                   NSError *parseError;
+                                   NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                       options:0
+                                                                                                         error:&parseError]
+                                                                       objectForKey:@"user_call"];
+                                   NSLog(@"%@",responseDictionary);
+                                   
+                                   if(parseError){
+                                       if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                          code:[parseError code]
+                                                                                                      userInfo:parseError.userInfo]);
+                                       return;
+                                   }
+                                   if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                       successHandler();
+                                   }else{
+                                       if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                     initWithDomain:@"PNPGenericWebserviceError"
+                                                                     code:-6060
+                                                                     userInfo:responseDictionary]);
+                                   }
+                               }
+                               @catch (NSException *exception) {
+                                   NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                                   if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                                  initWithDomain:@"PNPMalformedJson"
+                                                                  code:-2020
+                                                                  userInfo:nil]);
+                               }
+                           }else{
+                               if(errorHandler)errorHandler([self handleErrors:error]);
+                           }
+                       }];
+
+
+    } andErrorCallback:^(NSError *error) {
+        nil;
+    }];
+    
+    
+   }
 
 
 -(void) createCouponFromPromotion:(PNPCouponPromotion *) promo

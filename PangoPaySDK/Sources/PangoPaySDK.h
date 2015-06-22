@@ -46,6 +46,8 @@ typedef void(^PnPCommerceOrderSuccessHandler)(PNPCommerceOrder * order);
 typedef void(^PnPLoyaltyUserDataSuccessHandler)(PNPLoyaltyUserData * data);
 typedef void(^PnPCouponSuccessHandler)(PNPCoupon * coupon);
 typedef void(^PnPPromoSuccessHandler)(PNPPromo * promo);
+typedef void(^PnPPromoStatisticSuccessHandler)(PNPPromotionStatistic * promo);
+
 + (instancetype)sharedInstance;
 
 
@@ -447,10 +449,20 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                          limit:(int)limit
                                           page:(int)page;
 
+-(void) createPromotion:(PNPCoupon *) promo
+          withLogoImage:(UIImage *) logoImage
+         withPromoImage:(UIImage *) promoImage
+    withSuccessCallback:(PnPSuccessHandler) successHandler
+       andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 -(void) getCouponsExchangedWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                               andErrorCallback:(PnPGenericErrorHandler) errorHandler
                                          limit:(int)limit
                                           page:(int)page;
+
+-(void) getPromoStatisticWithPromo:(NSString *) identifier
+               WithSuccessCallback:(PnPPromoStatisticSuccessHandler)successHandler
+                  andErrorCallback:(PnPGenericErrorHandler)errorHandler;
 
 -(void) getUserCouponsExchangedWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                                   andErrorCallback:(PnPGenericErrorHandler) errorHandler;

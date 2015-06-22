@@ -1664,6 +1664,7 @@
 -(NSString *) description{
     return [NSString stringWithFormat:@"Id: %@, Company:%@, title: %@, longDescription: %@ , shortDescription:%@,actualUses:%@, limitUses:%@, gift:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ products: %@ , gift_products: %@ ,type:%@ ,fixedAmount: %@, percentageAmount: %@, validDays: %@, status: %@, user: %@, created: %@, timeRanges: %@",_identifier,_company,_title,_longDescription,_shortDescription,_actualUses, _limitUses, _gift,_logoUrl,_brandLogoUrl,_startDate,_endDate,_products,_giftProducts,_type,_fixedAmount,_percentageAmount,_validDays, _status, _user, _created, _timeRanges];
 
+
 }
     @end
 
@@ -1759,6 +1760,37 @@
 }
 
 @end
+
+@implementation PNPPromotionStatistic
+
+-(id) initWithExchanges:(NSDictionary *) exchanges notificationsOpened:(NSNumber *) notificationsOpened notificationsSended:(NSNumber *) notificationsSended {
+    self = [super init];
+    if(!self) return nil;
+    _exchanges = exchanges;
+    _notificationsOpened = notificationsOpened;
+    _notificationsSended = notificationsSended;
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if(!self) return nil;
+    _exchanges = [aDecoder decodeObjectForKey:@"exchanges"];
+    _notificationsOpened = [aDecoder decodeObjectForKey:@"notificationsOpened"];
+    _notificationsSended = [aDecoder decodeObjectForKey:@"notificationsSended"];
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeObject:_exchanges forKey:@"exchanges"];
+    [aCoder encodeObject:_notificationsOpened forKey:@"notificationsOpened"];
+    [aCoder encodeObject:_notificationsSended forKey:@"notificationsSended"];
+}
+
+
+@end
+
+
 
 
 @implementation PNPLoyaltySuscriptionField
