@@ -5446,11 +5446,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                        }];
 
 
-    } andErrorCallback:^(NSError *error) {
-        nil;
-    }];
-    
-    
+    } andErrorCallback:errorHandler];
    }
 
 
