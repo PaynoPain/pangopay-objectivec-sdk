@@ -452,6 +452,10 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 -(void) createPromotion:(PNPCoupon *) promo
           withLogoImage:(UIImage *) logoImage
          withPromoImage:(UIImage *) promoImage
+           withProvince:(NSString *) province
+               withCity:(NSString *) city
+             withGender:(NSString *) gender
+                withAge:(NSDictionary *) age
     withSuccessCallback:(PnPSuccessHandler) successHandler
        andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 

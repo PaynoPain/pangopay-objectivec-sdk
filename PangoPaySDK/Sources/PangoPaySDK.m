@@ -5306,8 +5306,12 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 -(void) createPromotion:(PNPCoupon *) promo
           withLogoImage:(UIImage *) logoImage
          withPromoImage:(UIImage *) promoImage
-              withSuccessCallback:(PnPSuccessHandler) successHandler
-                 andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+           withProvince:(NSString *) province
+               withCity:(NSString *) city
+             withGender:(NSString *) gender
+                withAge:(NSDictionary *) age
+    withSuccessCallback:(PnPSuccessHandler) successHandler
+       andErrorCallback:(PnPGenericErrorHandler) errorHandler{
     if(![self userIsLoggedIn]){
         NSLog(@"No user logged in.");
         return;
@@ -5332,10 +5336,10 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
         }
         
         
-        if(promo.shortDescription != nil){
+        if(![promo.shortDescription isEqualToString:@""]){
             [dic setObject:promo.shortDescription forKey:@"description_short"];
         }
-        if(promo.web != nil){
+        if(![promo.web isEqualToString:@""]){
             [dic setObject:promo.web forKey:@"web"];
         }
 
@@ -5365,11 +5369,34 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
         [dic setObject:promo.timeRanges forKey:@"time_range"];
      
         NSError *error;
+        
+        NSMutableDictionary *targets = [NSMutableDictionary new];
+        
+        if(![province isEqualToString:@""] && province!= nil){
+            [targets setObject:province forKey:@"province"];
+        }
+        
+        if(![city isEqualToString:@""] && city != nil){
+            [targets setObject:city forKey:@"city"];
+        }
+        
+        if(age!=nil){
+            [targets setObject:age.description forKey:@"age"];
+        }
+        
+        if(![gender isEqualToString:@""] && gender != nil){
+            [targets setObject:gender forKey:@"gender"];
+        }
+        
+        [dic setObject:targets forKey:@"targets"];
+
+        
         NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dic
                                                            options:NSJSONWritingPrettyPrinted
                                                              error:&error];
+
         NSLog(@"%@",[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]);
-        
+
         NSMutableDictionary *params = [NSMutableDictionary dictionaryWithDictionary:@{ @"action": @"promos.json",
                                                                                        @"method": @"post",
                                                                                        @"fields": [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]}];
