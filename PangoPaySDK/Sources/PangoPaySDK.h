@@ -47,6 +47,7 @@ typedef void(^PnPLoyaltyUserDataSuccessHandler)(PNPLoyaltyUserData * data);
 typedef void(^PnPCouponSuccessHandler)(PNPCoupon * coupon);
 typedef void(^PnPPromoSuccessHandler)(PNPPromo * promo);
 typedef void(^PnPPromoStatisticSuccessHandler)(PNPPromotionStatistic * promo);
+typedef void(^PnPCouponPromotionSuccessHandler)(PNPCouponPromotion * promo);
 
 + (instancetype)sharedInstance;
 
@@ -458,6 +459,22 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                 withAge:(NSDictionary *) age
     withSuccessCallback:(PnPSuccessHandler) successHandler
        andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) editPromotion:(PNPCouponPromotion *) promo
+          withLogoImage:(UIImage *) logoImage
+         withPromoImage:(UIImage *) promoImage
+           withProvince:(NSString *) province
+               withCity:(NSString *) city
+             withGender:(NSString *) gender
+                withAge:(NSDictionary *) age
+    withSuccessCallback:(PnPSuccessHandler) successHandler
+       andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+
+
+-(void) getPromotion:(PNPCouponPromotion *) promo
+ withSuccessCallback:(PnPCouponPromotionSuccessHandler) successHandler
+    andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) getCouponsExchangedWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                               andErrorCallback:(PnPGenericErrorHandler) errorHandler

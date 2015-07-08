@@ -703,6 +703,11 @@
 @property (strong,nonatomic) NSString * user;
 @property (strong,nonatomic) NSArray * timeRanges;
 @property (strong,nonatomic) NSString  *web;
+@property (strong,nonatomic) NSString *province;
+@property (strong,nonatomic) NSString *city;
+@property (strong,nonatomic) NSNumber *minimumAge;
+@property (strong,nonatomic) NSNumber *maximumAge;
+@property (strong,nonatomic) NSString *gender;
 
 
 
