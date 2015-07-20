@@ -174,6 +174,10 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
 withSuccessCallback:(PnPSuccessHandler) successHandler
  andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
+-(void) editUserLanguage:(NSString *)language
+     withSuccessCallback:(PnPSuccessHandler) successHandler
+        andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 -(void) editUserSetName:(NSString *) name
                 surname:(NSString *) surname
                   email:(NSString *) email

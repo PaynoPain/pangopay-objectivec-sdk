@@ -1345,6 +1345,65 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
     
 }
 
+-(void) editUserLanguage:(NSString *)language
+     withSuccessCallback:(PnPSuccessHandler) successHandler
+        andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+
+    if(![self isUserLoggedIn ]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    NSString *lang = @"";
+    if([language isEqualToString:@"en"]){
+        lang = @"eng";
+    }else if([language isEqualToString:@"es"]){
+        lang = @"esp";
+    }
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"users/edit"]
+                   usingParameters:@{@"language":lang}
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"edit"];
+                               NSLog(@"%@",responseDictionary);
+                               if(parseError){
+                                   if(errorHandler ) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                       code:[parseError code]
+                                                                                                   userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   if(successHandler)  successHandler();
+                               }else{
+                                   if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
+                                                                                     initWithDomain:@"PNPGenericWebserviceError"
+                                                                                     code:-6060
+                                                                                     userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc] initWithDomain:@"PNPMalformedJson"
+                                                                                                      code:-2020
+                                                                                                  userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler) errorHandler([self handleErrors:error]);
+                       }
+                   }];
+
+
+}
+
 -(void) editUserSetName:(NSString *) name
                 surname:(NSString *) surname
                   email:(NSString *) email
