@@ -5477,9 +5477,9 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                            if(!error){
                                @try {
                                    NSError *parseError;
-                                   NSDictionary *responseDictionary = [NSJSONSerialization JSONObjectWithData:responseData
+                                   NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
                                                                                                        options:0
-                                                                                                         error:&parseError];
+                                                                                                         error:&parseError] objectForKey:@"commerce_call"];
                                    NSLog(@"response: %@",responseDictionary);
                                    
                                    if(parseError){
