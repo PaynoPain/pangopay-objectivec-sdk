@@ -732,7 +732,8 @@
                  created:(NSDate *)created
                   status:(NSString *) status
                     user:(NSString *) user
-              timeRanges:(NSArray *) timeRanges;
+              timeRanges:(NSArray *) timeRanges
+                     web:(NSString *) web;
 @end
 
 

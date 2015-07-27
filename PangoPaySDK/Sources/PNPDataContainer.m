@@ -1575,7 +1575,8 @@
                  created:(NSDate *)created
                   status:(NSString *) status
                     user:(NSString *) user
-              timeRanges:(NSArray *) timeRanges{
+              timeRanges:(NSArray *) timeRanges
+                     web:(NSString *) web{
     self= [super init];
     if(!self) return nil;
     _identifier = identifier;
@@ -1600,6 +1601,7 @@
     _user = user;
     _created = created;
     _timeRanges = timeRanges;
+    _web = web;
     return self;
 }
 -(BOOL) isEqual:(id)object{
@@ -1631,6 +1633,7 @@
     _created = [aDecoder decodeObjectForKey:@"created"];
     _user = [aDecoder decodeObjectForKey:@"user"];
     _timeRanges = [aDecoder decodeObjectForKey:@"timeRanges"];
+    _web = [aDecoder decodeObjectForKey:@"web"];
     return self;
 }
 
@@ -1657,12 +1660,13 @@
     [aCoder encodeObject:_created forKey:@"created"];
     [aCoder encodeObject:_user forKey:@"user"];
     [aCoder encodeObject:_timeRanges forKey:@"timeRanges"];
+    [aCoder encodeObject:_web forKey:@"web"];
 
 }
 
 
 -(NSString *) description{
-    return [NSString stringWithFormat:@"Id: %@, Company:%@, title: %@, longDescription: %@ , shortDescription:%@,actualUses:%@, limitUses:%@, gift:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ products: %@ , gift_products: %@ ,type:%@ ,fixedAmount: %@, percentageAmount: %@, validDays: %@, status: %@, user: %@, created: %@, timeRanges: %@",_identifier,_company,_title,_longDescription,_shortDescription,_actualUses, _limitUses, _gift,_logoUrl,_brandLogoUrl,_startDate,_endDate,_products,_giftProducts,_type,_fixedAmount,_percentageAmount,_validDays, _status, _user, _created, _timeRanges];
+    return [NSString stringWithFormat:@"Id: %@, Company:%@, title: %@, longDescription: %@ , shortDescription:%@,actualUses:%@, limitUses:%@, gift:%@, logoUrl:%@, brandLogoUrl:%@, startDate:%@, endDate:%@ products: %@ , gift_products: %@ ,type:%@ ,fixedAmount: %@, percentageAmount: %@, validDays: %@, status: %@, user: %@, created: %@, timeRanges: %@, web: %@",_identifier,_company,_title,_longDescription,_shortDescription,_actualUses, _limitUses, _gift,_logoUrl,_brandLogoUrl,_startDate,_endDate,_products,_giftProducts,_type,_fixedAmount,_percentageAmount,_validDays, _status, _user, _created, _timeRanges, _web];
 
 
 }
