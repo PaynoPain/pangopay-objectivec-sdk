@@ -7529,7 +7529,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
     NSNumber *price = [NSNumber numberWithFloat:variant.price.floatValue * 100];
     
     [paramDicc setObject:price forKey:@"price"];
-    
+    [paramDicc setObject:@"1" forKey:@"stock"];
     NSString *pparams = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:paramDicc
                                                                                        options:0
                                                                                          error:&jerror]
