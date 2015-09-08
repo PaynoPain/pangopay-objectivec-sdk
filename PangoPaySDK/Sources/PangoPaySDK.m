@@ -2100,6 +2100,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                return;
                            }
                            if([[responseDictionary objectForKey:@"success"] boolValue]){
+                               NSLog(@"NOTIFICATION MARKED AS READ.");
                                if(successHandler) successHandler();
                            }else{
                                if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc] initWithDomain:@"PNPGenericWebserviceError"
@@ -3800,7 +3801,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                        NSDictionary *orderDic = [d objectForKey:@"order"];
                                        NSDictionary *payerDic = [orderDic objectForKey:@"payer"];
                                        NSArray *orderLines = [d objectForKey:@"order_lines"];
-                                       
+
                                        NSMutableArray *parsedOrderLines = [NSMutableArray new];
 
                                        for (NSDictionary *d in orderLines) {
@@ -3815,7 +3816,7 @@ withSuccessCallback:(PnPSuccessHandler)successHandler
                                            payerDic = [NSDictionary new];
                                        }
                                        
-                                       PNPCommerceOrder *o = [[PNPCommerceOrder alloc] initWithIdentifier:[orderDic objectForKey:@"id"] reference:[orderDic objectForKey:@"reference"] type:[orderDic objectForKey:@"type"] concept:[orderDic objectForKey:@"concept"] status:[orderDic objectForKey:@"status"] amount:[self clearAmount:[orderDic objectForKey:@"amount"]] netAmount:[self clearAmount:[orderDic objectForKey:@"net_amount"]] refundAmount:[self clearAmount:[orderDic objectForKey:@"refund_amount"]] currencySymbol:[[orderDic objectForKey:@"currency"] objectForKey:@"symbol"] mail:[payerDic objectForKey:@"mail"] userId:[payerDic objectForKey:@"user_id"] name:[payerDic objectForKey:@"name"] surname:[payerDic objectForKey:@"surname"] prefix:[payerDic objectForKey:@"prefix"] phone:[payerDic objectForKey:@"phone"] created:[df dateFromString:[orderDic objectForKey:@"created"]] orderLines:parsedOrderLines];
+                                       PNPCommerceOrder *o = [[PNPCommerceOrder alloc] initWithIdentifier:[orderDic objectForKey:@"id"] reference:[orderDic objectForKey:@"reference"] type:[orderDic objectForKey:@"type"] concept:[orderDic objectForKey:@"concept"] status:[orderDic objectForKey:@"status"] amount:[self clearAmount:[orderDic objectForKey:@"amount"]] netAmount:[self clearAmount:[orderDic objectForKey:@"net_amount"]] refundAmount:[self clearAmount:[orderDic objectForKey:@"refund_amount"]] currencySymbol:[[orderDic objectForKey:@"currency"] objectForKey:@"symbol"] mail:NULL_TO_NIL([orderDic objectForKey:@"mail_ticket"]) userId:[payerDic objectForKey:@"user_id"] name:[payerDic objectForKey:@"name"] surname:[payerDic objectForKey:@"surname"] prefix:[payerDic objectForKey:@"prefix"] phone:[payerDic objectForKey:@"phone"] created:[df dateFromString:[orderDic objectForKey:@"created"]] orderLines:parsedOrderLines];
                                        [orders addObject:o];
                                    }
                                    if(successHandler) successHandler(orders);
@@ -7727,8 +7728,6 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 }
 
 -(NSURL *) generateUrl:(NSString *) extension{
-    NSLog(@"GENERATE URL: %@",[NSString stringWithFormat:@"%@.json",extension]);
-    NSLog(@"generateURL: %@", [self.environment.url URLByAppendingPathComponent:[NSString stringWithFormat:@"%@.json",extension]]);
     return [self.environment.url URLByAppendingPathComponent:[NSString stringWithFormat:@"%@.json",extension]];
 }
 
