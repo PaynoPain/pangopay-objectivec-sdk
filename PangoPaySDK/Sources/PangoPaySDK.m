@@ -5074,7 +5074,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                        @try {
                                            NSLog(@"%@",d);
                                            NSDictionary *promo = [d objectForKey:@"Promo"];
-                                           PNPCouponPromotion *p = [[PNPCouponPromotion alloc] initWithIdentifier:NULL_TO_NIL([promo objectForKey:@"id"])  title:NULL_TO_NIL([promo objectForKey:@"title"]) company:NULL_TO_NIL([[d objectForKey:@"Company"] objectForKey:@"name"]) longDescription: NULL_TO_NIL([promo objectForKey:@"description"]) shortDescription:NULL_TO_NIL([promo objectForKey:@"description_short"]) type:NULL_TO_NIL([promo objectForKey:@"type"]) validDays:NULL_TO_NIL([promo objectForKey:@"valid_days"]) products:NULL_TO_NIL([promo objectForKey:@"products"]) logoUrl:NULL_TO_NIL([promo objectForKey:@"logo"]) brandLogoUrl:NULL_TO_NIL([promo objectForKey:@"logo_brand"]) fixedAmount:NULL_TO_NIL([promo objectForKey:@"fixed_amount"]) percentageAmount:NULL_TO_NIL([promo objectForKey:@"percentage_amount"]) gift:NULL_TO_NIL([promo objectForKey:@"gift"]) giftProducts:NULL_TO_NIL([promo objectForKey:@"gift_products"]) actualUses:NULL_TO_NIL([promo objectForKey:@"uses"]) limitUses:NULL_TO_NIL([promo objectForKey:@"uses"]) startDate:[date dateFromString:NULL_TO_NIL([promo objectForKey:@"start_date"])] endDate:[date dateFromString:NULL_TO_NIL([promo objectForKey:@"end_date"])]created:[date dateFromString:NULL_TO_NIL([promo objectForKey:@"created"])] status:NULL_TO_NIL([promo objectForKey:@"status"]) user:NULL_TO_NIL([promo objectForKey:@"user_name"]) timeRanges:NULL_TO_NIL([d objectForKey:@"TimeRanges"]) web:NULL_TO_NIL([promo objectForKey:@"web"])];
+                                           PNPCouponPromotion *p = [[PNPCouponPromotion alloc] initWithIdentifier:NULL_TO_NIL([promo objectForKey:@"id"])  title:NULL_TO_NIL([promo objectForKey:@"title"]) company:NULL_TO_NIL([[d objectForKey:@"Company"] objectForKey:@"name"]) longDescription: NULL_TO_NIL([promo objectForKey:@"description"]) shortDescription:NULL_TO_NIL([promo objectForKey:@"description_short"]) type:NULL_TO_NIL([promo objectForKey:@"type"]) validDays:NULL_TO_NIL([promo objectForKey:@"valid_days"]) products:NULL_TO_NIL([promo objectForKey:@"products"]) logoUrl:NULL_TO_NIL([promo objectForKey:@"logo"]) brandLogoUrl:NULL_TO_NIL([promo objectForKey:@"logo2"]) fixedAmount:NULL_TO_NIL([promo objectForKey:@"fixed_amount"]) percentageAmount:NULL_TO_NIL([promo objectForKey:@"percentage_amount"]) gift:NULL_TO_NIL([promo objectForKey:@"gift"]) giftProducts:NULL_TO_NIL([promo objectForKey:@"gift_products"]) actualUses:NULL_TO_NIL([promo objectForKey:@"uses"]) limitUses:NULL_TO_NIL([promo objectForKey:@"uses"]) startDate:[date dateFromString:NULL_TO_NIL([promo objectForKey:@"start_date"])] endDate:[date dateFromString:NULL_TO_NIL([promo objectForKey:@"end_date"])]created:[date dateFromString:NULL_TO_NIL([promo objectForKey:@"created"])] status:NULL_TO_NIL([promo objectForKey:@"status"]) user:NULL_TO_NIL([promo objectForKey:@"user_name"]) timeRanges:NULL_TO_NIL([d objectForKey:@"TimeRanges"]) web:NULL_TO_NIL([promo objectForKey:@"web"])];
                                            [promos addObject:p];
                                        }
                                        @catch (NSException *exception) {
@@ -7792,5 +7792,16 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 }
 
 @end
+
+
+@implementation PNPSodexoProductionEnvironment
+
+-(id) init{
+    self=[super initWithUrl:[NSURL URLWithString:@"https://sodexo-core.paynopain.com"]];
+    return self;
+}
+
+@end
+
 
 
