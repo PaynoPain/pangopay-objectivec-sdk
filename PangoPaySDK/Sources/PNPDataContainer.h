@@ -60,6 +60,44 @@
 
 @end
 
+@interface PNPUserCommerce : NSObject <NSCoding>
+
+-(id) initWithAddress: (NSString *) address
+                  cif: (NSString *) cif
+                 city: (NSString *) city
+           commerceId: (NSNumber *) commerceId
+         contactPhone: (NSNumber *) contactPhone
+              created: (NSDate *) dateCreated
+             distance: (NSNumber *) distance
+                   id: (NSNumber *) identifier
+                  lat: (NSNumber *) lat
+                  lon: (NSNumber *) lon
+             modified: (NSDate *) modified
+                 name: (NSString *) name
+             province: (NSString *) province
+          totalPoints: (NSNumber *) totalPoints
+          totalPromos: (NSNumber *) totalPromos
+              zipCode: (NSNumber *) zipCode;
+
+
+@property (strong,nonatomic) NSString *address;
+@property (strong,nonatomic) NSString *cif;
+@property (strong,nonatomic) NSString *city;
+@property (strong,nonatomic) NSNumber *commerceId;
+@property (strong,nonatomic) NSNumber *contactPhone;
+@property (strong,nonatomic) NSDate *dateCreated;
+@property (strong,nonatomic) NSNumber *distance;
+@property (strong,nonatomic) NSNumber *identifier;
+@property (strong,nonatomic) NSNumber *lat;
+@property (strong,nonatomic) NSNumber *lon;
+@property (strong,nonatomic) NSDate *modified;
+@property (strong,nonatomic) NSString *name;
+@property (strong,nonatomic) NSString *province;
+@property (strong,nonatomic) NSNumber *totalPoints;
+@property (strong,nonatomic) NSNumber *totalPromos;
+@property (strong,nonatomic) NSNumber *zipCode;
+@end
+
 
 
 #define PNPNotificationSendPayment          @"sendPayment"

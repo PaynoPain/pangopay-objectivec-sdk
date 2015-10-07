@@ -151,6 +151,94 @@
 
 @end
 
+@implementation PNPUserCommerce
+
+-(id) initWithAddress: (NSString *) address
+                  cif: (NSString *) cif
+                 city: (NSString *) city
+           commerceId: (NSNumber *) commerceId
+         contactPhone: (NSNumber *) contactPhone
+              created: (NSDate *) dateCreated
+             distance: (NSNumber *) distance
+                   id: (NSNumber *) identifier
+                  lat: (NSNumber *) lat
+                  lon: (NSNumber *) lon
+             modified: (NSDate *) modified
+                 name: (NSString *) name
+             province: (NSString *) province
+          totalPoints: (NSNumber *) totalPoints
+          totalPromos: (NSNumber *) totalPromos
+              zipCode: (NSNumber *) zipCode{
+    
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+    _address = address;
+    _cif = cif;
+    _city = city;
+    _commerceId = commerceId;
+    _contactPhone = contactPhone;
+    _dateCreated = dateCreated;
+    _distance = distance;
+    _identifier = identifier;
+    _lat = lat;
+    _lon = lon;
+    _modified = modified;
+    _name = name;
+    _province = province;
+    _totalPoints = totalPoints;
+    _totalPromos = totalPromos;
+    _zipCode = zipCode;
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)decoder{
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+    _address = [decoder decodeObjectForKey:@"address"];
+    _cif = [decoder decodeObjectForKey:@"cif"];
+    _city = [decoder decodeObjectForKey:@"city"];
+    _commerceId = [decoder decodeObjectForKey:@"commerceId"];
+    _contactPhone = [decoder decodeObjectForKey:@"contactPhone"];
+    _dateCreated = [decoder decodeObjectForKey:@"dateCreated"];
+    _distance = [decoder decodeObjectForKey:@"distance"];
+    _identifier = [decoder decodeObjectForKey:@"identifier"];
+    _lat = [decoder decodeObjectForKey:@"lat"];
+    _lon = [decoder decodeObjectForKey:@"lon"];
+    _modified = [decoder decodeObjectForKey:@"modified"];
+    _name = [decoder decodeObjectForKey:@"name"];
+    _province = [decoder decodeObjectForKey:@"province"];
+    _totalPoints = [decoder decodeObjectForKey:@"totalPoints"];
+    _totalPromos = [decoder decodeObjectForKey:@"totalPromos"];
+    _zipCode = [decoder decodeObjectForKey:@"zipCode"];
+    
+    return self;
+}
+-(void) encodeWithCoder:(NSCoder *)encoder{
+    [encoder encodeObject:_address forKey:@"address"];
+    [encoder encodeObject:_cif forKey:@"cif"];
+    [encoder encodeObject:_city forKey:@"city"];
+    [encoder encodeObject:_commerceId forKey:@"commerceId"];
+    [encoder encodeObject:_contactPhone forKey:@"contactPhone"];
+    [encoder encodeObject:_dateCreated forKey:@"dateCreated"];
+    [encoder encodeObject:_distance forKey:@"distance"];
+    [encoder encodeObject:_identifier forKey:@"identifier"];
+    [encoder encodeObject:_lat forKey:@"lat"];
+    [encoder encodeObject:_lon forKey:@"lon"];
+    [encoder encodeObject:_modified forKey:@"modified"];
+    [encoder encodeObject:_name forKey:@"name"];
+    [encoder encodeObject:_province forKey:@"province"];
+    [encoder encodeObject:_totalPoints forKey:@"totalPoints"];
+    [encoder encodeObject:_totalPromos forKey:@"totalPromos"];
+    [encoder encodeObject:_zipCode forKey:@"zipCode"];
+}
+
+
+@end
+
 @implementation PNPNotification
 -(id) initWithId:(NSNumber *) identifier
     creationDate:(NSDate *) created

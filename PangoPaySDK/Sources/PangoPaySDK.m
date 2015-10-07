@@ -7664,6 +7664,177 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
     
 }
 
+#pragma mark - Commerces
+
+-(void) getUserCommercesWithLatitude:(NSNumber *) latitude
+                       withLongidude:(NSNumber *) longitude
+                        withDistance:(NSNumber *) distance
+                 withSuccessCallback:(PnPSuccessHandler) successHandler
+                    andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    if(![self isUserLoggedIn ]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+    NSMutableDictionary *paramDicc = [NSMutableDictionary new];
+    [paramDicc setObject:latitude forKey:@"latitude"];
+    [paramDicc setObject:longitude forKey:@"longitude"];
+    [paramDicc setObject:distance forKey:@"distance"];
+    
+    
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"/UserCommerces/getByDistance"]
+                   usingParameters:paramDicc
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           
+                           @try {
+                               NSError *parseError;
+                               
+                               NSDictionary *responseDictionary = [NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+
+                               if([[[responseDictionary valueForKey:@"getByDistance"] valueForKey:@"success"] boolValue]){
+                                   NSDictionary *commerces = [[responseDictionary valueForKey:@"getByDistance"] valueForKey:@"data"];
+                                   NSMutableArray *commercesResponse = [NSMutableArray new];
+                                   for(NSDictionary *d in commerces){
+                                       PNPUserCommerce *uc = [[PNPUserCommerce alloc] initWithAddress:NULL_TO_NIL([d objectForKey:@"address"])
+                                                                                                  cif:NULL_TO_NIL([d objectForKey:@"cif"])
+                                                                                                 city:NULL_TO_NIL([d objectForKey:@"city"])
+                                                                                           commerceId:NULL_TO_NIL([d objectForKey:@"commerce_id"])
+                                                                                         contactPhone:NULL_TO_NIL([d objectForKey:@"contact_phone"])
+                                                                                              created:NULL_TO_NIL([d objectForKey:@"created"])
+                                                                                             distance:NULL_TO_NIL([d objectForKey:@"distance"])
+                                                                                                   id:NULL_TO_NIL([d objectForKey:@"id"])
+                                                                                                  lat:NULL_TO_NIL([d objectForKey:@"lat"])
+                                                                                                  lon:NULL_TO_NIL([d objectForKey:@"lon"])
+                                                                                             modified:NULL_TO_NIL([d objectForKey:@"modified"])
+                                                                                                 name:NULL_TO_NIL([d objectForKey:@"name"])
+                                                                                             province:NULL_TO_NIL([d objectForKey:@"province"])
+                                                                                          totalPoints:NULL_TO_NIL([d objectForKey:@"total_points"])
+                                                                                          totalPromos:NULL_TO_NIL([d objectForKey:@"total_promos"])
+                                                                                              zipCode:NULL_TO_NIL([d objectForKey:@"zip_code"])];
+                                      
+                                       
+
+                                       [commercesResponse addObject:uc];
+                                   }
+                                   if(successHandler) successHandler(commercesResponse);
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+
+                   }];
+}
+
+-(void) getCommerceByName:(NSString *) search
+      withSuccessCallback:(PnPSuccessHandler) successHandler
+         andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    if(![self isUserLoggedIn ]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"/UserCommerces/getByText"]
+                   usingParameters:@{@"search":search}
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           
+                           @try {
+                               NSError *parseError;
+                               NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                               NSDictionary *responseDictionary = [NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               NSLog(@"RESPONSE DICT: %@", [responseDictionary valueForKey:@"getByText"]);
+                               if([[[responseDictionary valueForKey:@"getByText"] valueForKey:@"success"] boolValue]){
+                                   NSDictionary *commerces = [[responseDictionary valueForKey:@"getByText"] valueForKey:@"data"];
+                                   NSMutableArray *commercesResponse = [NSMutableArray new];
+                                   NSLog(@"COMMERCES DICT: %@", commerces);
+                                   NSLog(@"SEARCH NAME: %@", search);
+                                   for(NSDictionary *d in commerces){
+                                       NSLog(@"NAME: %@",[d objectForKey:@"name"]);
+                                       NSString *commerceName =NULL_TO_NIL([d objectForKey:@"name"]);
+                                       NSLog(@"COMMERCE NAME NULL TO NIL: %@", commerceName);
+                                           PNPUserCommerce *uc = [[PNPUserCommerce alloc] initWithAddress:NULL_TO_NIL([d objectForKey:@"address"])
+                                                                                                      cif:NULL_TO_NIL([d objectForKey:@"cif"])
+                                                                                                     city:NULL_TO_NIL([d objectForKey:@"city"])
+                                                                                               commerceId:NULL_TO_NIL([d objectForKey:@"commerce_id"])
+                                                                                             contactPhone:NULL_TO_NIL([d objectForKey:@"contact_phone"])
+                                                                                                  created:NULL_TO_NIL([d objectForKey:@"created"])
+                                                                                                 distance:NULL_TO_NIL([d objectForKey:@"distance"])
+                                                                                                       id:NULL_TO_NIL([d objectForKey:@"id"])
+                                                                                                      lat:NULL_TO_NIL([d objectForKey:@"lat"])
+                                                                                                      lon:NULL_TO_NIL([d objectForKey:@"lon"])
+                                                                                                 modified:NULL_TO_NIL([d objectForKey:@"modified"])
+                                                                                                     name:NULL_TO_NIL([d objectForKey:@"name"])
+                                                                                                 province:NULL_TO_NIL([d objectForKey:@"province"])
+                                                                                              totalPoints:NULL_TO_NIL([d objectForKey:@"total_points"])
+                                                                                              totalPromos:NULL_TO_NIL([d objectForKey:@"total_promos"])
+                                                                                                  zipCode:NULL_TO_NIL([d objectForKey:@"zip_code"])];
+                                           [commercesResponse addObject:uc];
+                                       
+                                   }
+                                   NSLog(@"COMMERCES RESPONSE: %@ ", commercesResponse);
+                                   if(successHandler) successHandler(commercesResponse);
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+
+                   }];
+    
+}
+
+
 
 #pragma mark - Private Methods
 -(NSNumber *) clearAmount:(NSNumber *)n{
