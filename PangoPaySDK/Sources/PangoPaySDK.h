@@ -593,6 +593,18 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
       andErrorHandler:(PnPGenericErrorHandler) errorHandler;
 
 
+#pragma mark - Commerces
+
+-(void) getUserCommercesWithLatitude:(NSNumber *) latitude
+                       withLongidude:(NSNumber *) longitude
+                        withDistance:(NSNumber *) distance
+                 withSuccessCallback:(PnPSuccessHandler) successHandler
+                    andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) getCommerceByName:(NSString *) search
+      withSuccessCallback:(PnPSuccessHandler) successHandler
+         andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 @end
 
 @interface PNPEnvironment : NSObject
