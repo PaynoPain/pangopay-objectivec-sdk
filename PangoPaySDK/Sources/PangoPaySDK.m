@@ -1901,6 +1901,14 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                    NSDateFormatter *df = [[NSDateFormatter alloc] init];
                                    [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
                                    [df setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
+                                   NSMutableArray *orderLines = [[NSMutableArray alloc]init];
+                                   NSArray *ol =[[responseDictionary objectForKey:@"data"] objectForKey:@"order_lines"];
+                                   NSNumberFormatter *nf = [[NSNumberFormatter alloc]init];
+                                   
+                                   for (NSDictionary *orderLine in ol) {
+                                       PNPOrderLine *orderL = [[PNPOrderLine alloc]initWithIdentifier:[orderLine objectForKey:@"external_id"] name:[orderLine objectForKey:@"name"] amount:[self clearAmount:[orderLine objectForKey:@"amount"]] netAmount:[self clearAmount:[orderLine objectForKey:@"net_amount"]] orderId:[order objectForKey:@"id"] number:[nf numberFromString:[orderLine objectForKey:@"number"]] refunded:[[orderLine objectForKey:@"amount"] boolValue] type:[orderLine objectForKey:@"type"] externalId:[orderLine objectForKey:@"external_id"]];
+                                       [orderLines addObject:orderL];
+                                   }
                                    PNPOrder *o = [[PNPOrder alloc] initWithIdentifier:[order objectForKey:@"id"]
                                                                             reference:[order objectForKey:@"reference"]
                                                                               concept:[order objectForKey:@"concept"]
@@ -1910,7 +1918,8 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                                             netAmount:[self clearAmount:[order objectForKey:@"net_amount"]]
                                                                     loyaltyPercentage:[self clearAmount:[order objectForKey:@"loyalty_percentage"]]
                                                                 loyaltyDiscountAmount:[self clearAmount:[order objectForKey:@"loyalty_discount_amount"]]
-                                                                             currency:[[order objectForKey:@"currency"] objectForKey:@"symbol"]];
+                                                                             currency:[[order objectForKey:@"currency"] objectForKey:@"symbol"]
+                                                                           orderLines:[NSArray arrayWithArray:orderLines]];
                                    if(successHandler) successHandler(o);
                                    
 

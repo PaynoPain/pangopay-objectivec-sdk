@@ -512,6 +512,7 @@
 @property (strong,nonatomic) NSString *currency;
 @property (strong,nonatomic) NSDate *created;
 @property (strong,nonatomic) NSString *commerce;
+@property (strong,nonatomic) NSArray *orderLines;
 
 -(id) initWithIdentifier:(NSNumber *) identifier
                reference:(NSString *) reference
@@ -522,7 +523,9 @@
                netAmount:(NSNumber *) netAmount
        loyaltyPercentage:(NSNumber *) loyaltyPercentage
        loyaltyDiscountAmount:(NSNumber *) loyaltyDiscountAmount
-                currency:(NSString *) currency;
+                currency:(NSString *) currency
+              orderLines:(NSArray *) orderLines;
+
 
 @end
 

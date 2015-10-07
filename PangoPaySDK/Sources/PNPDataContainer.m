@@ -1261,7 +1261,8 @@
                netAmount:(NSNumber *) netAmount
        loyaltyPercentage:(NSNumber *) loyaltyPercentage
    loyaltyDiscountAmount:(NSNumber *) loyaltyDiscountAmount
-                currency:(NSString *) currency{
+                currency:(NSString *) currency
+              orderLines:(NSArray *) orderLines{
     self = [super init];
     if(!self) return nil;
     self.identifier = identifier;
@@ -1274,13 +1275,14 @@
     self.loyaltyPercentage = loyaltyPercentage;
     self.loyaltyDiscountAmount = loyaltyDiscountAmount;
     self.currency = currency;
+    self.orderLines = orderLines;
     
     return self;
     
 }
 
 -(NSString *) description{
-    return [NSString stringWithFormat:@"\n ID: %@ \n Reference: %@ Concept: %@ \n Created: %@ \n Commerce: %@ \n Amount: %@ %@ \n ",_identifier,_reference,_concept,_created,_commerce,_amount,_currency];
+    return [NSString stringWithFormat:@"\n ID: %@ \n Reference: %@ Concept: %@ \n Created: %@ \n Commerce: %@ \n Amount: %@ %@ OrderLines: %@\n ",_identifier,_reference,_concept,_created,_commerce,_amount,_currency,_orderLines];
 }
 @end
 
