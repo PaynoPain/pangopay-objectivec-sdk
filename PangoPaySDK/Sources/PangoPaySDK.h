@@ -638,12 +638,10 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 -(void) getUserCommercesWithLatitude:(NSNumber *) latitude
                        withLongidude:(NSNumber *) longitude
                         withDistance:(NSNumber *) distance
+                            withName:(NSString *) name
+                      withIdentifier:(NSString *) identifier
                  withSuccessCallback:(PnPSuccessHandler) successHandler
                     andErrorCallback:(PnPGenericErrorHandler) errorHandler;
-
--(void) getCommerceByName:(NSString *) search
-      withSuccessCallback:(PnPSuccessHandler) successHandler
-         andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 @end
 

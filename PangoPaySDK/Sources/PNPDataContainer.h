@@ -69,7 +69,7 @@
          contactPhone: (NSNumber *) contactPhone
               created: (NSDate *) dateCreated
              distance: (NSNumber *) distance
-                   id: (NSNumber *) identifier
+           identifier: (NSNumber *) identifier
                   lat: (NSNumber *) lat
                   lon: (NSNumber *) lon
              modified: (NSDate *) modified
@@ -77,7 +77,9 @@
              province: (NSString *) province
           totalPoints: (NSNumber *) totalPoints
           totalPromos: (NSNumber *) totalPromos
-              zipCode: (NSNumber *) zipCode;
+              zipCode: (NSNumber *) zipCode
+         commerceLogo: (NSString *) commerceLogo
+   commerceBackground: (NSString *) commerceBackground;
 
 
 @property (strong,nonatomic) NSString *address;
@@ -96,6 +98,8 @@
 @property (strong,nonatomic) NSNumber *totalPoints;
 @property (strong,nonatomic) NSNumber *totalPromos;
 @property (strong,nonatomic) NSNumber *zipCode;
+@property (strong,nonatomic) NSString *commerceLogo;
+@property (strong,nonatomic) NSString *commerceBackground;
 @end
 
 

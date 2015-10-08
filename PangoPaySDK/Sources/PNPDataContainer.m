@@ -160,7 +160,7 @@
          contactPhone: (NSNumber *) contactPhone
               created: (NSDate *) dateCreated
              distance: (NSNumber *) distance
-                   id: (NSNumber *) identifier
+           identifier: (NSNumber *) identifier
                   lat: (NSNumber *) lat
                   lon: (NSNumber *) lon
              modified: (NSDate *) modified
@@ -168,7 +168,9 @@
              province: (NSString *) province
           totalPoints: (NSNumber *) totalPoints
           totalPromos: (NSNumber *) totalPromos
-              zipCode: (NSNumber *) zipCode{
+              zipCode: (NSNumber *) zipCode
+         commerceLogo:(NSString *)commerceLogo
+   commerceBackground:(NSString *)commerceBackground{
     
     self = [super init];
     if (!self) {
@@ -190,6 +192,8 @@
     _totalPoints = totalPoints;
     _totalPromos = totalPromos;
     _zipCode = zipCode;
+    _commerceBackground = commerceBackground;
+    _commerceLogo = commerceLogo;
     return self;
 }
 
@@ -214,7 +218,8 @@
     _totalPoints = [decoder decodeObjectForKey:@"totalPoints"];
     _totalPromos = [decoder decodeObjectForKey:@"totalPromos"];
     _zipCode = [decoder decodeObjectForKey:@"zipCode"];
-    
+    _commerceLogo = [decoder decodeObjectForKey:@"logo"];
+    _commerceBackground = [decoder decodeObjectForKey:@"background"];
     return self;
 }
 -(void) encodeWithCoder:(NSCoder *)encoder{
@@ -234,6 +239,8 @@
     [encoder encodeObject:_totalPoints forKey:@"totalPoints"];
     [encoder encodeObject:_totalPromos forKey:@"totalPromos"];
     [encoder encodeObject:_zipCode forKey:@"zipCode"];
+    [encoder encodeObject:_commerceBackground forKey:@"background"];
+    [encoder encodeObject:_commerceLogo forKey:@"logo"];
 }
 
 
