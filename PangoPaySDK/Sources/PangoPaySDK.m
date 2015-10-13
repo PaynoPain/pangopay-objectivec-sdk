@@ -6329,7 +6329,6 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                            NSLog(@"no se ha podido parsear la fidelity %@ por el error %@",d,exception);
                                        }
                                    
-                                   if(successHandler) successHandler(nil);
                                }else{
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
                                                                  initWithDomain:@"PNPGenericWebserviceError"
