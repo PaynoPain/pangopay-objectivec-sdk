@@ -48,6 +48,8 @@ typedef void(^PnPCouponSuccessHandler)(PNPCoupon * coupon);
 typedef void(^PnPPromoSuccessHandler)(PNPPromo * promo);
 typedef void(^PnPPromoStatisticSuccessHandler)(PNPPromotionStatistic * promo);
 typedef void(^PnPCouponPromotionSuccessHandler)(PNPCouponPromotion * promo);
+typedef void(^PnpLoyaltyDataSuccessHandler)(PNPLoyalty *loyalty);
+
 
 + (instancetype)sharedInstance;
 
@@ -510,6 +512,14 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 -(void) getLoyaltiesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                        andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) getLoyaltyWithCommerceIdentifier:(NSNumber *) identifier
+                     withSuccessCallback:(PnpLoyaltyDataSuccessHandler) successHandler
+                        andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) getLoyaltyExchangesWithIdentifier:(NSNumber*) identifier
+                      withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                         andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 -(void) subscribeToLoyalty:(PNPLoyalty *) loyalty
                     params:(NSDictionary *) params
