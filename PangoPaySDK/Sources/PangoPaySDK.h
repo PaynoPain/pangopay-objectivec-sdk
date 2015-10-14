@@ -456,6 +456,10 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                          limit:(int)limit
                                           page:(int)page;
 
+-(void) getCouponPromotionsWithCommerce:(PNPUserCommerce *)commerce
+                        withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                       andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 -(void) createPromotion:(PNPCoupon *) promo
           withLogoImage:(UIImage *) logoImage
          withPromoImage:(UIImage *) promoImage
