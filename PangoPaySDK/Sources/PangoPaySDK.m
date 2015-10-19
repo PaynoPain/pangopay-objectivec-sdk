@@ -6402,6 +6402,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                            
                                            
                                            PNPLoyalty *l = [[PNPLoyalty alloc] initWithIdentifier:[[d objectForKey:@"loyalty"] objectForKey:@"id"] userId:[[d objectForKey:@"loyalty"] objectForKey:@"user_id"] title:[[d objectForKey:@"loyalty"] objectForKey:@"title"] description:[[d objectForKey:@"loyalty"] objectForKey:@"description"] shortDescription:[[d objectForKey:@"loyalty"] objectForKey:@"description_short"] logoUrl:NULL_TO_NIL([[d objectForKey:@"loyalty"] objectForKey:@"logo"] )status:[[d objectForKey:@"loyalty"] objectForKey:@"status"] startDate:[df dateFromString:[[d objectForKey:@"loyalty"] objectForKey:@"start_date"]] endDate:[df dateFromString:[[d objectForKey:@"loyalty"] objectForKey:@"end_data"]] amount:[[d objectForKey:@"loyalty"] objectForKey:@"amount"] points:[[d objectForKey:@"loyalty"] objectForKey:@"points"] suscriptionFields:memberFields exchangableCoupons:exchangeableCoupons commerces:commerces company:company benefits:benefits registered:[[d objectForKey:@"registered"] boolValue]];
+                                           l.code = [[d objectForKey:@"loyalty_member"] objectForKey:@"code"];
                                            if(successHandler) successHandler(l);
                                        }
                                        

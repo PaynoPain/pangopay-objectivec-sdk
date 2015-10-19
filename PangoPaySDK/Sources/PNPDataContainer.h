@@ -896,6 +896,7 @@
 @property (strong,nonatomic) NSArray *commerces;
 @property (strong,nonatomic) PNPLoyaltyCompany *company;
 @property (strong,nonatomic) NSArray *benefits;
+@property (strong,nonatomic) NSString *code;
 
 
 
