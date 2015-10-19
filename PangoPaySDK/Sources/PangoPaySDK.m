@@ -8042,9 +8042,10 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                                                           totalPromos:NULL_TO_NIL([d objectForKey:@"total_promos"])
                                                                                               zipCode:NULL_TO_NIL([d objectForKey:@"zip_code"])
                                                                                          commerceLogo:NULL_TO_NIL([d objectForKey:@"logo"])
-                                                                                   commerceBackground:NULL_TO_NIL([d objectForKey:@"logoLarge"])];
+                                                                                   commerceBackground:NULL_TO_NIL([d objectForKey:@"logoLarge"])
+                                                                                           hasLoyalty:[[d objectForKey:@"has_loyalty"] boolValue]
+                                                                                     promoRegistered:[[d objectForKey:@"promo_registered"] boolValue]];
                                       
-                                       
 
                                        [commercesResponse addObject:uc];
                                    }

@@ -170,7 +170,9 @@
           totalPromos: (NSNumber *) totalPromos
               zipCode: (NSNumber *) zipCode
          commerceLogo:(NSString *)commerceLogo
-   commerceBackground:(NSString *)commerceBackground{
+   commerceBackground:(NSString *)commerceBackground
+           hasLoyalty:(BOOL)hasLoyalty
+      promoRegistered:(BOOL)promoRegistered{
     
     self = [super init];
     if (!self) {
@@ -194,6 +196,8 @@
     _zipCode = zipCode;
     _commerceBackground = commerceBackground;
     _commerceLogo = commerceLogo;
+    _hasLoyalty = hasLoyalty;
+    _promoRegistered = promoRegistered;
     return self;
 }
 

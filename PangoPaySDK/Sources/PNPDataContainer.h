@@ -79,7 +79,9 @@
           totalPromos: (NSNumber *) totalPromos
               zipCode: (NSNumber *) zipCode
          commerceLogo: (NSString *) commerceLogo
-   commerceBackground: (NSString *) commerceBackground;
+   commerceBackground: (NSString *) commerceBackground
+           hasLoyalty: (BOOL) hasLoyalty
+      promoRegistered: (BOOL) promoRegistered;
 
 
 @property (strong,nonatomic) NSString *address;
@@ -100,6 +102,8 @@
 @property (strong,nonatomic) NSNumber *zipCode;
 @property (strong,nonatomic) NSString *commerceLogo;
 @property (strong,nonatomic) NSString *commerceBackground;
+@property  BOOL hasLoyalty;
+@property  BOOL promoRegistered;
 @end
 
 
