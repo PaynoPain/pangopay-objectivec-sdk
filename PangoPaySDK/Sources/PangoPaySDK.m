@@ -6431,6 +6431,136 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
     
 }
 
+-(void) getLoyaltyParametersWithCommerceIdentifier:(NSNumber*) identifier
+                     withSuccessCallback:(PnpLoyaltyDataSuccessHandler) successHandler
+                        andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    
+    if(![self userIsLoggedIn]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    NSString *action = [NSString stringWithFormat:@"commerces/%@/loyalties_register.json",identifier];
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"coupons/user_call"]
+                   usingParameters:@{
+                                     @"action":action,
+                                     @"method": @"get",
+                                     @"fields": @"{}",
+                                     }
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"user_call"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   NSArray *data = [responseDictionary objectForKey:@"data"];
+                                   NSDictionary *d = [data objectAtIndex:0];
+                                   NSDateFormatter *df = [[NSDateFormatter alloc] init];
+                                   [df setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Madrid"]];
+                                   [df setDateFormat:@"yyyy-MM-dd"];
+                                   @try {
+                                       NSMutableArray *memberFields = [NSMutableArray new];
+                                       for (id key in [d objectForKey:@"member_fields"]) {
+                                           if([[[d objectForKey:@"member_fields"] objectForKey:key] boolValue]){
+                                               NSString *mf = key;
+                                               if([mf isEqualToString:@"gender"]){
+                                                   [memberFields addObject:[[PNPLoyaltySuscriptionFieldSelect alloc] initWithName:NSLocalizedString(@"Sexo", nil) attribute:mf options:@[NSLocalizedString(@"Hombre", nil),NSLocalizedString(@"Mujer", nil)] andOptionValues:@[@"M",@"F"] order:4]];
+                                               }else if ([mf isEqualToString:@"name"]){
+                                                   [memberFields addObject:[[PNPLoyaltySuscriptionFieldText alloc] initWithName:NSLocalizedString(@"Nombre", nil) attribute:mf order:1]];
+                                               }else if ([mf isEqualToString:@"surname"]){
+                                                   [memberFields addObject:[[PNPLoyaltySuscriptionFieldText alloc] initWithName:NSLocalizedString(@"Primer apellido", nil) attribute:mf order:2]];
+                                               }else if ([mf isEqualToString:@"surname2"]){
+                                                   [memberFields addObject:[[PNPLoyaltySuscriptionFieldText alloc] initWithName:NSLocalizedString(@"Segundo apellido", nil) attribute:mf order:3]];
+                                               }else if([mf isEqualToString:@"country"]){
+                                                   [memberFields addObject:[[PNPLoyaltySuscriptionFieldText alloc] initWithName:NSLocalizedString(@"País", nil) attribute:mf order:7]];
+                                               }
+                                               else if([mf isEqualToString:@"province"]){
+                                                   [memberFields addObject:[[PNPLoyaltySuscriptionFieldText alloc] initWithName:NSLocalizedString(@"Provincia", nil) attribute:mf order:8]];
+                                               }
+                                               else if([mf isEqualToString:@"locality"]){
+                                                   [memberFields addObject:[[PNPLoyaltySuscriptionFieldText alloc] initWithName:NSLocalizedString(@"Localidad", nil) attribute:mf order:9]];
+                                               }
+                                               else if([mf isEqualToString:@"zip_code"]){
+                                                   [memberFields addObject:[[PNPLoyaltySuscriptionFieldText alloc] initWithName:NSLocalizedString(@"Código postal", nil) attribute:mf order:10]];
+                                               }
+                                               else if([mf isEqualToString:@"birthdate"]){
+                                                   [memberFields addObject:[[PNPLoyaltySuscriptionFieldText alloc] initWithName:NSLocalizedString(@"Fecha de nacimiento", nil) attribute:mf order:5]];
+                                               }
+                                               else if([mf isEqualToString:@"dni"]){
+                                                   [memberFields addObject:[[PNPLoyaltySuscriptionFieldText alloc] initWithName:NSLocalizedString(@"DNI", nil) attribute:mf order:6]];
+                                               }
+                                           }
+                                       }
+                                       NSSortDescriptor *s = [NSSortDescriptor sortDescriptorWithKey:@"order" ascending:YES];
+                                       memberFields = [NSMutableArray arrayWithArray:[memberFields sortedArrayUsingDescriptors:@[s]]];
+                                       
+                                       NSMutableArray *exchangeableCoupons = [NSMutableArray new];
+                                       for (NSDictionary *pe in [d objectForKey:@"points_exchanges"]) {
+                                           PNPLoyaltyExchanges *p = [[PNPLoyaltyExchanges alloc] initWithIdentifier:[pe objectForKey:@"id"] loyaltyIdentifier:[pe objectForKey:@"loyalty_id"] points:[pe objectForKey:@"points"] fixedAmount:[self clearAmount:NULL_TO_NIL([pe objectForKey:@"fixed_amount"])] percentageAmount:[self clearAmount:NULL_TO_NIL([pe objectForKey:@"percentage_amount"])] gift:NULL_TO_NIL([pe objectForKey:@"gift"])];
+                                           [exchangeableCoupons addObject:p];
+                                       }
+                                       
+                                       NSMutableArray *commerces = [NSMutableArray new];
+                                       for (NSDictionary *co in [d objectForKey:@"commerces"]) {
+                                           [commerces addObject:[[PNPLoyaltyCommerce alloc] initWithIdentifier:[co objectForKey:@"id"] name:[co objectForKey:@"name"]]];
+                                       }
+                                       
+                                       
+                                       PNPLoyaltyCompany *company = [[PNPLoyaltyCompany alloc] initWithName:[[d objectForKey:@"company"] objectForKey:@"name"]];
+                                       
+                                       
+                                       NSMutableArray *benefits = [NSMutableArray new];
+                                       NSLog(@"loyalty benefits: %@",[d objectForKey:@"loyalty_benefits"]);
+                                       NSLog(@"diccionario: %@",d );
+                                       
+                                       NSDictionary *be = [d objectForKey:@"loyalty_benefits"];
+                                       [benefits addObject:[[PNPLoyaltyBenefits alloc] initWithIdentifier:NULL_TO_NIL([be objectForKey:@"id"]) percentageAmount:NULL_TO_NIL([be objectForKey:@"percentage_amount"]) startDate:[df dateFromString:NULL_TO_NIL([be objectForKey:@"start_date"])] endDate:[df dateFromString:NULL_TO_NIL([be objectForKey:@"end_date"])]]];
+                                       
+                                       
+                                       PNPLoyalty *l = [[PNPLoyalty alloc] initWithIdentifier:[[d objectForKey:@"loyalty"] objectForKey:@"id"] userId:[[d objectForKey:@"loyalty"] objectForKey:@"user_id"] title:[[d objectForKey:@"loyalty"] objectForKey:@"title"] description:[[d objectForKey:@"loyalty"] objectForKey:@"description"] shortDescription:[[d objectForKey:@"loyalty"] objectForKey:@"description_short"] logoUrl:NULL_TO_NIL([[d objectForKey:@"loyalty"] objectForKey:@"logo"] )status:[[d objectForKey:@"loyalty"] objectForKey:@"status"] startDate:[df dateFromString:[[d objectForKey:@"loyalty"] objectForKey:@"start_date"]] endDate:[df dateFromString:[[d objectForKey:@"loyalty"] objectForKey:@"end_data"]] amount:[[d objectForKey:@"loyalty"] objectForKey:@"amount"] points:[[d objectForKey:@"loyalty"] objectForKey:@"points"] suscriptionFields:memberFields exchangableCoupons:exchangeableCoupons commerces:commerces company:company benefits:benefits registered:[[d objectForKey:@"registered"] boolValue]];
+                                       l.code = [[d objectForKey:@"loyalty_member"] objectForKey:@"code"];
+                                       if(successHandler) successHandler(l);
+                                   }
+                                   
+                                   @catch (NSException *exception) {
+                                       NSLog(@"no se ha podido parsear la fidelity %@ por el error %@",d,exception);
+                                   }
+                                   
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                   }];
+    
+}
+
+
 
 
 -(void) subscribeToLoyalty:(PNPLoyalty *) loyalty

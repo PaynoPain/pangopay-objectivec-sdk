@@ -521,6 +521,10 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                      withSuccessCallback:(PnpLoyaltyDataSuccessHandler) successHandler
                         andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
+-(void) getLoyaltyParametersWithCommerceIdentifier:(NSNumber*) identifier
+                               withSuccessCallback:(PnpLoyaltyDataSuccessHandler) successHandler
+                                  andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 -(void) getLoyaltyExchangesWithIdentifier:(NSNumber*) identifier
                       withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                          andErrorCallback:(PnPGenericErrorHandler) errorHandler;
