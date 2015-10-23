@@ -661,6 +661,12 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                         withFavorite:(BOOL) favorite
                  withSuccessCallback:(PnPSuccessHandler) successHandler
                     andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+-(void) removeUserCommerceFavoriteWithIdentifier:(NSString *) identifier
+                             withSuccessCallback:(PnPSuccessHandler) successHandler
+                                andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+-(void) setUserCommerceFavoriteWithIdentifier:(NSString *) identifier
+                             withSuccessCallback:(PnPSuccessHandler) successHandler
+                             andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 @end
 

@@ -8204,6 +8204,119 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                    }];
 }
 
+-(void) setUserCommerceFavoriteWithIdentifier:(NSString *) identifier
+                          withSuccessCallback:(PnPSuccessHandler) successHandler
+                             andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    if(![self isUserLoggedIn ]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+    NSMutableDictionary *paramDicc = [NSMutableDictionary new];
+    [paramDicc setObject:identifier forKey:@"location_id"];
+    
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"/user_commerces/add_favorite"]
+                   usingParameters:paramDicc
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               
+                               NSDictionary *responseDictionary = [NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                  options:0
+                                                                                                    error:&parseError];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               
+                               if([[[responseDictionary  objectForKey:@"add_favorite"]valueForKey:@"success"] boolValue]){
+                                   if(successHandler) successHandler();
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                       
+                   }];
+}
+
+-(void) removeUserCommerceFavoriteWithIdentifier:(NSString *) identifier
+             withSuccessCallback:(PnPSuccessHandler) successHandler
+                andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    if(![self isUserLoggedIn ]){
+        NSLog(@"No user logged in.");
+        return;
+    }
+    
+    NSMutableDictionary *paramDicc = [NSMutableDictionary new];
+    [paramDicc setObject:identifier forKey:@"location_id"];
+    
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"/user_commerces/delete_favorite"]
+                   usingParameters:paramDicc
+                       withAccount:self.userAccount
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               
+                               NSDictionary *responseDictionary = [NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                  options:0
+                                                                                                    error:&parseError];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               
+                               if([[[responseDictionary  objectForKey:@"remove_favorite"]valueForKey:@"success"] boolValue]){
+                                   if(successHandler) successHandler();
+                               }else{
+                                   if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
+                                                                 initWithDomain:@"PNPGenericWebserviceError"
+                                                                 code:-6060
+                                                                 userInfo:responseDictionary]);
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc]
+                                                              initWithDomain:@"PNPMalformedJson"
+                                                              code:-2020
+                                                              userInfo:nil]);
+                           }
+                       }else{
+                           if(errorHandler)errorHandler([self handleErrors:error]);
+                       }
+                       
+                   }];
+}
 
 
 
