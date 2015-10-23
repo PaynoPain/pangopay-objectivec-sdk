@@ -8119,10 +8119,11 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
         [paramDicc setObject:distance forKey:@"distance"];
     }else if(name != nil){
         [paramDicc setObject:name forKey:@"search"];
-    }else {
+    }else if(identifier != nil){
         [paramDicc setObject:identifier forKey:@"id"];
+    }if([NSNumber numberWithBool:favorite] != nil){
+        [paramDicc setObject:[NSNumber numberWithBool:favorite] forKey:@"favorite"];
     }
-    [paramDicc setObject:[NSNumber numberWithBool:favorite] forKey:@"favorite"];
     
     
     
@@ -8177,7 +8178,6 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                                                            hasLoyalty:[[d objectForKey:@"has_loyalty"] boolValue]
                                                                                      promoRegistered:[[d objectForKey:@"promo_registered"] boolValue]
                                                                                            isFavorite:[[d objectForKey:@"favorite"] boolValue]];
-                                      
 
                                        [commercesResponse addObject:uc];
                                    }

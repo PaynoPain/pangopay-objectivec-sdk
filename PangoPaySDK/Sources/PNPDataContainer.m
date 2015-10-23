@@ -199,6 +199,7 @@
     _commerceLogo = commerceLogo;
     _hasLoyalty = hasLoyalty;
     _promoRegistered = promoRegistered;
+    _favorite = favorite;
     return self;
 }
 
