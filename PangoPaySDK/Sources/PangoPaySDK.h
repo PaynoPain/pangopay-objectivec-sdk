@@ -658,6 +658,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                         withDistance:(NSNumber *) distance
                             withName:(NSString *) name
                       withIdentifier:(NSString *) identifier
+                        withFavorite:(BOOL) favorite
                  withSuccessCallback:(PnPSuccessHandler) successHandler
                     andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 

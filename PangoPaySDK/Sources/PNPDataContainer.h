@@ -81,7 +81,8 @@
          commerceLogo: (NSString *) commerceLogo
    commerceBackground: (NSString *) commerceBackground
            hasLoyalty: (BOOL) hasLoyalty
-      promoRegistered: (BOOL) promoRegistered;
+      promoRegistered: (BOOL)promoRegistered
+           isFavorite: (BOOL) favorite;
 
 
 @property (strong,nonatomic) NSString *address;
@@ -104,6 +105,7 @@
 @property (strong,nonatomic) NSString *commerceBackground;
 @property  BOOL hasLoyalty;
 @property  BOOL promoRegistered;
+@property  BOOL favorite;
 @end
 
 

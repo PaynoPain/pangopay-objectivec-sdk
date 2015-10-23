@@ -172,7 +172,8 @@
          commerceLogo:(NSString *)commerceLogo
    commerceBackground:(NSString *)commerceBackground
            hasLoyalty:(BOOL)hasLoyalty
-      promoRegistered:(BOOL)promoRegistered{
+      promoRegistered:(BOOL)promoRegistered
+           isFavorite:(BOOL)favorite{
     
     self = [super init];
     if (!self) {

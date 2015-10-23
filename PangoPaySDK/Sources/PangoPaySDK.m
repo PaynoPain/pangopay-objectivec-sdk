@@ -8104,6 +8104,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                         withDistance:(NSNumber *) distance
                             withName:(NSString *) name
                       withIdentifier:(NSString *) identifier
+                        withFavorite:(BOOL) favorite
                  withSuccessCallback:(PnPSuccessHandler) successHandler
                     andErrorCallback:(PnPGenericErrorHandler) errorHandler{
     if(![self isUserLoggedIn ]){
@@ -8121,7 +8122,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
     }else {
         [paramDicc setObject:identifier forKey:@"id"];
     }
-    
+    [paramDicc setObject:[NSNumber numberWithBool:favorite] forKey:@"favorite"];
     
     
     
@@ -8174,7 +8175,8 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                                                                          commerceLogo:NULL_TO_NIL([d objectForKey:@"logo"])
                                                                                    commerceBackground:NULL_TO_NIL([d objectForKey:@"logoLarge"])
                                                                                            hasLoyalty:[[d objectForKey:@"has_loyalty"] boolValue]
-                                                                                     promoRegistered:[[d objectForKey:@"promo_registered"] boolValue]];
+                                                                                     promoRegistered:[[d objectForKey:@"promo_registered"] boolValue]
+                                                                                           isFavorite:[[d objectForKey:@"favorite"] boolValue]];
                                       
 
                                        [commercesResponse addObject:uc];
