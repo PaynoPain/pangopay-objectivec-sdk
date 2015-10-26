@@ -160,7 +160,7 @@
          contactPhone: (NSNumber *) contactPhone
               created: (NSDate *) dateCreated
              distance: (NSNumber *) distance
-           identifier: (NSNumber *) identifier
+           identifier: (NSString *) identifier
                   lat: (NSNumber *) lat
                   lon: (NSNumber *) lon
              modified: (NSDate *) modified
@@ -249,6 +249,34 @@
     [encoder encodeObject:_commerceLogo forKey:@"logo"];
 }
 
+
+@end
+
+@implementation PNPSector
+-(id) initWithIdentifier:(NSNumber *) identifier
+             description:(NSString *) desc{
+    self = [super init];
+    if(self){
+        self.identifier = identifier;
+        self.desc = desc;
+    }
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)decoder{
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+    _identifier = [decoder decodeObjectForKey:@"identifier"];
+    _desc = [decoder decodeObjectForKey:@"desc"];
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)encoder{
+    [encoder encodeObject:_identifier forKey:@"identifier"];
+    [encoder encodeObject:_desc forKey:@"desc"];
+}
 
 @end
 

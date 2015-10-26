@@ -65,11 +65,11 @@
 -(id) initWithAddress: (NSString *) address
                   cif: (NSString *) cif
                  city: (NSString *) city
-           commerceId: (NSNumber *) commerceId
+           commerceId: (NSString *) commerceId
          contactPhone: (NSNumber *) contactPhone
               created: (NSDate *) dateCreated
              distance: (NSNumber *) distance
-           identifier: (NSNumber *) identifier
+           identifier: (NSString *) identifier
                   lat: (NSNumber *) lat
                   lon: (NSNumber *) lon
              modified: (NSDate *) modified
@@ -88,11 +88,11 @@
 @property (strong,nonatomic) NSString *address;
 @property (strong,nonatomic) NSString *cif;
 @property (strong,nonatomic) NSString *city;
-@property (strong,nonatomic) NSNumber *commerceId;
+@property (strong,nonatomic) NSString *commerceId;
 @property (strong,nonatomic) NSNumber *contactPhone;
 @property (strong,nonatomic) NSDate *dateCreated;
 @property (strong,nonatomic) NSNumber *distance;
-@property (strong,nonatomic) NSNumber *identifier;
+@property (strong,nonatomic) NSString *identifier;
 @property (strong,nonatomic) NSNumber *lat;
 @property (strong,nonatomic) NSNumber *lon;
 @property (strong,nonatomic) NSDate *modified;
@@ -108,7 +108,15 @@
 @property  BOOL favorite;
 @end
 
+@interface PNPSector : NSObject <NSCoding>
 
+-(id) initWithIdentifier:(NSNumber *) identifier
+             description:(NSString *) desc;
+
+@property (strong,nonatomic) NSNumber *identifier;
+@property (strong,nonatomic) NSString *desc;
+
+@end
 
 #define PNPNotificationSendPayment          @"sendPayment"
 #define PNPNotificationRequestPayment       @"requestPayment"
@@ -880,7 +888,7 @@
 
 @interface PNPLoyalty : NSObject <NSCoding>
 
-@property (strong,nonatomic) NSNumber *identifier;
+@property (strong,nonatomic) NSString *identifier;
 @property (strong,nonatomic) NSNumber *userId;
 
 @property (strong,nonatomic) NSString *title;

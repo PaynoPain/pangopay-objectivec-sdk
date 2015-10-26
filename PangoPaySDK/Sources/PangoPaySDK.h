@@ -517,15 +517,15 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 -(void) getLoyaltiesWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                        andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
--(void) getLoyaltyWithCommerceIdentifier:(NSNumber *) identifier
+-(void) getLoyaltyWithCommerceIdentifier:(NSString *) identifier
                      withSuccessCallback:(PnpLoyaltyDataSuccessHandler) successHandler
                         andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
--(void) getLoyaltyParametersWithCommerceIdentifier:(NSNumber*) identifier
+-(void) getLoyaltyParametersWithCommerceIdentifier:(NSString*) identifier
                                withSuccessCallback:(PnpLoyaltyDataSuccessHandler) successHandler
                                   andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
--(void) getLoyaltyExchangesWithIdentifier:(NSNumber*) identifier
+-(void) getLoyaltyExchangesWithIdentifier:(NSString*) identifier
                       withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                          andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
@@ -667,6 +667,9 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 -(void) setUserCommerceFavoriteWithIdentifier:(NSString *) identifier
                              withSuccessCallback:(PnPSuccessHandler) successHandler
                              andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
+-(void) getSectorsForCommerceWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                                andErrorCallback:(PnPGenericErrorHandler) errorHandler;
 
 @end
 

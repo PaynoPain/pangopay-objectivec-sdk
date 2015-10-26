@@ -6220,7 +6220,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
     
 }
 
--(void) getLoyaltyExchangesWithIdentifier:(NSNumber*) identifier
+-(void) getLoyaltyExchangesWithIdentifier:(NSString*) identifier
                      withSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
                         andErrorCallback:(PnPGenericErrorHandler) errorHandler{
     
@@ -6302,7 +6302,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
 
 
 
--(void) getLoyaltyWithCommerceIdentifier:(NSNumber*) identifier
+-(void) getLoyaltyWithCommerceIdentifier:(NSString*) identifier
                      withSuccessCallback:(PnpLoyaltyDataSuccessHandler) successHandler
                        andErrorCallback:(PnPGenericErrorHandler) errorHandler{
     
@@ -8316,6 +8316,82 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                        }
                        
                    }];
+}
+
+-(void) getSectorsForCommerceWithSuccessCallback:(PnPGenericNSAarraySucceddHandler) successHandler
+                                andErrorCallback:(PnPGenericErrorHandler) errorHandler{
+    
+    NSMutableDictionary *params = [[NSMutableDictionary alloc]init];
+    
+    [params setObject:self.clientId forKey:@"client_id"];
+    [params setObject:self.clientSecret forKey:@"client_secret"];
+    
+    
+    
+    [NXOAuth2Request performMethod:@"POST"
+                        onResource:[self generateUrl:@"register/sectors"]
+                   usingParameters:params
+                       withAccount:nil
+                           timeout:PNP_REQUEST_TIMEOUT
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error){
+                       NSLog(@"%@",[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]);
+                       if(!error){
+                           @try {
+                               NSError *parseError;
+                               
+                               
+                               NSDictionary *responseDictionary = [[NSJSONSerialization JSONObjectWithData:responseData
+                                                                                                   options:0
+                                                                                                     error:&parseError]
+                                                                   objectForKey:@"sectors"];
+                               if(parseError){
+                                   if(errorHandler) errorHandler( [[PNPNotAJsonError alloc] initWithDomain:parseError.domain
+                                                                                                      code:[parseError code]
+                                                                                                  userInfo:parseError.userInfo]);
+                                   return;
+                               }
+                               if([[responseDictionary objectForKey:@"success"] boolValue]){
+                                   NSLog(@"%@",responseDictionary);
+                                   NSDictionary *d = [responseDictionary objectForKey:@"data"];
+                                   NSMutableArray *sectors = [[NSMutableArray alloc]init];
+                                   for(id key in d){
+                                       PNPSector *s = [[PNPSector alloc]initWithIdentifier:key description:[d objectForKey:key]];
+                                       [sectors addObject:s];
+                                   }
+                                   if(successHandler)  successHandler(sectors);
+                               }else{
+                                   if([[responseDictionary objectForKey:@"code"] isEqualToString:@"EC0920"]){
+                                       if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
+                                                                       initWithDomain:@"PNPGenericWebserviceError"
+                                                                       code:-6060
+                                                                       userInfo:@{@"errors":[responseDictionary objectForKey:@"data"]}]);
+                                   }else{
+                                       if(errorHandler)  errorHandler([[PNPGenericWebserviceError alloc]
+                                                                       initWithDomain:@"PNPGenericWebserviceError"
+                                                                       code:-6060
+                                                                       userInfo:@{@"errors":@[@[[responseDictionary objectForKey:@"code"],[responseDictionary objectForKey:@"message"]]] }]);
+                                   }
+                                   
+                                   
+                                   
+                                   
+                               }
+                           }
+                           @catch (NSException *exception) {
+                               NSLog(@"%s --> %@",__PRETTY_FUNCTION__,exception);
+                               if(errorHandler) errorHandler([[PNPMalformedJsonError alloc] initWithDomain:@"PNPMalformedJson"
+                                                                                                      code:-2020
+                                                                                                  userInfo:nil]);
+                               
+                           }
+                       }else{
+                           if(errorHandler) errorHandler([self handleErrors:error]);
+                           
+                       }
+                   }];
+    
+
 }
 
 
