@@ -658,9 +658,11 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                         withDistance:(NSNumber *) distance
                             withName:(NSString *) name
                       withIdentifier:(NSString *) identifier
+                        withSector:(PNPSector *) sector
                         withFavorite:(BOOL) favorite
                  withSuccessCallback:(PnPSuccessHandler) successHandler
                     andErrorCallback:(PnPGenericErrorHandler) errorHandler;
+
 -(void) removeUserCommerceFavoriteWithIdentifier:(NSString *) identifier
                              withSuccessCallback:(PnPSuccessHandler) successHandler
                                 andErrorCallback:(PnPGenericErrorHandler) errorHandler;

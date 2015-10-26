@@ -8104,6 +8104,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                         withDistance:(NSNumber *) distance
                             withName:(NSString *) name
                       withIdentifier:(NSString *) identifier
+                          withSector:(PNPSector *) sector
                         withFavorite:(BOOL) favorite
                  withSuccessCallback:(PnPSuccessHandler) successHandler
                     andErrorCallback:(PnPGenericErrorHandler) errorHandler{
@@ -8121,10 +8122,13 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
         [paramDicc setObject:name forKey:@"search"];
     }else if(identifier != nil){
         [paramDicc setObject:identifier forKey:@"id"];
-    }if([NSNumber numberWithBool:favorite] != nil){
+    }
+    if([NSNumber numberWithBool:favorite] != nil){
         [paramDicc setObject:[NSNumber numberWithBool:favorite] forKey:@"favorite"];
     }
-    
+    if(sector != nil){
+        [paramDicc setObject:sector.identifier forKey:@"sector"];
+    }
     
     
     [NXOAuth2Request performMethod:@"POST"
@@ -8295,7 +8299,7 @@ withSuccessCallback:(PnPSuccessHandler) successHandler
                                    return;
                                }
                                
-                               if([[[responseDictionary  objectForKey:@"remove_favorite"]valueForKey:@"success"] boolValue]){
+                               if([[[responseDictionary  objectForKey:@"delete_favorite"]valueForKey:@"success"] boolValue]){
                                    if(successHandler) successHandler();
                                }else{
                                    if(errorHandler)errorHandler([[PNPGenericWebserviceError alloc]
